@@ -31,6 +31,8 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	
+
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// Postgres
@@ -45,6 +47,13 @@ dependencies {
 	// Kafka
 	implementation 'org.springframework.kafka:spring-kafka'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+	// Prometheus - 모니터링 툴
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+	// 얘가 관련 신호를 보냄
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 tasks.named('test') {

@@ -16,3 +16,16 @@ client:
 kafka:
   topics:
     news-content: newtopia.news.raw
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: "when_authorized"
