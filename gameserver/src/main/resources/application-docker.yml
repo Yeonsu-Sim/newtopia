@@ -1,0 +1,47 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/newtopia
+    username: newtopia
+    password: newtopia
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  kafka:
+    bootstrap-servers: kafka:9092
+
+    properties:
+      spring.json.trusted.packages: "*"
+    listener:
+      ack-mode: record # 메시지 단위로 커밋
+
+    consumer:
+      group-id: newtopia-docker
+      auto-offset-reset: earliest # 오프셋이 없을 때 어디서부터 읽을지(earlist: 가장 예전부터)
+      enable-auto-commit: false
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+    producer:
+      acks: all # 브로커로부터 몇 개의 확인을 받아야 성공이라 판단하는가
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 3
+      properties:
+        linger.ms: 5 # Producer가 메시지를 모아서 배치로 보낼 때 최대 기다리는 시간(ms)
+        batch.size: 65536
+        compression.type: snappy # 메시지를 브로커에 보내기 전에 압축할지 말지를 정하는 옵션
+        enable.idempotence: true
