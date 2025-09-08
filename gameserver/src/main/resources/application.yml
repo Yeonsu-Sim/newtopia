@@ -15,3 +15,17 @@ spring:
         "[format_sql]": true
         "[default_batch_fetch_size]": 500
         "[highlight_sql]": true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+      base-path: /actuator    # 기본값
+  endpoint:
+    health:
+      show-details: "when_authorized"

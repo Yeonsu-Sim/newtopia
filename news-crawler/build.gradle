@@ -31,6 +31,10 @@ dependencies {
 
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'io.projectreactor.kafka:reactor-kafka:1.3.22'
+	
+	// Monitoring
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
