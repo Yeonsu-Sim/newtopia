@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: news-crawler
+
+  profiles:
+    active: local
+
+client:
+  naver:
+    id: viMeyB3tqE4cS91Pxbn6
+    secret: H2irzJ0AbN
+    base-url: https://openapi.naver.com/v1/search/news.json
+    display: 100
+    sort: date
+
+kafka:
+  topics:
+    news-content: newtopia.news.raw
