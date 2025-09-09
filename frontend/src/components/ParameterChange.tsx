@@ -4,7 +4,7 @@ import{
   ProgressFill,
   ProgressBox,
   ProgressValue,
-  ParameterIcon
+  ParameterEmoji
 } from '@/routes/game/-Game.styles'
 
 interface ParameterProps {
@@ -12,19 +12,25 @@ interface ParameterProps {
   value: number;
 }
 
-const Parameter: React.FC<ParameterProps> = ({ type, value }) => {
-  let level = 1;
-  if (value >= 75) level = 4;
-  else if (value >= 50) level = 3;
-  else if (value >= 25) level = 2;
+const ParameterChange: React.FC<ParameterProps> = ({ type, value }) => {
+  const getEmoji = (t: ParameterProps["type"]) => {
+    switch (t) {
+      case "eco":
+        return "💰";
+      case "env":
+        return "🌱";
+      case "cit":
+        return "👥";
+      case "def":
+        return "🛡️";
+      default:
+        return "❓";
+    }
+  };
 
   return (
     <ParameterWrapper>
-      <ParameterIcon
-        type={type}
-        level={level}
-        src={`src/assets/parameters/${type}_${level}.png`}
-      />
+      <ParameterEmoji>{getEmoji(type)}</ParameterEmoji>
       <ProgressBox>
         <ProgressBar>
           <ProgressFill value={value} max={100} />
@@ -35,4 +41,4 @@ const Parameter: React.FC<ParameterProps> = ({ type, value }) => {
   );
 };
 
-export default Parameter;
+export default ParameterChange;

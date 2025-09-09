@@ -66,6 +66,13 @@ export const ParameterBox = styled.div`
     padding-bottom: 8rem;
 `;
 
+export const ParameterChangeBox = styled.div`
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 2rem;
+`;
+
 export const ParameterWrapper = styled.div`
     display: flex;
     flex-direction: column;
@@ -117,6 +124,10 @@ ParameterIcon.defaultProps = {
   alt: "",
 };
 
+export const ParameterEmoji = styled.div`
+  font-size: 2rem;
+`;
+
 export const GameMessage = styled.div`
     display: flex;
     justify-content: flex-end;
@@ -140,6 +151,11 @@ export const MessageBox = styled.div`
   border: 2px solid #555;
   position: relative;
   min-width: 350px;
+  cursor: pointer;
+
+  &:hover {
+    background: #424242ff;
+  }
 `;
 
 export const MessageIcon = styled.img.attrs({
