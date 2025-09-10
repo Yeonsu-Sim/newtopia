@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-storage
+  labels:
+    app: newtopia
+    component: storage
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: 172.26.14.247
+  share: /nfs
+volumeBindingMode: Immediate
+allowVolumeExpansion: true 

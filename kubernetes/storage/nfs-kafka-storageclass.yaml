@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-kafka
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: 172.26.14.247
+  share: /nfs/kafka-data
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
