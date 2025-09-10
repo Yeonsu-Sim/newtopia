@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: newtopia-minio
+  labels:
+    name: newtopia-minio
+    environment: development

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: newtopia-db
+  labels:
+    app: newtopia-db
+    component: postgres
+spec:
+  serviceName: "postgres-service"
+  replicas: 1 # by default is 1
+  selector:
+    matchLabels:
+      app: newtopia-db # has to match .spec.template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: newtopia-db # has to match .spec.selector.matchLabels
+        component: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:alpine3.22
+        volumeMounts:
+          - name:  postgres-pv
+            mountPath: /var/lib/postgresql/data
+        ports:
+        - containerPort: 5432
+          name: postgres
+        envFrom:
+          - secretRef:
+              name: postgres-secret
+      volumes:
+      - name: postgres-pv
+        persistentVolumeClaim:
+          claimName: postgres-pvc

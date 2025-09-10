@@ -1,0 +1,1 @@
+kubectl -n newtopia-kafka apply -f "https://strimzi.io/install/latest?namespace=newtopia-kafka"

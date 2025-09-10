@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: newtopia-db
+  labels:
+    app: newtopia-db
+    component: redis
+spec:
+  serviceName: "redis-service"
+  replicas: 1 # by default is 1
+  selector:
+    matchLabels:
+      app: newtopia-db # has to match .spec.template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: newtopia-db # has to match .spec.selector.matchLabels
+        component: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        volumeMounts:
+          - name:  redis-pv
+            mountPath: /data
+        ports:
+        - containerPort: 6379
+          name: redis
+      volumes:
+      - name: redis-pv
+        persistentVolumeClaim:
+          claimName: redis-pvc
