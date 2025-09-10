@@ -5,6 +5,7 @@ import io.ssafy.p.i13c203.gameserver.domain.member.dto.request.SignupRequestDto;
 import io.ssafy.p.i13c203.gameserver.domain.member.dto.response.LoginResponseDto;
 import io.ssafy.p.i13c203.gameserver.domain.member.dto.response.SignupResponseDto;
 import io.ssafy.p.i13c203.gameserver.domain.member.service.MemberService;
+import io.ssafy.p.i13c203.gameserver.global.APIResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -23,14 +24,17 @@ public class AuthController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDto> signup(@Valid @RequestBody SignupRequestDto request) {
+    public ResponseEntity<APIResponse<SignupResponseDto, Void>> signup(@Valid @RequestBody SignupRequestDto request) {
         SignupResponseDto response = memberService.signup(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                APIResponse.success("회원가입에 성공했습니다",response)
+        );
+
     }
     
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto request, 
+    public ResponseEntity<APIResponse<LoginResponseDto, Void>> login(@Valid @RequestBody LoginRequestDto request,
                                                   HttpServletResponse response) {
         LoginResponseDto loginResponse = memberService.login(request);
         
@@ -53,11 +57,13 @@ public class AuthController {
         nicknameCookie.setHttpOnly(true);
         response.addCookie(nicknameCookie);
         
-        return ResponseEntity.ok(loginResponse);
+        return ResponseEntity.ok(
+                APIResponse.success("로그인에 성공했습니다",loginResponse)
+        );
     }
     
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response) {
+    public  ResponseEntity<APIResponse<Void, Void>> logout(HttpServletResponse response) {
         // 쿠키 삭제 (maxAge를 0으로 설정)
         Cookie memberIdCookie = new Cookie("memberId", null);
         memberIdCookie.setMaxAge(0);

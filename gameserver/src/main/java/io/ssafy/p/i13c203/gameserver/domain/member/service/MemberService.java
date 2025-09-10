@@ -6,6 +6,10 @@ import io.ssafy.p.i13c203.gameserver.domain.member.dto.response.LoginResponseDto
 import io.ssafy.p.i13c203.gameserver.domain.member.dto.response.SignupResponseDto;
 import io.ssafy.p.i13c203.gameserver.domain.member.entity.Member;
 import io.ssafy.p.i13c203.gameserver.domain.member.entity.Role;
+import io.ssafy.p.i13c203.gameserver.domain.member.exception.DuplicatedEmailException;
+import io.ssafy.p.i13c203.gameserver.domain.member.exception.DuplicatedNicknameException;
+import io.ssafy.p.i13c203.gameserver.domain.member.exception.InvalidPasswordException;
+import io.ssafy.p.i13c203.gameserver.domain.member.exception.MemberNotFoundException;
 import io.ssafy.p.i13c203.gameserver.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +29,12 @@ public class MemberService {
     public SignupResponseDto signup(SignupRequestDto request) {
         // 이메일 중복 체크
         if (memberRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new DuplicatedEmailException();
         }
         
         // 닉네임 중복 체크
         if (memberRepository.existsByNickname(request.getNickname())) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+            throw new DuplicatedNicknameException();
         }
         
         // 비밀번호 암호화
@@ -59,16 +63,16 @@ public class MemberService {
     public LoginResponseDto login(LoginRequestDto request) {
         // 이메일로 회원 조회
         Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 이메일입니다."));
         
         // 삭제된 회원 체크
         if (member.getIsDeleted()) {
-            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+            throw new MemberNotFoundException("탈퇴한 회원입니다.");
         }
         
         // 비밀번호 확인
         if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }
         
         log.info("로그인 성공: email={}, nickname={}", member.getEmail(), member.getNickname());
