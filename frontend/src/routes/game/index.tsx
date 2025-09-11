@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router'
+import { useState, useEffect } from 'react';
+import { createFileRoute } from '@tanstack/react-router';
+import { useGameStore } from "@/store/gameStore";
 import{
   MainContainer,
   GameFont,
@@ -18,6 +19,7 @@ import GuestDialog from '@/components/GuestDialog/GuestDialog';
 import ChoiceDialog from '@/components/ChoiceDialog/ChoiceDIalog';
 import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
 
+import { exampleStartResponse, exampleChoiceResponse } from '@/data/exampleResponse';
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
@@ -28,34 +30,65 @@ function RouteComponent() {
   const [choiceOpen, setChoiceOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
+  const { currentStats, currentTurn, countryName, playerName, setGameStart, setStats, setTurn } = useGameStore();
+  const [currentArticle, setCurrentArticle] = useState<any>(null);
+  const [currentCard, setCurrentCard] = useState<any>(null);
+
+  useEffect(() => {
+    const startTurn = exampleStartResponse.data.game.turn;
+    setGameStart(
+      exampleStartResponse.data.game.gameId, 
+      startTurn.countryStats, 
+      exampleStartResponse.data.game.countryName, 
+      "방준엽", 
+      startTurn.number
+    );
+    setCurrentCard(startTurn.card);
+    setCurrentArticle(startTurn.card.relatedArticle);
+  }, []);
+
+  const handleChoice = (choice: string) => {
+    const nextTurn = exampleChoiceResponse.data.nextTurn;
+
+    setCurrentCard(nextTurn.card);
+    setCurrentArticle(nextTurn.card.relatedArticle);
+    setStats(nextTurn.countryStats);
+    setTurn(nextTurn.number);
+
+    setGuestOpen(false);
+    setChoiceOpen(false);
+    setFeedbackOpen(true);
+  };
+
   return (
     <MainContainer>
       <GameFont />
-      
+
       <GameHeader>
         <InfoBox>
-          <InfoText>광주5반 국가</InfoText>
-          <InfoText>방준엽 플레이어</InfoText>
+          <InfoText>{countryName}</InfoText>
+          <InfoText>{playerName} 플레이어</InfoText>
         </InfoBox>
         <TurnBox>
-          <TurnText>15턴</TurnText>
+          <TurnText>{currentTurn}턴</TurnText>
         </TurnBox>
       </GameHeader>
 
       <ParameterBox>
-        <Parameter type="eco" value={70} />
-        <Parameter type="env" value={40} />
-        <Parameter type="cit" value={10} />
-        <Parameter type="def" value={90} />
+        <Parameter type="eco" value={currentStats.eco} />
+        <Parameter type="env" value={currentStats.env} />
+        <Parameter type="cit" value={currentStats.opi} />
+        <Parameter type="def" value={currentStats.mil} />
       </ParameterBox>
 
       <GameMessage onClick={() => setGuestOpen(true)}>
         <Message text="새로운 손님이 도착했습니다!" />
       </GameMessage>
-      {guestOpen && (
+
+      {guestOpen && currentCard && (
         <GuestDialog
-          guestName="싸피교육생 문영호"
-          guestText="밥줘."
+          guestName={currentCard.npc.name}
+          guestText={currentCard.content}
           open
           onClose={() => setGuestOpen(false)}
           onSelect={() => {
@@ -65,25 +98,24 @@ function RouteComponent() {
         />
       )}
 
-      {choiceOpen && (
+      {choiceOpen && currentCard && (
         <ChoiceDialog
-          guestText="밥줘."
+          guestText={currentCard.content}
+          choices={currentCard.choices}
+          currentStats={currentStats}
           open
           onBack={() => {
             setChoiceOpen(false);
             setGuestOpen(true);
           }}
-          onSelect={() => {
-            setChoiceOpen(false);
-            setGuestOpen(false);
-            setFeedbackOpen(true);
-          }}
+          onSelect={handleChoice}
         />
       )}
 
       {feedbackOpen && (
         <FeedbackDialog
           open
+          article={currentArticle}
           onClose={() => setFeedbackOpen(false)}
         />
       )}
