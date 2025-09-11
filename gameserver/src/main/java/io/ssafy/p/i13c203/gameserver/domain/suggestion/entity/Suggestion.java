@@ -3,6 +3,10 @@ package io.ssafy.p.i13c203.gameserver.domain.suggestion.entity;
 
 import io.ssafy.p.i13c203.gameserver.domain.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,9 +14,13 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "suggestions")
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Suggestion {
 
-    @Id
+    @Id @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -29,9 +37,6 @@ public class Suggestion {
     @Column(name = "suggestion_category")
     private SuggestionCategory category;
 
-    @Column(name = "image_key")
-    private String imageKey;
-
     @Column(nullable = false)
     private String text;
 
@@ -42,7 +47,5 @@ public class Suggestion {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-
 
 }

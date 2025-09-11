@@ -9,16 +9,19 @@ import lombok.ToString;
 @Getter
 @ToString
 public class SuggestionCreateRequest {
+
+    @NotNull
+    private Long memberId;
+
     @NotBlank(message = "title이 null 일 수 없습니다.")
     private String title;
-
-    @NotBlank(message = "content가 null일 수 없습니다.")
-    private String content;
 
     @NotBlank(message = "text가 null일 수 없습니다.")
     private String text;
 
     @NotNull
     private SuggestionCategory suggestionCategory;
+
+    private int[] imageIds;
 
 }

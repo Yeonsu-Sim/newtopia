@@ -48,3 +48,10 @@ spring:
 
   listener:
     ack-mode: record
+
+# minio 쪽으로 바꿔야 함
+#app:
+#  storage:
+#    local:
+#      base_dir : /var/app/uploads
+#      public-base-url: http://localhost:8080/files

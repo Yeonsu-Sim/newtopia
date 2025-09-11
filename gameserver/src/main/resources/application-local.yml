@@ -45,3 +45,10 @@ spring:
         batch.size: 65536
         compression.type: snappy # 메시지를 브로커에 보내기 전에 압축할지 말지를 정하는 옵션
         enable.idempotence: true
+
+# local 에 저장하다가 가야되니까 그냥 이걸 application에 올려두자
+#app:
+#  storage:
+#    local:
+#      base_dir : /var/app/uploads
+#      public-base-url: http://localhost:8080/files
