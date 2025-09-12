@@ -24,7 +24,10 @@ public enum ErrorCode {
     REDIS_ERROR("REDIS_ERROR", "캐시 처리 중 오류가 발생했습니다."),
 
     AUTH_REQUIRED("AUTH_REQUIRED", "인증이 필요합니다."),
-    INVALID_MEMBER_ID_COOKIE("INVALID_MEMBER_ID_COOKIE", "유효하지 않은 회원 ID 쿠키 입니다.");
+    INVALID_MEMBER_ID_COOKIE("INVALID_MEMBER_ID_COOKIE", "유효하지 않은 회원 ID 쿠키 입니다."),
+
+    // ===== 엔딩 도메인 =====
+    NOT_FOUND("NOT_FOUND", "해당하는 자원을 찾을 수 없습니다.");
 
 
     private final String code;

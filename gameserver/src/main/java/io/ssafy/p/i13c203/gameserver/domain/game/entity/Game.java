@@ -1,6 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.game.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.CardDoc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.ChoiceWeights;
@@ -13,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -39,6 +41,9 @@ public class Game {
 
     @Column(nullable = false)
     private Long memberId;
+
+    @Column(nullable = true)
+    private String endingCode;
 
     @Column(nullable = false, length = 64)
     private String countryName;
@@ -68,6 +73,9 @@ public class Game {
     @Column(nullable = false)
     private boolean active;
 
+    @Column
+    private Instant endedAt;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -75,4 +83,10 @@ public class Game {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public void markEnded(EndingDoc ending) {
+        this.endingCode = ending.code();
+        this.endedAt = Instant.now();
+        this.active = false;
+    }
 }

@@ -40,8 +40,7 @@ public class Scenario {
     @Column(nullable = false, length = 128)
     private String title;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     // NPC는 FK로 관리
