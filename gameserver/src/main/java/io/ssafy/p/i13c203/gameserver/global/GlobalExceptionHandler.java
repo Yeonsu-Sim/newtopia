@@ -1,9 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.global;
 
-import io.ssafy.p.i13c203.gameserver.domain.member.exception.DuplicatedEmailException;
-import io.ssafy.p.i13c203.gameserver.domain.member.exception.DuplicatedNicknameException;
 import io.ssafy.p.i13c203.gameserver.domain.member.exception.InvalidPasswordException;
-import io.ssafy.p.i13c203.gameserver.domain.member.exception.MemberNotFoundException;
+import io.ssafy.p.i13c203.gameserver.global.exception.BusinessException;
 import io.ssafy.p.i13c203.gameserver.global.exception.DuplicatedException;
 import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
 import io.ssafy.p.i13c203.gameserver.global.exception.NotFoundException;
@@ -42,5 +40,10 @@ public class GlobalExceptionHandler {
                 .body(APIResponse.fail(e.getErrorCode().code(), e.getMessage()));
     }
 
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<APIResponse<?,?>> handleBusinessException(BusinessException e){
+        return ResponseEntity.badRequest()
+                .body(APIResponse.fail(e.getErrorCode().code(), e.getMessage()));
+    }
 
 }
