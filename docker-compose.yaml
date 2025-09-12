@@ -74,16 +74,122 @@ services:
     depends_on:
       - kafka
 
-  # namenode:
-  #   image: apache/hadoop:latest
-  #   container_name: namenode
-  #   restart: unless-stopped
-  #   ports:
-  #     - "9870:9870"
-  #   volumes:
-  #     - hadoop_namenode:/hadoop/dfs/name
+  spark:
+    build:
+      context: ./data-pipeline
+      dockerfile: Dockerfile
+    image: spark-rawtoclean:latest
+    container_name: spark
+    restart: unless-stopped
+    ports:
+      - "4040:4040"
+    depends_on:
+      - kafka
+      - minio
+      - minio-mc
+    environment:
+      KAFKA_BOOTSTRAP: kafka:9092
+      SRC_TOPIC: newtopia.news.raw
+      DST_TOPIC: newtopia.news.clean
+      CHECKPOINT_DIR: s3a://newtopia/ckpt/raw_to_clean
+      INDEX_BASE: s3a://newtopia/index/simhash
+      INDEX_TTL_DAYS: 7   
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: minio
+      S3_SECRET_KEY: minio123
+      HAMMING_THRESH: 4
+      BANDS: 8
+      BBITS: 8
+    volumes:
+      - spark_ivy_cache:/tmp/.ivy2
 
-  # 모니터링을 하기 위한 promethues , grafana
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # 콘솔 UI
+    volumes:
+      - minio_data:/data
+
+  # 한 번 실행돼서 버킷 만들어주는 init 컨테이너
+  minio-mc:
+    image: minio/mc:latest
+    depends_on: [minio]
+    entrypoint: >
+      /bin/sh -c "
+      set -e
+      mc alias set localminio http://minio:9000 minio minio123 &&
+      mc mb -p localminio/newtopia &&
+      mc ilm rule add --id=expire-data-7d --prefix data/ --expire-days=7 localminio/newtopia &&
+      echo 'MinIO ILM: newtopia(data/ 7d), newtopia-ckpt(no ILM)' "
+    restart: "no"
+
+  analyzer-worker:
+    build:
+      context: ./data-pipeline/workers/analyzer-worker
+      dockerfile: Dockerfile
+    container_name: analyzer-worker
+    restart: unless-stopped
+    depends_on:
+      - kafka
+      - minio
+    gpus: all
+    user: "0:0"
+    environment:
+      # === Kafka ===
+      KAFKA_BOOTSTRAP: kafka:9092
+      SRC_TOPIC: newtopia.news.clean
+      DST_TOPIC: newtopia.news.analyzed
+      DLQ_TOPIC: newtopia.news.clean.dlq
+      GROUP_ID: newtopia.analyzer.v1
+      AUTO_OFFSET_RESET: earliest
+
+      # === MinIO ===
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: minio
+      S3_SECRET_KEY: minio123
+      S3_BUCKET: newtopia
+      S3_REGION: us-east-1
+      S3_PATH_STYLE: "true"
+      S3_SSL_ENABLED: "false"
+
+      # === 저장/필터 ===
+      S3_PREFIX_ANALYZED: news/analyzed
+      S3_PREFIX_REJECTED: news/rejected
+      S3_PREFIX_DLQ: news/dlq/topic=newtopia.news.clean
+      ACCEPTED_MAJORS: economy,defense,publicSentiment,environment
+      MIN_MAJOR_CONF: "0.30"
+      SAVE_REJECTED_TO_MINIO: "true"
+
+      # === 모델/캐시/디바이스 ===
+      PYTHONPATH: /app/src
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "1"
+      TZ: Asia/Seoul
+      USE_CUDA: "true"                    # KoBERTLoader가 CUDA 선택
+      KOBERT_CACHE_DIR: /models/kobert    # 모델 캐시 경로(볼륨)
+      HF_HOME: /opt/hf_cache              # HF 캐시 경로(볼륨)
+
+      # NVIDIA 런타임 힌트(선택)
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+
+
+    volumes:
+      - ./data-pipeline/workers/analyzer-worker/src:/app/src
+      - models_cache:/models
+      - hf_cache:/opt/hf_cache
+
+    working_dir: /app/src
+    command: ["python", "-m", "worker"]
+
+    # 모니터링을 하기 위한 promethues , grafana
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -122,5 +228,9 @@ volumes:
   redis_data:
   postgres_data:
   kafka_data:
+  minio_data:
+  spark_ivy_cache:
+  models_cache:
+  hf_cache:
   prometheus_data:
   grafana_data:
