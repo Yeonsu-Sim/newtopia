@@ -1,0 +1,26 @@
+# python junk
+**/__pycache__/
+**/*.py[cod]
+*.log
+
+# VCS & IDE
+.git
+.gitignore
+*.iml
+.vscode/
+.idea/
+
+# env
+.env
+*.env
+
+# DO NOT SEND MODEL/CACHE INTO BUILD CONTEXT
+src/ai_core/kobert_cache/
+src/**/kobert_cache/
+models/
+.cache/
+.huggingface/
+**/models--*/
+**/*.bin
+**/*.safetensors
+**/*.pt
