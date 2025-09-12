@@ -39,6 +39,8 @@ build:gameserver:
     changes:
       - "gameserver/**/*"
     when: on_success
+  - if: '$CI_COMMIT_BRANCH == "master"'
+    when: manual
   - when: never
   variables:
     GIT_STRATEGY: clone
@@ -84,6 +86,8 @@ build:frontend:
     changes:
       - "frontend/**/*"
     when: on_success
+  - if: '$CI_COMMIT_BRANCH == "master"'
+    when: manual
   - when: never
   variables:
     GIT_STRATEGY: clone
