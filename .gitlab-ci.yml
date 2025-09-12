@@ -104,4 +104,4 @@ build:frontend:
         --dockerfile Dockerfile
         --destination $FRONTEND_DOCKER_IMAGE:$CI_COMMIT_SHA
         --destination $FRONTEND_DOCKER_IMAGE:latest
-    - echo "Frontend build & push 성공 "
+        --build-arg NGINX_CONF=$NGINX_CONF
