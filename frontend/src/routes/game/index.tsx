@@ -47,7 +47,7 @@ function RouteComponent() {
     setCurrentArticle(startTurn.card.relatedArticle);
   }, []);
 
-  const handleChoice = (choice: string) => {
+  const handleChoice = (_choice: string) => {
     const nextTurn = exampleChoiceResponse.data.nextTurn;
 
     setCurrentCard(nextTurn.card);
