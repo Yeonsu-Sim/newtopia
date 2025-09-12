@@ -78,33 +78,43 @@ public class GameController {
                 request.choice()
         );
 
-        // applied.after & delta 구성
-        var after = CountryStatsDto.of(result.nextTurn().countryStats());
-        var prev = result.applied().countryStats();
-        var delta = CountryStatsDeltaDto.of(
-                after.economy() - prev.economy(),
-                after.defense() - prev.defense(),
-                after.publicSentiment() - prev.publicSentiment(),
-                after.environment() - prev.environment()
+        // after / prev / delta
+        var afterDto = CountryStatsDto.of(result.nextTurn().countryStats()); // 적용 "이후"
+        var prevDoc  = result.applied().countryStats();                      // 적용 "이전"
+        var deltaDto = CountryStatsDeltaDto.of(
+                afterDto.economy()        - prevDoc.economy(),
+                afterDto.defense()        - prevDoc.defense(),
+                afterDto.publicSentiment()- prevDoc.publicSentiment(),
+                afterDto.environment()    - prevDoc.environment()
         );
 
-        // 게임 종료 판정/엔딩은 추후 서비스 레이어에서 결정하도록 훅만 남김
+        // 다음 카드(엔딩이면 null)
+        var nextCard = result.nextTurn().card();
+        CardBriefDto nextCardDto = (nextCard == null) ? null : CardBriefDto.from(nextCard);
+        var nextCardIdForApplied = (nextCard == null) ? null : nextCard.cardId();
+
         var response = SubmitChoiceResponse.of(
                 AppliedDto.of(
-                        result.applied().turn(),
-                        result.nextTurn().card().cardId(),
-                        result.applied().choosedCode(),
-                        CountryStatsChangeDto.of(after, delta)
+                        result.applied().turn(),          // 이번에 마무리된 턴 번호
+                        nextCardIdForApplied,             // 다음 카드 id (엔딩이면 null)
+                        result.applied().choosedCode(),   // 사용자가 고른 코드
+                        CountryStatsChangeDto.of(afterDto, deltaDto)
                 ),
-                GameStateDto.of(false, null, null), // TODO: 서비스 로직 연동해 실제 종료 판단
+                // 실제 게임 종료/엔딩 정보 반영
+                GameStateDto.of(
+                        result.gameOver(),
+                        null,  // TODO: Game Result - Report 기능 구현 이후 값 지정
+                        EndingDto.from(result.ending())
+                ),
                 NextTurnDto.of(
-                        result.nextTurn().turn(),
-                        CountryStatsDto.of(result.nextTurn().countryStats()),
-                        CardBriefDto.from(result.nextTurn().card())
+                        result.nextTurn().turn(),         // 다음 턴 번호(엔딩이면 현재 턴 유지)
+                        afterDto,                         // 적용 이후 스탯
+                        nextCardDto                       // 다음 카드(엔딩이면 null)
                 )
         );
 
-        String msg = response.gameState().gameOver() ? "게임이 종료되었습니다." : "답변 선택을 완료했습니다.";
+        String msg = result.gameOver() ? "게임이 종료되었습니다." : "답변 선택을 완료했습니다.";
         return ResponseEntity.ok(APIResponse.success(msg, response));
     }
+
 }

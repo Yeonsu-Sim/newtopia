@@ -1,5 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.game.service;
 
+import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
+import io.ssafy.p.i13c203.gameserver.domain.ending.service.EndingService;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.*;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CardType;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
@@ -36,6 +38,7 @@ public class GameService {
     private final GameHistoryRepository historyRepo;
     private final NpcRepository npcRepo;
     private final ScenarioService scenarioService;
+    private final EndingService endingService;
 
     @Transactional(readOnly = true)
     public Game findByIdOrThrow(Long gameId) {
@@ -94,12 +97,11 @@ public class GameService {
     }
 
     // ========== 9.3 선택 반영 (AOP 멱등성) ==========
+    // io.ssafy.p.i13c203.gameserver.domain.game.service.GameService#submitChoice
+
     @IdempotentOperation(
             hashArgs = {"gameId","cardId","choiceCode"},
-            ttlSeconds = 600,
-            lockSeconds = 10,
-            waitMillis = 800,
-            spinIntervalMillis = 40)
+            ttlSeconds = 600, lockSeconds = 10, waitMillis = 800, spinIntervalMillis = 40)
     @Transactional
     public SubmitChoiceResult submitChoice(Long gameId, Long memberId, UUID cardId, String choiceCode) {
         Game game = findByIdOrThrow(gameId, memberId);
@@ -110,67 +112,85 @@ public class GameService {
         ChoiceDoc chosen = game.getCurrentChoices().get(choiceCode);
         if (chosen == null) throw new BusinessException(ErrorCode.INVALID_CHOICE_CODE);
 
+        // -------- (0) 적용 "이전" 스냅샷 ----------
+        CountryStatsDoc beforeStats = new CountryStatsDoc(
+                game.getCountryStats().getEconomy(),
+                game.getCountryStats().getDefense(),
+                game.getCountryStats().getPublicSentiment(),
+                game.getCountryStats().getEnvironment()
+        );
+        int finishedTurn = game.getTurn();
 
-        // 1) choice code -> effect
+        // -------- (1) effect 반영 ----------
         EffectDoc effect = chosen.effect();
+        game.setChoiceWeights(addWeights(game.getChoiceWeights(), effect.weights()));
 
-
-        // 2) effect.weights를 choiceWeights에 가산 (0~1 클램프)
-        game.setChoiceWeights( addWeights(game.getChoiceWeights(), effect.weights()) );
-
-
-        // 3) 최종 영향 점수 = effect.scores × (대분류별 중분류 가중치 합) → 반올림 → countryStats에 가산(**0~100** 클램프)
-        int dEco = (int) Math.round(effect.scores().economy() * game.getChoiceWeights().sumEconomy());
-        int dDef = (int) Math.round(effect.scores().defense() * game.getChoiceWeights().sumDefense());
+        int dEco = (int) Math.round(effect.scores().economy()         * game.getChoiceWeights().sumEconomy());
+        int dDef = (int) Math.round(effect.scores().defense()         * game.getChoiceWeights().sumDefense());
         int dOpi = (int) Math.round(effect.scores().publicSentiment() * game.getChoiceWeights().sumPublicSentiment());
-        int dEnv = (int) Math.round(effect.scores().environment() * game.getChoiceWeights().sumEnvironment());
+        int dEnv = (int) Math.round(effect.scores().environment()     * game.getChoiceWeights().sumEnvironment());
         game.getCountryStats().addDelta(dEco, dDef, dOpi, dEnv);
 
+        // 적용 "이후" 스냅샷
+        CountryStatsDoc afterStats = new CountryStatsDoc(
+                game.getCountryStats().getEconomy(),
+                game.getCountryStats().getDefense(),
+                game.getCountryStats().getPublicSentiment(),
+                game.getCountryStats().getEnvironment()
+        );
 
-        // 4) 히스토리 스냅샷 저장 (별도 테이블)
+        // -------- (2) 히스토리 저장 (after 기준 스냅샷) ----------
         HistoryEntryDoc entry = new HistoryEntryDoc(
-                game.getTurn(),
+                finishedTurn,
                 choiceCode,
-                new CountryStatsDoc(
-                        game.getCountryStats().getEconomy(),
-                        game.getCountryStats().getDefense(),
-                        game.getCountryStats().getPublicSentiment(),
-                        game.getCountryStats().getEnvironment()
-                ),
+                afterStats,
                 toWeightsDoc(game.getChoiceWeights()),
                 game.getCurrentCard(),
                 Instant.now()
         );
         historyRepo.save(GameHistory.builder()
                 .gameId(gameId)
-                .turn(game.getTurn())
+                .turn(finishedTurn)
                 .entry(entry)
                 .build());
 
+        // -------- (3) 게임 종료 판단 ----------
+        EndingDoc ending = endingService.getEndingOrNull(game);
+        game.setChoosedCode(choiceCode); // 사용자가 고른 코드 기록
 
-        // 5) 다음 카드 선정 (시나리오 서비스: 파라미터 임시로 game 전체)
-        int nextTurn = game.getTurn() + 1;
+        if (ending != null) {
+            game.markEnded(ending); // endingCode, endedAt, active=false
 
-        // 1) 다음 시나리오 고르기 (조건평가 포함)
-        // TODO: 임시 테스트 데이터 수거
+            try { gameRepo.saveAndFlush(game); }
+            catch (OptimisticLockingFailureException e) { throw new BusinessException(ErrorCode.CONCURRENCY_CONFLICT); }
+
+            // 엔딩 응답: nextCard=null, 다음 턴 증가 없음
+            return SubmitChoiceResult.ended(
+                    finishedTurn, choiceCode, beforeStats, afterStats, ending
+                                           );
+        }
+
+        // -------- (4) 다음 카드 선정 ----------
+        int nextTurn = finishedTurn + 1;
+
+        // TODO: 실제 로직 연결 전 임시 시나리오
         Scenario nextScenario = makeTestScenario();
-//        Scenario nextScenario = scenarioService.nextScenario(game, nextTurn);
-
-        // 2) 시나리오 → CardDoc
         CardDoc next = toCardDoc(nextScenario, CardType.CONSEQUENCE);
 
         game.setTurn(nextTurn);
         game.setCurrentCard(next);
         game.setCurrentChoices(next.choices());
-        game.setChoosedCode(choiceCode);
-
 
         try { gameRepo.saveAndFlush(game); }
         catch (OptimisticLockingFailureException e) { throw new BusinessException(ErrorCode.CONCURRENCY_CONFLICT); }
 
-
-        return SubmitChoiceResult.from(game, entry, next);
+        return SubmitChoiceResult.progress(
+                finishedTurn, choiceCode,
+                beforeStats,
+                nextTurn, afterStats, next
+        );
     }
+
 
     private ChoiceWeights addWeights(ChoiceWeights base, EffectWeightsDoc d) {
         ChoiceWeights delta = ChoiceWeights.builder()
@@ -259,9 +279,9 @@ public class GameService {
 
         // scores 도메인 객체(대분류 4개)
         EffectScoresDoc scoresA =
-                new EffectScoresDoc(3, 0, 1, 0); // economy, defense, publicSentiment, environment
+                new EffectScoresDoc(10, 0, 5, -3); // economy, defense, publicSentiment, environment
         EffectScoresDoc scoresB =
-                new EffectScoresDoc(1, 0, 0, 0);
+                new EffectScoresDoc(1, -5, 10, 0);
 
         // effect
         EffectDoc effectA =
