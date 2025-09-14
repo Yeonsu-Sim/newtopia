@@ -9,6 +9,16 @@ services:
     ports:
       - "18080:8080"
 
+  gameserver:
+    build:
+      context: ./gameserver
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8080:8080"
+
   postgres:
     image: postgres:latest
     restart: unless-stopped
