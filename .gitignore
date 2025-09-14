@@ -133,3 +133,8 @@ config.json
 # HuggingFace cache
 kobert_cache/
 models--*/
+
+# ========================
+# Docker / Environment specific
+# ========================
+docker-compose.override.yml
