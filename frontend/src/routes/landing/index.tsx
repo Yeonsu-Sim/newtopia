@@ -22,7 +22,7 @@ function LandingPage() {
   const navigate = useNavigate();
   const [currentState, setCurrentState] = useState<'initial' | 'menu'>('initial');
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authMode] = useState<'login' | 'signup'>('login');
   
   // 오디오 커스텀 훅 사용
   const { isBgmPlaying, playClickSound, toggleBgm } = useAudio({
