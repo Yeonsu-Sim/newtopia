@@ -42,8 +42,8 @@ const ChoiceDialog: React.FC<ChoiceDialogProps> = ({ guestText, choices, current
       <ParameterChangeBox>
         <ParameterChange type="eco" value={currentStats.eco} />
         <ParameterChange type="env" value={currentStats.env} />
-        <ParameterChange type="cit" value={currentStats.opi} />
-        <ParameterChange type="def" value={currentStats.mil} />
+        <ParameterChange type="opi" value={currentStats.opi} />
+        <ParameterChange type="mil" value={currentStats.mil} />
       </ParameterChangeBox>
         
       <DialogBox>

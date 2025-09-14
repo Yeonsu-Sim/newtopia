@@ -8,7 +8,7 @@ import{
 } from '@/routes/game/-Game.styles'
 
 interface ParameterProps {
-  type: "eco" | "env" | "cit" | "def";
+  type: "eco" | "env" | "opi" | "mil";
   value: number;
 }
 
@@ -19,9 +19,9 @@ const ParameterChange: React.FC<ParameterProps> = ({ type, value }) => {
         return "💰";
       case "env":
         return "🌱";
-      case "cit":
+      case "opi":
         return "👥";
-      case "def":
+      case "mil":
         return "🛡️";
       default:
         return "❓";
