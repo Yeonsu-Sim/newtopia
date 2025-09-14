@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate, useLocation } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router';
 import {
   Container,
   TopRightButton,
@@ -13,8 +13,9 @@ export const Route = createFileRoute('/ending/')({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { endingCode } = location.state as { endingCode: string };
+  const router = useRouter();
+  const searchParams = new URLSearchParams(router.state.location.search);
+  const endingCode = searchParams.get('endingCode');
 
   const [ending, setEnding] = useState<any>(null);
 

@@ -88,34 +88,37 @@ function RouteComponent() {
   }, [user]);
 
   const handleChoice = async (choiceCode: "A" | "B") => {
-  if (!gameId || !currentCard) return;
+    if (!gameId || !currentCard) return;
 
-  try {
-    const result = await submitChoice(gameId, currentCard.cardId, choiceCode);
+    try {
+      const result = await submitChoice(gameId, currentCard.cardId, choiceCode);
 
-    if (result.gameOver && result.ending?.code) {
-      navigate({
-        to: '/ending/',
-        state: { endingCode: result.ending.code },
-      });
-      return;
+      if (result.gameOver && result.ending?.code) {
+        navigate({
+            to: `/ending?endingCode=${result.ending.code}`,
+        });
+        return;
+      }
+
+      const nextTurn = result.nextTurn;
+      if (nextTurn) {
+        setCurrentCard(nextTurn.card);
+        setCurrentArticle(nextTurn.card.relatedArticle);
+        setStats(nextTurn.countryStats);
+        setTurn(nextTurn.number);
+
+        setGuestOpen(false);
+        setChoiceOpen(false);
+        setFeedbackOpen(true);
+      }
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    const nextTurn = result.nextTurn;
-    if (nextTurn) {
-      setCurrentCard(nextTurn.card);
-      setCurrentArticle(nextTurn.card.relatedArticle);
-      setStats(nextTurn.countryStats);
-      setTurn(nextTurn.number);
-
-      setGuestOpen(false);
-      setChoiceOpen(false);
-      setFeedbackOpen(true);
-    }
-  } catch (err) {
-    console.error(err);
-  }
-};
+  const handleChoiceWrapper = (choiceCode: string) => {
+    handleChoice(choiceCode as "A" | "B");
+  };
 
   return (
     <MainContainer>
@@ -169,7 +172,7 @@ function RouteComponent() {
             setChoiceOpen(false);
             setGuestOpen(true);
           }}
-          onSelect={handleChoice}
+          onSelect={handleChoiceWrapper} // 타입 안전하게
         />
       )}
 
