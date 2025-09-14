@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useGameStore } from "@/store/gameStore";
-import{
+import {
   MainContainer,
   GameFont,
   GameHeader,
@@ -11,7 +11,7 @@ import{
   TurnText,
   ParameterBox,
   GameMessage
-} from '@/routes/game/-Game.styles'
+} from '@/routes/game/-Game.styles';
 
 import Parameter from "@/components/Parameter";
 import Message from "@/components/Message";
@@ -19,11 +19,13 @@ import GuestDialog from '@/components/GuestDialog/GuestDialog';
 import ChoiceDialog from '@/components/ChoiceDialog/ChoiceDIalog';
 import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
 
-import { exampleStartResponse, exampleChoiceResponse } from '@/data/exampleResponse';
+import { useGame } from '@/hooks/useGame';
+import { useGamePlay } from '@/hooks/useGamePlay';
+import { useAuthStore } from '@/store/authStore';
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   const [guestOpen, setGuestOpen] = useState(false);
@@ -33,32 +35,87 @@ function RouteComponent() {
   const { currentStats, currentTurn, countryName, playerName, setGameStart, setStats, setTurn } = useGameStore();
   const [currentArticle, setCurrentArticle] = useState<any>(null);
   const [currentCard, setCurrentCard] = useState<any>(null);
+  const [gameId, setGameId] = useState<number | null>(null);
+
+  const { fetchOngoingGame, fetchGameById, createNewGame } = useGame();
+  const { submitChoice } = useGamePlay();
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const startTurn = exampleStartResponse.data.game.turn;
-    setGameStart(
-      exampleStartResponse.data.game.gameId, 
-      startTurn.countryStats, 
-      exampleStartResponse.data.game.countryName, 
-      "방준엽", 
-      startTurn.number
-    );
-    setCurrentCard(startTurn.card);
-    setCurrentArticle(startTurn.card.relatedArticle);
-  }, []);
+    if (!user) return;
+    const initGame = async () => {
+      try {
+        const ongoing = await fetchOngoingGame();
 
-  const handleChoice = (_choice: string) => {
-    const nextTurn = exampleChoiceResponse.data.nextTurn;
+        if (ongoing?.data?.game) {
+          const gameData = await fetchGameById(ongoing.data.game.gameId);
+          const startTurn = gameData.data.game.turn;
 
-    setCurrentCard(nextTurn.card);
-    setCurrentArticle(nextTurn.card.relatedArticle);
-    setStats(nextTurn.countryStats);
-    setTurn(nextTurn.number);
+          setGameId(gameData.data.game.gameId);
+          setGameStart(
+            gameData.data.game.gameId,
+            startTurn.countryStats,
+            gameData.data.game.countryName,
+            user?.nickname || "플레이어",
+            startTurn.number
+          );
 
-    setGuestOpen(false);
-    setChoiceOpen(false);
-    setFeedbackOpen(true);
-  };
+          setCurrentCard(startTurn.card);
+          setCurrentArticle(startTurn.card.relatedArticle);
+        } else {
+          const newGame = await createNewGame(countryName.trim());
+          const startTurn = newGame.data.game.turn;
+
+          setGameId(newGame.data.game.gameId);
+          setGameStart(
+            newGame.data.game.gameId,
+            startTurn.countryStats,
+            newGame.data.game.countryName,
+            user?.nickname || "플레이어",
+            startTurn.number
+          );
+
+          setCurrentCard(startTurn.card);
+          setCurrentArticle(startTurn.card.relatedArticle);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    initGame();
+  }, [user]);
+
+  const handleChoice = async (choiceCode: "A" | "B") => {
+  if (!gameId || !currentCard) return;
+
+  try {
+    const result = await submitChoice(gameId, currentCard.cardId, choiceCode);
+
+    if (result.gameOver && result.ending?.code) {
+      navigate({
+        to: '/ending/',
+        state: { endingCode: result.ending.code },
+      });
+      return;
+    }
+
+    const nextTurn = result.nextTurn;
+    if (nextTurn) {
+      setCurrentCard(nextTurn.card);
+      setCurrentArticle(nextTurn.card.relatedArticle);
+      setStats(nextTurn.countryStats);
+      setTurn(nextTurn.number);
+
+      setGuestOpen(false);
+      setChoiceOpen(false);
+      setFeedbackOpen(true);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
     <MainContainer>
@@ -70,15 +127,19 @@ function RouteComponent() {
           <InfoText>{playerName} 플레이어</InfoText>
         </InfoBox>
         <TurnBox>
-          <TurnText>{currentTurn}턴</TurnText>
+          <TurnText>{currentTurn ?? 0}턴</TurnText>
         </TurnBox>
       </GameHeader>
 
       <ParameterBox>
-        <Parameter type="eco" value={currentStats.eco} />
-        <Parameter type="env" value={currentStats.env} />
-        <Parameter type="cit" value={currentStats.opi} />
-        <Parameter type="def" value={currentStats.mil} />
+        {currentStats && (
+          <>
+            <Parameter type="eco" value={currentStats.eco} />
+            <Parameter type="env" value={currentStats.env} />
+            <Parameter type="opi" value={currentStats.opi} />
+            <Parameter type="mil" value={currentStats.mil} />
+          </>
+        )}
       </ParameterBox>
 
       <GameMessage onClick={() => setGuestOpen(true)}>
@@ -102,7 +163,7 @@ function RouteComponent() {
         <ChoiceDialog
           guestText={currentCard.content}
           choices={currentCard.choices}
-          currentStats={currentStats}
+          currentStats={currentStats!}
           open
           onBack={() => {
             setChoiceOpen(false);
@@ -120,5 +181,5 @@ function RouteComponent() {
         />
       )}
     </MainContainer>
-  )
+  );
 }

@@ -1,8 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
+import { useAuthStore } from '@/store/authStore';
 import { useAudio } from '@/hooks/useAudio';
+import { useGame } from '@/hooks/useGame';
 import { GameBackground } from '@/components/common/GameBackground';
+import { ContinueModal } from '@/components/ContinueModal/ContinueModal';
 import {
   SetupContainer,
   TitleSection,
@@ -13,8 +16,8 @@ import {
   InputInner,
   CountryNameInput,
   InstructionText,
-  BackButton
-} from './-GameSetup.styles';
+  BackButton,
+} from '@/routes/game/setup/-GameSetup.styles';
 
 export const Route = createFileRoute('/game/setup/')({
   component: GameSetupPage,
@@ -23,35 +26,80 @@ export const Route = createFileRoute('/game/setup/')({
 function GameSetupPage() {
   const navigate = useNavigate();
   const { setGameStart } = useGameStore();
-  const [countryName, setCountryName] = useState('');
+  const { user } = useAuthStore();
   const { playClickSound } = useAudio();
+  const { fetchOngoingGame, fetchGameById, createNewGame } = useGame();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [countryName, setCountryName] = useState('');
+  const [showNameInput, setShowNameInput] = useState(false);
+  const [ongoingGame, setOngoingGame] = useState<any>(null);
+
+  useEffect(() => {
+    const checkGame = async () => {
+      try {
+        const data = await fetchOngoingGame();
+        if (data?.data?.game) {
+          setOngoingGame(data.data.game);
+        } else {
+          setShowNameInput(true);
+        }
+      } catch (err) {
+        console.error(err);
+        setShowNameInput(true);
+      }
+    };
+    checkGame();
+  }, []);
+
+  const startGame = (game: any) => {
+    const turn = game.turn;
+    setGameStart(
+      game.gameId,
+      {
+        eco: turn.countryStats.eco,
+        mil: turn.countryStats.mil,
+        opi: turn.countryStats.opi,
+        env: turn.countryStats.env,
+      },
+      game.countryName,
+      user?.nickname || '플레이어',
+      turn.number
+    );
+    navigate({ to: '/game' });
+  };
+
+  const handleContinue = async () => {
+    playClickSound();
+    if (!ongoingGame) return;
+    const data = await fetchGameById(ongoingGame.gameId);
+    if (data?.data?.game) {
+      startGame(data.data.game);
+    }
+  };
+
+  const handleNewGame = () => {
+    playClickSound();
+    setOngoingGame(null);
+    setShowNameInput(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     playClickSound();
-    
+
     if (!countryName.trim()) {
       alert('나라 이름을 입력해주세요.');
       return;
     }
 
-    // 게임 상태 초기화 및 시작
-    // TODO: 실제 게임 시작 API 호출 후 실제 데이터로 교체
-    const mockGameId = `game_${Date.now()}`;
-    const initialStats = { eco: 50, mil: 50, opi: 50, env: 50 };
-    const playerName = "플레이어"; // TODO: 로그인된 사용자 닉네임으로 교체
-    const initialTurn = 1;
-
-    setGameStart(
-      mockGameId,
-      initialStats,
-      countryName.trim(),
-      playerName,
-      initialTurn
-    );
-
-    // 게임 화면으로 이동
-    navigate({ to: '/game' });
+    try {
+      const data = await createNewGame(countryName.trim());
+      if (data?.data?.game) {
+        startGame(data.data.game);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,44 +114,49 @@ function GameSetupPage() {
   return (
     <SetupContainer>
       <GameBackground variant="setup" />
-      
-      {/* 뒤로가기 버튼 */}
-      <BackButton onClick={handleBack}>
-        ← 뒤로가기
-      </BackButton>
-      
-      {/* 제목 */}
-      <TitleSection>
-        <TitleText>
-          <p>통치할 나라의 이름을 입력해주세요</p>
-        </TitleText>
-      </TitleSection>
+      <BackButton onClick={handleBack}>← 뒤로가기</BackButton>
 
-      {/* 입력 폼 */}
-      <FormSection>
-        <CountryNameForm onSubmit={handleSubmit}>
-          <InputWrapper>
-            <InputInner>
-              <CountryNameInput
-                type="text"
-                value={countryName}
-                onChange={handleInputChange}
-                placeholder="이름"
-                maxLength={20}
-                required
-              />
-            </InputInner>
-          </InputWrapper>
-          
-          {/* 숨겨진 제출 버튼 (Enter 키로 제출) */}
-          <button type="submit" style={{ display: 'none' }}>제출</button>
-        </CountryNameForm>
-      </FormSection>
+      {ongoingGame && !showNameInput && (
+        <ContinueModal
+          countryName={ongoingGame.countryName}
+          onContinue={handleContinue}
+          onNewGame={handleNewGame}
+        />
+      )}
 
-      {/* 안내 텍스트 */}
-      <InstructionText>
-        <p>Enter를 눌러 계속하기</p>
-      </InstructionText>
+      {showNameInput && (
+        <>
+          <TitleSection>
+            <TitleText>
+              <p>통치할 나라의 이름을 입력해주세요</p>
+            </TitleText>
+          </TitleSection>
+
+          <FormSection>
+            <CountryNameForm onSubmit={handleSubmit}>
+              <InputWrapper>
+                <InputInner>
+                  <CountryNameInput
+                    type="text"
+                    value={countryName}
+                    onChange={handleInputChange}
+                    placeholder="이름"
+                    maxLength={20}
+                    required
+                  />
+                </InputInner>
+              </InputWrapper>
+              <button type="submit" style={{ display: 'none' }}>
+                제출
+              </button>
+            </CountryNameForm>
+          </FormSection>
+
+          <InstructionText>
+            <p>Enter를 눌러 계속하기</p>
+          </InstructionText>
+        </>
+      )}
     </SetupContainer>
   );
 }

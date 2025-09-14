@@ -31,7 +31,7 @@ class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry reg) {
         reg.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5500")  // TODO: 임시 허용 수거
+                .allowedOrigins("http://localhost:3000")  // TODO: 임시 허용 수거
                 .allowedMethods("GET","POST","PUT","DELETE","OPTIONS","HEAD")
                 .allowCredentials(true)
                 .allowedHeaders("*");
