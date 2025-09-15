@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gameserver
+  namespace: newtopia-app
+  labels:
+    app: gameserver
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gameserver
+  template:
+    metadata:
+      labels:
+        app: gameserver
+    spec:
+      containers:
+      - name: gameserver
+        image: dudgh614/gameserver-app:CI_COMMIT_SHA
+        ports:
+        - containerPort: 8080
+          name: http
+        envFrom:
+          - secretRef:
+              name: gameserver-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gameserver-service
+  namespace: newtopia-app
+  labels:
+    app: gameserver
+spec:
+  type: NodePort
+  selector:
+    app: gameserver
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30080
+    name: http

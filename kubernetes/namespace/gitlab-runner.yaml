@@ -1,29 +1,41 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+apiVersion: v1
+kind: Namespace
 metadata:
-  namespace: gitlab-runner
-  name: gitlab-runner-gitlab-runner-role
-rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get", "list", "create", "update", "patch", "delete"]
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list", "create", "delete"]
-- apiGroups: [""]
-  resources: ["pods/log"]
-  verbs: ["get", "list", "watch"]
+  name:  gitlab-runner
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRole
 metadata:
-  name: gitlab-runner-gitlab-runner-binding
-  namespace: gitlab-runner
+  name: gitlab-runner-role
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "create", "update", "patch"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "create", "update", "patch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list"]
+- apiGroups: ["apps"]
+  resources: ["deployments/status"]
+  verbs: ["get", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab-runner-role-binding
 subjects:
 - kind: ServiceAccount
   name: gitlab-runner
   namespace: gitlab-runner
 roleRef:
-  kind: Role
-  name: gitlab-runner-gitlab-runner-role
+  kind: ClusterRole
+  name: gitlab-runner-role
   apiGroup: rbac.authorization.k8s.io

@@ -56,11 +56,26 @@ spec:
     port: 9000
     targetPort: 9000
     protocol: TCP
-  - name: console
-    port: 9001
-    targetPort: 9001
-    protocol: TCP
   selector:
     app: newtopia-minio
     component: minio
   type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-service
+  namespace: newtopia-minio
+  labels:
+    app: newtopia-minio
+    component: minio
+spec:
+  ports:
+  - name: console
+    port: 9001
+    nodePort: 30901
+    protocol: TCP
+  selector:
+    app: newtopia-minio
+    component: minio
+  type: NodePort
