@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useAudio } from '@/hooks/useAudio';
 import { GameBackground } from '@/components/common/GameBackground';
 import { MenuButton } from '@/components/common/MenuButton';
+import { HotTopic } from '@/components/common/HotTopic';
 import {
   MainContainer,
   WelcomeSection,
@@ -85,18 +86,21 @@ function MainPage() {
       
       {/* 메뉴 버튼들 */}
       <MenuContainer>
-        <MenuButton onClick={handleStartGame} variant="main">
+        <MenuButton onClick={handleStartGame} variant="landing">
           게임하기
         </MenuButton>
 
-        <MenuButton onClick={handleMyInfo} variant="main">
+        <MenuButton onClick={handleMyInfo} variant="landing">
           내정보
         </MenuButton>
 
-        <MenuButton onClick={handleSuggestion} variant="main">
+        <MenuButton onClick={handleSuggestion} variant="landing">
           건의하기
         </MenuButton>
       </MenuContainer>
+
+      {/* 이달의 핫토픽 뉴스 */}
+      <HotTopic />
     </MainContainer>
   );
 }
