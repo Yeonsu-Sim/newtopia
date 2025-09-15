@@ -8,17 +8,30 @@ import {
   Comment
 } from '@/components/FeedbackDialog/FeedbackDialog.styles'
 
+interface Article {
+  title: string;
+  url: string;
+};
+
 interface FeedbackDialogProps {
   open: boolean;
+  article: Article;
   onClose: () => void;
 }
 
-const FeedbackDialog: React.FC<FeedbackDialogProps> = ({ onClose }) => {
+const FeedbackDialog: React.FC<FeedbackDialogProps> = ({ article, onClose }) => {
   return (
     <DialogOverlay>
       <DialogBox>
         <h2>뉴스 속보</h2>
-        <p>선택에 따른 뉴스 내용입니다.</p>
+        <p>선택과 관련된 뉴스입니다.</p>
+        <div>
+          <strong>제목:</strong> {article.title}<br />
+          <strong>링크:</strong>{" "}
+          <a href={article.url} target="_blank" rel="noopener noreferrer">
+            {article.url}
+          </a>
+        </div>
         <CloseButton onClick={onClose}>확인</CloseButton>
       </DialogBox>
       <CommentBox>

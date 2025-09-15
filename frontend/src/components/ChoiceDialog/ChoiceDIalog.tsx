@@ -15,28 +15,42 @@ import {
 
 import ParameterChange from '@/components/ParameterChange';
 
-interface ChoiceDialogProps {
-  guestText: string;
-  open: boolean;
-  onBack: () => void;
-  onSelect: () => void;
+interface ChoiceOption {
+  code: string;
+  label: string;
 }
 
-const ChoiceDialog: React.FC<ChoiceDialogProps> = ({ guestText, onBack, onSelect }) => {
+interface CountryStats {
+  eco: number;
+  mil: number;
+  opi: number;
+  env: number;
+}
+
+interface ChoiceDialogProps {
+  guestText: string;
+  choices: ChoiceOption[];
+  currentStats: CountryStats;
+  open: boolean;
+  onBack: () => void;
+  onSelect: (choiceCode: string) => void;
+}
+
+const ChoiceDialog: React.FC<ChoiceDialogProps> = ({ guestText, choices, currentStats, onBack, onSelect }) => {
   return (
     <DialogOverlay>
       <ParameterChangeBox>
-        <ParameterChange type="eco" value={70} />
-        <ParameterChange type="env" value={70} />
-        <ParameterChange type="cit" value={70} />
-        <ParameterChange type="def" value={70} />
+        <ParameterChange type="eco" value={currentStats.eco} />
+        <ParameterChange type="env" value={currentStats.env} />
+        <ParameterChange type="opi" value={currentStats.opi} />
+        <ParameterChange type="mil" value={currentStats.mil} />
       </ParameterChangeBox>
         
       <DialogBox>
         <h2>{guestText}</h2>
         <ChoiceCards>
-          <CardA onClick={onSelect}>선택지 1</CardA>
-          <CardB onClick={onSelect}>선택지 2</CardB>
+          {choices[0] && <CardA onClick={() => onSelect(choices[0].code)}>{choices[0].label}</CardA>}
+          {choices[1] && <CardB onClick={() => onSelect(choices[1].code)}>{choices[1].label}</CardB>}
         </ChoiceCards>
         <CloseButton onClick={onBack}>뒤로가기</CloseButton>
       </DialogBox>

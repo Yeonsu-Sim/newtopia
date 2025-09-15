@@ -1,10 +1,11 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanstackDevtools } from '@tanstack/react-devtools'
+// import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+// import { TanstackDevtools } from '@tanstack/react-devtools'
+import { useEffect } from 'react'
 
-import Header from '../components/Header'
+import { useAuthStore } from '../store/authStore'
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+// import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -12,12 +13,19 @@ interface MyRouterContext {
   queryClient: QueryClient
 }
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: () => (
+function RootComponent() {
+  const { initializeAuth } = useAuthStore();
+
+  // 앱 시작시 쿠키에서 인증 정보 복원
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+  return (
     <>
-      <Header />
+      {/* <Header /> */}
       <Outlet />
-      <TanstackDevtools
+      {/* <TanstackDevtools
         config={{
           position: 'bottom-left',
         }}
@@ -28,7 +36,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           },
           TanStackQueryDevtools,
         ]}
-      />
+      /> */}
     </>
-  ),
+  );
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+  component: RootComponent,
 })

@@ -57,6 +57,16 @@ dependencies {
 	// 얘가 관련 신호를 보냄
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+
+	// Hibernate Utils - json 타입의 객체 매핑
+	implementation "io.hypersistence:hypersistence-utils-hibernate-63:3.11.0"
+
+	// UUID v7 - 시계열 기반 랜덤 ID 생성 (인덱싱 성능 향상)
+	implementation "com.github.f4b6a3:uuid-creator:5.3.6"
+
+	// AOP - Idempotency-Key 처리
+	implementation "org.springframework.boot:spring-boot-starter-aop"
+
 }
 
 tasks.named('test') {

@@ -98,3 +98,43 @@ out/
 # ========================
 .tanstack
 routeTree.gen.ts
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+
+
+# ========================
+# ML / HuggingFace / KoBERT artifacts
+# ========================
+# 모델 가중치 / 토크나이저 파일
+*.safetensors
+*.bin
+*.pt
+*.onnx
+*.h5
+*.ckpt
+tokenizer.json
+tokenizer_config.json
+special_tokens_map.json
+added_tokens.json
+vocab.txt
+merges.txt
+config.json
+
+# HuggingFace cache
+kobert_cache/
+models--*/
+
+# ========================
+# Docker / Environment specific
+# ========================
+docker-compose.override.yml

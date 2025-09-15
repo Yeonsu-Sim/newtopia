@@ -8,7 +8,7 @@ import{
 } from '@/routes/game/-Game.styles'
 
 interface ParameterProps {
-  type: "eco" | "env" | "cit" | "def";
+  type: "eco" | "env" | "opi" | "mil";
   value: number;
 }
 
