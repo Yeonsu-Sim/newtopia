@@ -77,6 +77,7 @@ dependencies {
 	// Minio - Object Storage
 	implementation 'io.minio:minio:8.5.14'
 
+
 }
 
 tasks.named('test') {
