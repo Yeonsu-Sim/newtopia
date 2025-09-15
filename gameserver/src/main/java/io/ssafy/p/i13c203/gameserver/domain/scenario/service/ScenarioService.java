@@ -1,10 +1,6 @@
 package io.ssafy.p.i13c203.gameserver.domain.scenario.service;
 
-import io.ssafy.p.i13c203.gameserver.domain.game.doc.CardDoc;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.NpcRefDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Npc;
-import io.ssafy.p.i13c203.gameserver.domain.game.model.CardType;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.repository.ScenarioRepository;
 import io.ssafy.p.i13c203.gameserver.global.exception.BusinessException;

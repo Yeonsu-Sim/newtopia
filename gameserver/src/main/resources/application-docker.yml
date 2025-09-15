@@ -46,5 +46,6 @@ spring:
         compression.type: snappy # 메시지를 브로커에 보내기 전에 압축할지 말지를 정하는 옵션
         enable.idempotence: true
 
-
-
+logging:
+  level:
+    '[io.ssafy.p.i13c203.gameserver]': trace

@@ -1,87 +1,61 @@
 package io.ssafy.p.i13c203.gameserver.domain.member.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import io.ssafy.p.i13c203.gameserver.domain.member.dto.request.LoginRequestDto;
 import io.ssafy.p.i13c203.gameserver.domain.member.dto.request.SignupRequestDto;
 import io.ssafy.p.i13c203.gameserver.domain.member.dto.response.LoginResponseDto;
 import io.ssafy.p.i13c203.gameserver.domain.member.dto.response.SignupResponseDto;
-import io.ssafy.p.i13c203.gameserver.domain.member.service.MemberService;
 import io.ssafy.p.i13c203.gameserver.global.APIResponse;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequiredArgsConstructor
-@Slf4j
-@RequestMapping("/api/v1/auth")
-public class AuthController {
+@Tag(name = "인증 API", description = "회원 인증 관련 API (실제 처리는 Spring Security Filter에서 수행)")
+public interface AuthController {
 
-    private final MemberService memberService;
-
+    @Operation(summary = "회원가입", description = "새로운 회원을 등록합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "회원가입 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일 또는 닉네임")
+    })
     @PostMapping("/signup")
-    public ResponseEntity<APIResponse<SignupResponseDto, Void>> signup(@Valid @RequestBody SignupRequestDto request) {
-        SignupResponseDto response = memberService.signup(request);
+    ResponseEntity<APIResponse<SignupResponseDto, Void>> signup(
+            @Parameter(description = "회원가입 요청 정보")
+            @RequestBody @Valid SignupRequestDto request
+    );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                APIResponse.success("회원가입에 성공했습니다",response)
-        );
-
-    }
-    
+    @Operation(
+        summary = "로그인",
+        description = "이메일과 비밀번호로 로그인합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "로그인 성공 - JWT 토큰이 쿠키로 설정됩니다"),
+        @ApiResponse(responseCode = "401", description = "인증 실패 - 이메일 또는 비밀번호 불일치")
+    })
     @PostMapping("/login")
-    public ResponseEntity<APIResponse<LoginResponseDto, Void>> login(@Valid @RequestBody LoginRequestDto request,
-                                                  HttpServletResponse response) {
-        LoginResponseDto loginResponse = memberService.login(request);
-        
-        // 쿠키에 회원 정보 저장
-        Cookie memberIdCookie = new Cookie("memberId", String.valueOf(loginResponse.getId()));
-        memberIdCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
-        memberIdCookie.setPath("/");
-        memberIdCookie.setHttpOnly(true);
-        response.addCookie(memberIdCookie);
-        
-        Cookie emailCookie = new Cookie("email", loginResponse.getEmail());
-        emailCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
-        emailCookie.setPath("/");
-        emailCookie.setHttpOnly(true);
-        response.addCookie(emailCookie);
-        
-        Cookie nicknameCookie = new Cookie("nickname", loginResponse.getNickname());
-        nicknameCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
-        nicknameCookie.setPath("/");
-        nicknameCookie.setHttpOnly(true);
-        response.addCookie(nicknameCookie);
-        
-        return ResponseEntity.ok(
-                APIResponse.success("로그인에 성공했습니다",loginResponse)
-        );
+    default ResponseEntity<APIResponse<LoginResponseDto, Void>> login(
+            @Parameter(description = "로그인 요청 정보")
+            @RequestBody @Valid LoginRequestDto request
+    ){
+        throw new UnsupportedOperationException("This method is for documentation only. Actual login is handled by Spring Security.");
     }
-    
+
+    @Operation(
+        summary = "로그아웃",
+        description = "현재 세션을 종료하고 JWT 쿠키를 삭제합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "로그아웃 성공 - 모든 인증 쿠키가 삭제됩니다")
+    })
     @PostMapping("/logout")
-    public  ResponseEntity<APIResponse<Void, Void>> logout(HttpServletResponse response) {
-        // 쿠키 삭제 (maxAge를 0으로 설정)
-        Cookie memberIdCookie = new Cookie("memberId", null);
-        memberIdCookie.setMaxAge(0);
-        memberIdCookie.setPath("/");
-        response.addCookie(memberIdCookie);
-        
-        Cookie emailCookie = new Cookie("email", null);
-        emailCookie.setMaxAge(0);
-        emailCookie.setPath("/");
-        response.addCookie(emailCookie);
-        
-        Cookie nicknameCookie = new Cookie("nickname", null);
-        nicknameCookie.setMaxAge(0);
-        nicknameCookie.setPath("/");
-        response.addCookie(nicknameCookie);
-        
-        log.info("로그아웃 완료");
-        
-        return ResponseEntity.ok().build();
+    default ResponseEntity<APIResponse<Void, Void>> logout(){
+        throw new UnsupportedOperationException("This method is for documentation only. Actual logout is handled by Spring Security.");
     }
 }

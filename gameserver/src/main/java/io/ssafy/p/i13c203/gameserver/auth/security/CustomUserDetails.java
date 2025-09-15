@@ -1,0 +1,63 @@
+package io.ssafy.p.i13c203.gameserver.auth.security;
+
+import io.ssafy.p.i13c203.gameserver.domain.member.entity.Member;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.Collections;
+
+public class CustomUserDetails implements UserDetails {
+
+    private final Member member;
+
+    public CustomUserDetails(Member member) {
+        this.member = member;
+    }
+
+    public Long getMemberId() {
+        return member.getId();
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(
+            new SimpleGrantedAuthority("ROLE_" + member.getRole().name())
+        );
+    }
+
+    @Override
+    public String getPassword() {
+        return member.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return member.getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return !member.getIsDeleted();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !member.getIsDeleted();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return !member.getIsDeleted();
+    }
+}

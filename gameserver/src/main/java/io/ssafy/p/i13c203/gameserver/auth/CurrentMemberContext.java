@@ -7,6 +7,7 @@ import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
 /**
  * 요청별 현재 회원 정보를 보관하는 컨텍스트 (Spring Security 미사용)
  */
+@Deprecated
 public class CurrentMemberContext {
 
     private static final ThreadLocal<Long> HOLDER = new ThreadLocal<>();
