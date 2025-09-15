@@ -29,8 +29,16 @@ management:
     health:
       show-details: "when_authorized"
 
-app:
-  storage:
-    local:
-      base-dir: C:/var/app/uploads
-      public-base-url: http://localhost:8080/files
+
+# JWT 설정
+jwt:
+  secret: "YXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZmFzZGY="  # TODO: 실제 프로덕션에서는 환경변수로 관리
+  access-token-expiration: 900000      # 15분 (15 * 60 * 1000)
+  refresh-token-expiration: 604800000  # 7일 (7 * 24 * 60 * 60 * 1000)
+
+# 쿠키 설정
+cookie:
+  secure: false
+  same-site: "Lax"
+  access-token-name: "accessToken"
+  refresh-token-name: "refreshToken"

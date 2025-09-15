@@ -142,15 +142,15 @@ services:
 
   analyzer-worker:
     build:
-      context: ./data-pipeline/workers/analyzer-worker
-      dockerfile: Dockerfile
+      context: ./data-pipeline
+      dockerfile: workers/analyzer-worker/Dockerfile
     container_name: analyzer-worker
     restart: unless-stopped
     depends_on:
       - kafka
       - minio
     gpus: all
-    user: "0:0"
+    user: "1000:1000"
     environment:
       # === Kafka ===
       KAFKA_BOOTSTRAP: kafka:9092
@@ -177,24 +177,26 @@ services:
       MIN_MAJOR_CONF: "0.30"
       SAVE_REJECTED_TO_MINIO: "true"
 
-      # === 모델/캐시/디바이스 ===
-      PYTHONPATH: /app/src
+      # === 모델/런타임 ===
+      PYTHONPATH: /app/src:/app:/app/common
       TOKENIZERS_PARALLELISM: "false"
       OMP_NUM_THREADS: "1"
       TZ: Asia/Seoul
-      USE_CUDA: "true"                    # KoBERTLoader가 CUDA 선택
-      KOBERT_CACHE_DIR: /models/kobert    # 모델 캐시 경로(볼륨)
-      HF_HOME: /opt/hf_cache              # HF 캐시 경로(볼륨)
 
-      # NVIDIA 런타임 힌트(선택)
+      HF_HOME: /app/.cache/huggingface
+      TRANSFORMERS_CACHE: /app/.cache/huggingface
+
+      MODEL_NAME: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+      MIN_MINOR_CONF: "0.30"
+      CLASSIFY_MAX_WORKERS: "4"
+
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
 
-
     volumes:
       - ./data-pipeline/workers/analyzer-worker/src:/app/src
-      - models_cache:/models
-      - hf_cache:/opt/hf_cache
+      - ./data-pipeline/common:/app/common
+      - hf_cache:/app/.cache/huggingface
 
     working_dir: /app/src
     command: ["python", "-m", "worker"]
@@ -240,7 +242,6 @@ volumes:
   kafka_data:
   minio_data:
   spark_ivy_cache:
-  models_cache:
   hf_cache:
   prometheus_data:
   grafana_data:

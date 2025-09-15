@@ -58,9 +58,9 @@ public class SuggestionService {
         // 이때 imageRepository에서 image들을 꺼내와서 작업해야함
         List<Image> allById = imageRepository.findAllById(imageIds);
 
-        for (Image image : allById) {
-            image.setSuggestion(save);
-        }
+//        for (Image image : allById) {
+//            image.setSuggestion(save);
+//        }
 
 
         return SuggestionCreateResponse.builder()

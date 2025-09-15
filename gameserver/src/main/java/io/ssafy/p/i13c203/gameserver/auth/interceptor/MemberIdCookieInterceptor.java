@@ -10,11 +10,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.Arrays;
-
 /**
  * 로그인 시 심은 HttpOnly Cookie("memberId")를 읽어 컨텍스트에 주입하는 인터셉터.
  */
+@Deprecated
 @Component
 public class MemberIdCookieInterceptor implements HandlerInterceptor {
 

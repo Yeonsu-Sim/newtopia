@@ -1,7 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.image.entity;
 
 import io.ssafy.p.i13c203.gameserver.domain.member.entity.Member;
-import io.ssafy.p.i13c203.gameserver.domain.suggestion.entity.Suggestion;
+//import io.ssafy.p.i13c203.gameserver.domain.suggestion.entity.Suggestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -33,9 +33,10 @@ public class Image {
     private String storageKey;
 
 
-    @Setter
-    @ManyToOne
-    private Suggestion suggestion;
+//   제안쪽
+//    @Setter
+//    @ManyToOne
+//    private Suggestion suggestion;
 
     @Enumerated(EnumType.STRING)
     private ImageStatus status;
@@ -48,6 +49,9 @@ public class Image {
 
     @Column(nullable = false)
     private String originalName;
+
+    @Column
+    private String url;
 
     @ManyToOne
     private Member member;
