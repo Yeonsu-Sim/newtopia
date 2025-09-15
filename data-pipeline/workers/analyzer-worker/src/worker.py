@@ -5,6 +5,7 @@ import json
 import logging
 import time
 import hashlib
+import re
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Tuple
 
@@ -15,8 +16,7 @@ from botocore.config import Config as BotoConfig
 from botocore.exceptions import ClientError
 
 # 🔹 프로젝트 내부 모듈
-from ai_core.category_analyzer import CategoryAnalyzer  # 4×4 체계 반영
-from ai_core.sentiment_analyzer import SentimentAnalyzer
+from ai_core.category_analyzer import CategoryAnalyzer
 
 # 🔹 서비스별 설정 (레이어드 config)
 from config import cfg  # data-pipeline/workers/analyzer-worker/src/config.py 에서 제공
@@ -33,6 +33,22 @@ def today_utc() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
+def current_year_utc() -> str:
+    return datetime.now(timezone.utc).strftime("%Y")
+
+
+def extract_year(published_at: Optional[str]) -> str:
+    """
+    published_at(ISO 등)에서 연도(YYYY) 추출. 실패 시 현재 UTC 연도 반환.
+    """
+    if not published_at:
+        return current_year_utc()
+    m = re.search(r"(19|20)\d{2}", str(published_at))
+    if m:
+        return m.group(0)
+    return current_year_utc()
+
+
 def ensure_article_id(rec: Dict[str, Any]) -> str:
     """
     article_id가 없으면 source_url(+보조필드)로 결정적 해시 생성
@@ -45,22 +61,28 @@ def ensure_article_id(rec: Dict[str, Any]) -> str:
     return hashlib.sha1(src.encode("utf-8")).hexdigest()[:20]
 
 
-def build_analyzed_key(major: str, article_id: str, dt: Optional[str] = None) -> str:
-    dt = dt or today_utc()
+def build_analyzed_key(year: str, major: str, article_id: str) -> str:
+    """
+    news/analyzed/year=YYYY/major={major}/{article_id}.json
+    """
     prefix = cfg.S3_PREFIX_ANALYZED.rstrip("/")
-    return f"{prefix}/major={major}/dt={dt}/{article_id}.json"
+    return f"{prefix}/year={year}/major={major}/{article_id}.json"
 
 
-def build_rejected_key(article_id: str, dt: Optional[str] = None) -> str:
-    dt = dt or today_utc()
+def build_rejected_key(year: str, article_id: str) -> str:
+    """
+    news/rejected/year=YYYY/{article_id}.json
+    """
     prefix = cfg.S3_PREFIX_REJECTED.rstrip("/")
-    return f"{prefix}/dt={dt}/{article_id}.json"
+    return f"{prefix}/year={year}/{article_id}.json"
 
 
-def build_dlq_key(article_id: str, dt: Optional[str] = None) -> str:
-    dt = dt or today_utc()
+def build_dlq_key(year: str, article_id: str) -> str:
+    """
+    news/dlq/topic=.../year=YYYY/{article_id}.json
+    """
     prefix = cfg.S3_PREFIX_DLQ.rstrip("/")
-    return f"{prefix}/dt={dt}/{article_id}.json"
+    return f"{prefix}/year={year}/{article_id}.json"
 
 
 def top_major_and_conf(categories: Dict[str, Any]) -> Tuple[Optional[str], float]:
@@ -174,7 +196,7 @@ async def send_with_retry(
                 topic,
                 key=key,  # serializer가 처리
                 value=value,
-                headers=[("pipeline_stage", b"category+sentiment")],
+                headers=[("pipeline_stage", b"category")],
             )
             return
         except Exception as e:
@@ -189,23 +211,18 @@ async def send_with_retry(
 # 인프로세스 분석기 (전역 1회 초기화)
 # --------------------
 cat_analyzer: Optional[CategoryAnalyzer] = None
-sent_analyzer: Optional[SentimentAnalyzer] = None
 sem = asyncio.Semaphore(cfg.MAX_CONCURRENCY)
 
 
 async def init_analyzers_once():
-    global cat_analyzer, sent_analyzer
+    global cat_analyzer
     if cat_analyzer is None:
         cat_analyzer = CategoryAnalyzer()
         await cat_analyzer.initialize()
         logging.getLogger("analyzer-worker").info("CategoryAnalyzer initialized")
-    if sent_analyzer is None:
-        sent_analyzer = SentimentAnalyzer()
-        await sent_analyzer.initialize()
-        logging.getLogger("analyzer-worker").info("SentimentAnalyzer initialized")
 
 
-def build_output(req: Dict[str, Any], cat_res, sent_res) -> Dict[str, Any]:
+def build_output(req: Dict[str, Any], cat_res) -> Dict[str, Any]:
     return {
         "source_url": req.get("source_url"),
         "title": req.get("title"),
@@ -220,10 +237,6 @@ def build_output(req: Dict[str, Any], cat_res, sent_res) -> Dict[str, Any]:
                 for k, v in cat_res.sub_categories.items()
             },
             "debug_similarities": getattr(cat_res, "debug_similarities", {}) or {},
-        },
-        "sentiment": {
-            "positive": float(sent_res.get("positive", 0.0)),
-            "negative": float(sent_res.get("negative", 0.0)),
         },
     }
 
@@ -285,8 +298,7 @@ async def run():
                         # 🔹 인프로세스 분석 호출 (동시성 제한)
                         async with sem:
                             cat_res = cat_analyzer.analyze_news(req["title"], req["content"])
-                            sent_res = sent_analyzer.analyze(req["content"] or req["title"] or "")
-                            out = build_output(req, cat_res, sent_res)
+                            out = build_output(req, cat_res)
 
                         # 🔹 4대분류 + 임계치 필터
                         categories = out.get("categories", {}) or {}
@@ -295,7 +307,8 @@ async def run():
                         if (not major) or (major not in cfg.ACCEPTED_MAJORS) or (conf < cfg.MIN_MAJOR_CONF):
                             # 분류 불가 → Kafka 미전송, (옵션) MinIO rejected 기록
                             if cfg.SAVE_REJECTED_TO_MINIO:
-                                key = build_rejected_key(article_id)
+                                year = extract_year(req.get("published_at"))
+                                key = build_rejected_key(year, article_id)
                                 payload = {
                                     "article_id": article_id,
                                     **req,
@@ -306,13 +319,17 @@ async def run():
                                     s3,
                                     key,
                                     payload,
-                                    meta={"pipeline-stage": "rejected", "reason": "not-classified-or-low-confidence"},
+                                    meta={
+                                        "pipeline-stage": "rejected",
+                                        "reason": "not-classified-or-low-confidence",
+                                        "year": year,
+                                    },
                                 )
                             # 처리 완료로 간주하고 커밋
                             await consumer.commit()
                             continue
 
-                        # 🔹 성공 결과(분류+감정) → Kafka & MinIO
+                        # 🔹 성공 결과(카테고리 분류) → Kafka & MinIO
                         enriched = dict(out)
                         enriched["article_id"] = article_id
                         enriched["processed_at"] = now_iso_utc()
@@ -320,10 +337,15 @@ async def run():
                         # Kafka
                         await send_with_retry(producer, cfg.DST_TOPIC, enriched, key=article_id)
 
-                        # MinIO
-                        dt = today_utc()
-                        key = build_analyzed_key(major, article_id, dt=dt)
-                        s3_put_json(s3, key, enriched, meta={"pipeline-stage": "analyzed", "major": major})
+                        # MinIO (연도 파티션: published_at 기준, 실패 시 현재 연도)
+                        year = extract_year(req.get("published_at"))
+                        key = build_analyzed_key(year, major, article_id)
+                        s3_put_json(
+                            s3,
+                            key,
+                            enriched,
+                            meta={"pipeline-stage": "analyzed", "major": major, "year": year},
+                        )
 
                         # 🔹 성공 후 커밋
                         await consumer.commit()
@@ -341,7 +363,13 @@ async def run():
                             await send_with_retry(producer, cfg.DLQ_TOPIC, dlq_payload, key=article_id)
                         finally:
                             try:
-                                s3_put_json(s3, build_dlq_key(article_id), dlq_payload, meta={"pipeline-stage": "dlq"})
+                                year = extract_year(rec.get("published_at"))
+                                s3_put_json(
+                                    s3,
+                                    build_dlq_key(year, article_id),
+                                    dlq_payload,
+                                    meta={"pipeline-stage": "dlq", "year": year},
+                                )
                             except Exception:
                                 logger.warning("failed to mirror DLQ to MinIO (ignored)")
                             await consumer.commit()

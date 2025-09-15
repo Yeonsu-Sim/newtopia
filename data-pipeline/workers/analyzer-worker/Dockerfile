@@ -1,33 +1,34 @@
 # data-pipeline/workers/analyzer-worker/Dockerfile
-# GPU용: PyTorch + CUDA + cuDNN 런타임 포함 베이스 이미지
 FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     TZ=Asia/Seoul \
     HF_HUB_DISABLE_TELEMETRY=1 \
-    TOKENIZERS_PARALLELISM=false
+    TOKENIZERS_PARALLELISM=false \
+    TRANSFORMERS_CACHE=/app/.cache/huggingface \
+    HF_HOME=/app/.cache/huggingface \
+    PYTHONPATH=/app:/app/src:/app/common
 
 WORKDIR /app
 
-# 필수 유틸
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl ca-certificates && \
+    git curl ca-certificates build-essential && \
     rm -rf /var/lib/apt/lists/*
 
-# 의존성 먼저 복사 → 빌드 캐시 활용
-COPY requirements.txt /app/requirements.txt
-
+# 컨텍스트 = ./data-pipeline
+COPY workers/analyzer-worker/requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt
 
-# 앱 소스
-COPY src /app/src
+COPY workers/analyzer-worker/src /app/src
+COPY common /app/common
 
-# 비루트 권장
-RUN useradd -m appuser && chown -R appuser:appuser /app
+# ✔ 캐시 디렉터리 만들고, UID 1000 유저 생성
+RUN mkdir -p /app/.cache/huggingface && \
+    useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+
 USER appuser
-
-# 실행(compose에서 command를 덮어써도 됨)
 WORKDIR /app/src
 CMD ["python", "-m", "worker"]
