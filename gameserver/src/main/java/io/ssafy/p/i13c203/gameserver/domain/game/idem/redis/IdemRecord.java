@@ -1,4 +1,4 @@
-package io.ssafy.p.i13c203.gameserver.domain.game.redis;
+package io.ssafy.p.i13c203.gameserver.domain.game.idem.redis;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;

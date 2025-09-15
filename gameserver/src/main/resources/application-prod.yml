@@ -11,6 +11,16 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
+  jpa:
+    hibernate:
+      ddl-auto: create  # TODO: 임시 설정 수거 -> none
+
+  sql:
+    init:
+      mode: always  # TODO: 임시 설정 수거 -> never
+      data-locations: classpath:sql/data.sql
+
+
   data:
     redis:
       host: ${REDIS_HOST}

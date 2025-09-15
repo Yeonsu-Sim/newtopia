@@ -7,6 +7,7 @@ import io.ssafy.p.i13c203.gameserver.domain.game.dto.response.*;
 import io.ssafy.p.i13c203.gameserver.global.APIResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,6 +74,12 @@ public interface GameController {
             @Parameter(description = "게임 ID", example = "1")
             @PathVariable Long gameId,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(
+                    name = "Idempotency-Key",
+                    in = ParameterIn.HEADER,
+                    required = false, // 강제하려면 true
+                    description = "동일 요청 재전송 시 멱등 보장을 위한 키"
+            ) @RequestHeader String idemKey,
             @Parameter(description = "선택지 제출 요청 정보")
             @RequestBody @Valid SubmitChoiceRequest request
     );

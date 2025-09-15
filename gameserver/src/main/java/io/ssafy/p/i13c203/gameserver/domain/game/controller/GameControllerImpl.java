@@ -83,6 +83,7 @@ public class GameControllerImpl implements GameController {
     public ResponseEntity<APIResponse<SubmitChoiceResponse, Void>> submitChoice(
             @PathVariable Long gameId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idemKey,
             @RequestBody @Valid SubmitChoiceRequest request
     ) {
         if (userDetails == null) {
