@@ -1,120 +1,79 @@
 package io.ssafy.p.i13c203.gameserver.domain.game.controller;
 
-import io.ssafy.p.i13c203.gameserver.auth.annotation.CurrentMemberId;
-import io.ssafy.p.i13c203.gameserver.domain.game.dto.*;
+import io.ssafy.p.i13c203.gameserver.auth.security.CustomUserDetails;
 import io.ssafy.p.i13c203.gameserver.domain.game.dto.request.CreateGameRequest;
 import io.ssafy.p.i13c203.gameserver.domain.game.dto.request.SubmitChoiceRequest;
 import io.ssafy.p.i13c203.gameserver.domain.game.dto.response.*;
-import io.ssafy.p.i13c203.gameserver.domain.game.service.GameService;
-import io.ssafy.p.i13c203.gameserver.domain.game.service.SubmitChoiceResult;
 import io.ssafy.p.i13c203.gameserver.global.APIResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/v1/games")
-@RequiredArgsConstructor
-public class GameController {
+@Tag(name = "게임 API", description = "게임 생성, 진행, 선택지 제출 관련 API")
+public interface GameController {
 
-    private final GameService gameService;
-
-    // 진행 중인 게임 조회
+    @Operation(summary = "내 진행중인 게임 조회", description = "현재 로그인된 사용자의 진행 중인 게임 정보를 조회합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "게임 정보 조회 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 필요"),
+        @ApiResponse(responseCode = "404", description = "진행 중인 게임이 없음")
+    })
     @GetMapping("/me")
-    public ResponseEntity<APIResponse<GetMyGameResponse, Void>> getMyGame(@CurrentMemberId Long memberId) {
-        var opt = gameService.getActiveGame(memberId);
-        if (opt.isEmpty()) {
-            return ResponseEntity.ok(APIResponse.success("진행 중인 게임이 없습니다.",
-                    GetMyGameResponse.of(null)));
-        }
-        var g = opt.get();
-        return ResponseEntity.ok(APIResponse.success("진행 중인 게임을 불러왔습니다.",
-                GetMyGameResponse.of(
-                        GameSummaryDto.of(
-                                g.getGameId(),
-                                g.getCountryName(),
-                                TurnSummaryDto.of(
-                                        g.getTurn(),
-                                        CountryStatsDto.of(g.getCountryStats())
-                                )
-                        )
-                )));
-    }
+    ResponseEntity<APIResponse<GetMyGameResponse, Void>> getMyGame(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
+    );
 
-    // 게임 만들기 (force=true면 기존 active를 닫고 새로 생성)
+    @Operation(summary = "새 게임 생성", description = "새로운 게임을 생성합니다. force=true 시 기존 게임을 종료하고 새 게임을 시작합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "게임 생성 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
+        @ApiResponse(responseCode = "401", description = "인증 필요"),
+        @ApiResponse(responseCode = "409", description = "이미 진행중인 게임이 있음 (force=false인 경우)")
+    })
     @PostMapping
-    public ResponseEntity<APIResponse<GameDetailResponse, Void>> createGame(
-            @CurrentMemberId Long memberId,
+    ResponseEntity<APIResponse<GameDetailResponse, Void>> createGame(
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(description = "기존 게임 강제 종료 여부", example = "false")
             @RequestParam(name = "force", defaultValue = "false") boolean force,
+            @Parameter(description = "게임 생성 요청 정보")
             @RequestBody @Valid CreateGameRequest request
-    ) {
-        var game = gameService.createGame(memberId, request.countryName(), force);
-        return ResponseEntity.ok(APIResponse.success("게임이 생성되었습니다.",
-                GameDetailResponse.from(game)));
-    }
+    );
 
-    // 게임 상세 조회
+    @Operation(summary = "게임 상세 조회", description = "특정 게임의 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "게임 상세 정보 조회 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 필요"),
+        @ApiResponse(responseCode = "403", description = "해당 게임에 접근 권한 없음"),
+        @ApiResponse(responseCode = "404", description = "게임을 찾을 수 없음")
+    })
     @GetMapping("/{gameId}")
-    public ResponseEntity<APIResponse<GameDetailResponse, Void>> getGame(
+    ResponseEntity<APIResponse<GameDetailResponse, Void>> getGame(
+            @Parameter(description = "게임 ID", example = "1")
             @PathVariable Long gameId,
-            @CurrentMemberId Long memberId
-    ) {
-        var game = gameService.findByIdOrThrow(gameId, memberId);
-        return ResponseEntity.ok(APIResponse.success("게임을 불러왔습니다.", GameDetailResponse.from(game)));
-    }
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
+    );
 
-    // 시나리오 답변 선택 (Idempotency-Key는 AOP가 헤더에서 읽음)
+    @Operation(summary = "선택지 제출", description = "시나리오 카드의 선택지를 선택하여 제출합니다. Idempotency-Key 헤더로 중복 방지 가능합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "선택지 제출 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 선택지 또는 게임 상태"),
+        @ApiResponse(responseCode = "401", description = "인증 필요"),
+        @ApiResponse(responseCode = "403", description = "해당 게임에 접근 권한 없음"),
+        @ApiResponse(responseCode = "404", description = "게임 또는 카드를 찾을 수 없음"),
+        @ApiResponse(responseCode = "409", description = "이미 처리된 요청 (Idempotency)")
+    })
     @PostMapping("/{gameId}/choice")
-    public ResponseEntity<APIResponse<SubmitChoiceResponse, Void>> submitChoice(
+    ResponseEntity<APIResponse<SubmitChoiceResponse, Void>> submitChoice(
+            @Parameter(description = "게임 ID", example = "1")
             @PathVariable Long gameId,
-            @CurrentMemberId Long memberId,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(description = "선택지 제출 요청 정보")
             @RequestBody @Valid SubmitChoiceRequest request
-    ) {
-        SubmitChoiceResult result = gameService.submitChoice(
-                gameId,
-                memberId,
-                request.cardId(),
-                request.choice()
-        );
-
-        // after / prev / delta
-        var afterDto = CountryStatsDto.of(result.nextTurn().countryStats()); // 적용 "이후"
-        var prevDoc  = result.applied().countryStats();                      // 적용 "이전"
-        var deltaDto = CountryStatsDeltaDto.of(
-                afterDto.economy()        - prevDoc.economy(),
-                afterDto.defense()        - prevDoc.defense(),
-                afterDto.publicSentiment()- prevDoc.publicSentiment(),
-                afterDto.environment()    - prevDoc.environment()
-        );
-
-        // 다음 카드(엔딩이면 null)
-        var nextCard = result.nextTurn().card();
-        CardBriefDto nextCardDto = (nextCard == null) ? null : CardBriefDto.from(nextCard);
-        var nextCardIdForApplied = (nextCard == null) ? null : nextCard.cardId();
-
-        var response = SubmitChoiceResponse.of(
-                AppliedDto.of(
-                        result.applied().turn(),          // 이번에 마무리된 턴 번호
-                        nextCardIdForApplied,             // 다음 카드 id (엔딩이면 null)
-                        result.applied().choosedCode(),   // 사용자가 고른 코드
-                        CountryStatsChangeDto.of(afterDto, deltaDto)
-                ),
-                // 실제 게임 종료/엔딩 정보 반영
-                GameStateDto.of(
-                        result.gameOver(),
-                        null,  // TODO: Game Result - Report 기능 구현 이후 값 지정
-                        EndingDto.from(result.ending())
-                ),
-                NextTurnDto.of(
-                        result.nextTurn().turn(),         // 다음 턴 번호(엔딩이면 현재 턴 유지)
-                        afterDto,                         // 적용 이후 스탯
-                        nextCardDto                       // 다음 카드(엔딩이면 null)
-                )
-        );
-
-        String msg = result.gameOver() ? "게임이 종료되었습니다." : "답변 선택을 완료했습니다.";
-        return ResponseEntity.ok(APIResponse.success(msg, response));
-    }
-
+    );
 }

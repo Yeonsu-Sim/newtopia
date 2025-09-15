@@ -10,6 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
+@Deprecated
 public class CurrentMemberIdArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
