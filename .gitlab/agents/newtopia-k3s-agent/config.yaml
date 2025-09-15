@@ -1,0 +1,20 @@
+# GitLab Agent for Kubernetes configuration
+# This allows GitLab CI/CD to deploy to the newtopia-app namespace
+
+ci_access:
+  projects:
+    - id: s13-bigdata-dist-sub1/S13P21C203
+      default_namespace: newtopia-app
+
+gitops:
+  # Enable GitOps workflow if needed
+  manifest_projects:
+    - id: s13-bigdata-dist-sub1/S13P21C203
+      default_namespace: newtopia-app
+      paths:
+        - glob: 'kubernetes/**/*.yaml'
+        - glob: 'kubernetes/**/*.yml'
+
+observability:
+  logging:
+    level: info

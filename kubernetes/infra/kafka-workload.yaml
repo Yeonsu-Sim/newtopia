@@ -40,5 +40,5 @@ spec:
       - id: 0
         type: persistent-claim
         size: 20Gi
-        class: nfs-kafka
+        class: nfs-storage
         deleteClaim: false
