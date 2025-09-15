@@ -13,7 +13,6 @@ import io.ssafy.p.i13c203.gameserver.domain.game.model.CountryStats;
 import io.ssafy.p.i13c203.gameserver.domain.game.repository.GameHistoryRepository;
 import io.ssafy.p.i13c203.gameserver.domain.game.repository.GameRepository;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.NpcRefDoc;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.SpawnConditionsDoc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Npc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.repository.NpcRepository;
@@ -76,9 +75,7 @@ public class GameService {
         ChoiceWeights weights = ChoiceWeights.builder().build(); // 기본 0
 
         // 1) 첫 시나리오 선택은 ScenarioService가 담당
-        // TODO: 임시 테스트 데이터 수거
-        Scenario sc = makeTestScenario();
-//        Scenario sc = scenarioService.firstScenario();
+        Scenario sc = scenarioService.firstScenario();
 
         // 2) CardDoc 생성은 GameService가 담당
         CardDoc first = toCardDoc(sc, CardType.ORIGIN);
@@ -97,7 +94,6 @@ public class GameService {
     }
 
     // ========== 9.3 선택 반영 (AOP 멱등성) ==========
-    // io.ssafy.p.i13c203.gameserver.domain.game.service.GameService#submitChoice
 
     @IdempotentOperation(
             hashArgs = {"gameId","cardId","choiceCode"},
@@ -167,15 +163,13 @@ public class GameService {
             // 엔딩 응답: nextCard=null, 다음 턴 증가 없음
             return SubmitChoiceResult.ended(
                     finishedTurn, choiceCode, beforeStats, afterStats, ending
-                                           );
+            );
         }
 
         // -------- (4) 다음 카드 선정 ----------
         int nextTurn = finishedTurn + 1;
-
-        // TODO: 실제 로직 연결 전 임시 시나리오
-        Scenario nextScenario = makeTestScenario();
-        CardDoc next = toCardDoc(nextScenario, CardType.CONSEQUENCE);
+        Scenario nextScenario = scenarioService.nextScenario(game, nextTurn);
+        CardDoc next = toCardDoc(nextScenario, CardType.ORIGIN);
 
         game.setTurn(nextTurn);
         game.setCurrentCard(next);
@@ -236,81 +230,6 @@ public class GameService {
         );
     }
 
-    /**
-     * 임시 테스트 시나리오 반환
-     */
-    private Scenario makeTestScenario() {
-        // 1) 첫 시나리오 선택은 ScenarioService가 담당
-        Scenario sc = new Scenario();
-
-        // ----- 기본 메타 -----
-        sc.setId(1L);
-        sc.setTitle("새 정부의 경제 어젠다");
-        sc.setContent("새로운 내각이 경제정책 우선순위를 논의합니다.");
-
-        // ----- NPC (참조만 설정: id, name, imageS3Key) -----
-        Npc npc = new Npc();
-        npc.setId(101L);
-        npc.setName("대변인");
-        npc.setImageS3Key("npc/spokesperson.png");
-        sc.setNpc(npc);
-
-        // ----- 스폰 조건 (첫 카드: 조건 없음) -----
-        sc.setSpawn(new SpawnConditionsDoc(
-                        java.util.List.of() // 빈 조건 목록
-                )
-        );
-
-        // ----- 선택지(effect: scores + weights) -----
-        final String[] MINORS = {
-                "macroeconomy","fiscalPolicy","financialMarkets","industryBusiness",
-                "militarySecurity","alliances","cyberSpace","publicSafety",
-                "publicOpinion","socialIssues","protestsStrikes","healthWelfare",
-                "climateChangeEnergy","pollutionDisaster","biodiversity","resourceManagement"
-        };
-
-        // 16개 중분류 가중치
-        EffectWeightsDoc fullWeights = new  EffectWeightsDoc(
-                0.1, 0.2, 0.1, 0.1,
-                0.1, 0.2, 0.1, 0.1,
-                0.1, 0.2, 0.1, 0.1,
-                0.1, 0.2, 0.1, 0.1
-                );
-
-        // scores 도메인 객체(대분류 4개)
-        EffectScoresDoc scoresA =
-                new EffectScoresDoc(10, 0, 5, -3); // economy, defense, publicSentiment, environment
-        EffectScoresDoc scoresB =
-                new EffectScoresDoc(1, -5, 10, 0);
-
-        // effect
-        EffectDoc effectA =
-                new EffectDoc(scoresA, fullWeights);
-        EffectDoc effectB =
-                new EffectDoc(scoresB, fullWeights);
-
-        // choice A/B
-        ChoiceDoc choiceA =
-                new ChoiceDoc("A", "일자리 창출 계획 가속", effectA);
-        ChoiceDoc choiceB =
-                new ChoiceDoc("B", "재정 건전성 최우선", effectB);
-
-        // 선택지 맵(순서 고정용 LinkedHashMap)
-        java.util.Map<String, io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc> choices =
-                new java.util.LinkedHashMap<>();
-        choices.put("A", choiceA);
-        choices.put("B", choiceB);
-        sc.setChoices(choices);
-
-        // ----- 관련 기사 -----
-        sc.setRelatedArticle(
-                new io.ssafy.p.i13c203.gameserver.domain.scenario.doc.RelatedArticleDoc(
-                        "경제 컨퍼런스 개최",
-                        "https://news.example/econ-1"
-                )
-        );
-        return sc;
-    }
 }
 
 

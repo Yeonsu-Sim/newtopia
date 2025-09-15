@@ -7,14 +7,15 @@ spring:
 
   jpa:
     show-sql: true
-    hibernate:
-      ddl-auto: create  # TODO: 임시 설정
+#    hibernate:
+#      ddl-auto: create  # 각 profile의 yml 파일로 이동
     open-in-view: false
     properties:
       hibernate:
         "[format_sql]": true
         "[default_batch_fetch_size]": 500
         "[highlight_sql]": true
+    defer-datasource-initialization: true
 
 management:
   endpoints:
