@@ -9,17 +9,58 @@ export const GameFont = createGlobalStyle`
   }
 `;
 
+export const BackgroundWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  min-width: 800px;
+`;
+
+export const BackgroundImage = styled.img`
+  width: 100%;
+  height: auto;
+  display: block;
+`;
+
+export const ParameterWrapper = styled.div<{ x: number; y: number }>`
+  position: absolute;
+  top: ${({ y }) => y}%;
+  left: ${({ x }) => x}%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 10%; 
+`;
+
+export const ParameterChangeWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem;
+`;
+
 export const MainContainer = styled.div`
-  background-color: #1a1a2e;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 0 3rem 1rem 3rem;
   color: #fff;
   font-family: 'Cafe24ProUp', sans-serif;
+  background-color: #1a1a2e;
+  min-width: 1000px;
+`;
+
+export const Background = styled.img`
+  width: 100%;
+  height: auto;
+  display: block;
 `;
 
 export const GameHeader = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
   padding: 1rem 1rem;
   font-family: 'Cafe24ProUp', sans-serif;
 `;
@@ -73,13 +114,6 @@ export const ParameterChangeBox = styled.div`
     padding: 2rem;
 `;
 
-export const ParameterWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 1rem;
-`;
-
 export const ProgressBar = styled.div`
     width: 100px;
     height: 10px;
@@ -112,11 +146,12 @@ export const ProgressBox = styled.div`
 export const ProgressValue = styled.div`
     color: #ffffff;
     margin: 0.3rem 0;
+    font-size: 0.8em;
     text-shadow: 1px 2px 2px #696969ff;
 `;
 
 export const ParameterIcon = styled.img<{ type: string; level: number }>`
-  width: 200px;
+  width: 100%;
   height: auto;
 `;
 

@@ -24,10 +24,14 @@ export const ChoiceCards = styled.div`
 `;
 
 export const CardA = styled.div`
-  flex: 1;
+  flex: 1;  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   height:300px;
   padding: 1rem;
-  background: #3e508aff;
+  background: #0883bd;
   border-radius: 8px;
   cursor: pointer;
   &:hover {
@@ -36,10 +40,14 @@ export const CardA = styled.div`
 `;
 
 export const CardB = styled.div`
-  flex: 1;
+  flex: 1;  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   height:300px;
   padding: 1rem;
-  background: #b7a05cff;
+  background: #e49000;
   border-radius: 8px;
   cursor: pointer;
   &:hover {

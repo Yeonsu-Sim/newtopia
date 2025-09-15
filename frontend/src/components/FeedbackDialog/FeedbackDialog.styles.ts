@@ -13,13 +13,21 @@ export const DialogOverlay = styled.div`
 export const DialogBox = styled.div`
   background: #2e2e3a;
   padding: 2rem;
-  width: 400px;
-  height: 50%;
+  width: 700px;
+  height: 80%;
   border-radius: 12px;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+`;
+
+export const DialogTitle = styled.div`
+  font-size: 1.8rem;
+`;
+
+export const NewsTitle = styled.div`
+  font-size: 1.2rem;
 `;
 
 export const CommentBox = styled.div`
