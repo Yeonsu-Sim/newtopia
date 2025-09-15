@@ -174,7 +174,7 @@ services:
       S3_PREFIX_REJECTED: news/rejected
       S3_PREFIX_DLQ: news/dlq/topic=newtopia.news.clean
       ACCEPTED_MAJORS: economy,defense,publicSentiment,environment
-      MIN_MAJOR_CONF: "0.30"
+      MIN_MAJOR_CONF: "0.60"
       SAVE_REJECTED_TO_MINIO: "true"
 
       # === 모델/런타임 ===
@@ -184,11 +184,10 @@ services:
       TZ: Asia/Seoul
 
       HF_HOME: /app/.cache/huggingface
-      TRANSFORMERS_CACHE: /app/.cache/huggingface
 
       MODEL_NAME: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
-      MIN_MINOR_CONF: "0.30"
-      CLASSIFY_MAX_WORKERS: "4"
+      MIN_MINOR_CONF: "0.60" # 카테고리 분류 시 최소 조건
+      CLASSIFY_MAX_WORKERS: "4" # 분류 테스크를 동시에 처리할 프로세스 워커 수
 
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
@@ -200,6 +199,73 @@ services:
 
     working_dir: /app/src
     command: ["python", "-m", "worker"]
+
+  sentiment-worker:
+    build:
+      context: ./data-pipeline
+      dockerfile: workers/sentiment-worker/Dockerfile
+    container_name: sentiment-worker
+    image: newtopia/sentiment-worker:latest
+    restart: unless-stopped
+    depends_on:
+      - kafka
+      - minio
+    gpus: all
+    user: "1000:1000"
+    environment:
+      # === Kafka ===
+      KAFKA_BOOTSTRAP: kafka:9092
+      SRC_TOPIC: newtopia.news.analyzed
+      DST_TOPIC: newtopia.news.sentiment
+      DLQ_TOPIC: newtopia.news.sentiment.dlq
+      GROUP_ID: newtopia.sentiment.v1
+      AUTO_OFFSET_RESET: earliest
+      KAFKA_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_SASL_MECHANISM: ""
+      KAFKA_SASL_JAAS: ""
+
+      # === MinIO / S3 === (BaseConfig + 확장)
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: minio
+      S3_SECRET_KEY: minio123
+      S3_BUCKET: newtopia
+      S3_REGION: us-east-1
+      S3_PATH_STYLE: "true"
+      S3_SSL_ENABLED: "false"
+      # sentiment 스냅샷 저장 prefix
+      S3_PREFIX_SENTIMENT: news/sentiment
+      S3_PREFIX_DLQ: news/dlq/topic=newtopia.news.sentiment
+
+      # === 모델/런타임 ===
+      PYTHONPATH: /app/src:/app:/app/common
+      TOKENIZERS_PARALLELISM: "false"
+      OMP_NUM_THREADS: "1"
+      TZ: Asia/Seoul
+
+      HF_HOME: /app/.cache/huggingface
+
+      MODEL_NAME: snunlp/KR-FinBert-SC
+      USE_CUDA: "true"
+      BATCH_SIZE: "32"
+      MAX_CONTENT_LEN: "4000"
+      POLL_TIMEOUT_MS: "1000"
+      SEND_RETRIES: "2"
+      SEND_BACKOFF_MS: "400"
+      MAX_SEQ_LEN_TOKENS: "256"
+      SLIDING_STRIDE_TOKENS: "128"
+      PRODUCER_COMPRESSION: "lz4"
+
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+
+    volumes:
+      - ./data-pipeline/workers/sentiment-worker/src:/app/src
+      - ./data-pipeline/common:/app/common
+      - hf_cache:/app/.cache/huggingface
+
+    working_dir: /app/src
+    command: ["python", "-m", "worker"]
+
 
     # 모니터링을 하기 위한 promethues , grafana
   prometheus:
