@@ -9,8 +9,9 @@ import {
   InfoBox,
   InfoText,
   TurnText,
-  ParameterBox,
-  GameMessage
+  GameMessage,
+  BackgroundWrapper,
+  BackgroundImage
 } from '@/routes/game/-Game.styles';
 
 import Parameter from "@/components/Parameter";
@@ -134,16 +135,17 @@ function RouteComponent() {
         </TurnBox>
       </GameHeader>
 
-      <ParameterBox>
-        {currentStats && (
-          <>
-            <Parameter type="eco" value={currentStats.eco} />
-            <Parameter type="env" value={currentStats.env} />
-            <Parameter type="opi" value={currentStats.opi} />
-            <Parameter type="mil" value={currentStats.mil} />
-          </>
-        )}
-      </ParameterBox>
+      <BackgroundWrapper>
+        <BackgroundImage src="/backgrounds/game_background.png" />
+          {currentStats && (
+            <>
+              <Parameter type="eco" value={currentStats.eco} x={10} y={53} />
+              <Parameter type="env" value={currentStats.env} x={29} y={54} />
+              <Parameter type="opi" value={currentStats.opi} x={72} y={54} />
+              <Parameter type="mil" value={currentStats.mil} x={90} y={54} />
+            </>
+          )}
+      </BackgroundWrapper>
 
       <GameMessage onClick={() => setGuestOpen(true)}>
         <Message text="새로운 손님이 도착했습니다!" />
@@ -153,6 +155,7 @@ function RouteComponent() {
         <GuestDialog
           guestName={currentCard.npc.name}
           guestText={currentCard.content}
+          guestImage={currentCard.npc.imageUrl}
           open
           onClose={() => setGuestOpen(false)}
           onSelect={() => {
