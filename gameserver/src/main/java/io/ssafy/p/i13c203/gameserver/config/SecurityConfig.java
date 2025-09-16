@@ -80,6 +80,7 @@ public class SecurityConfig {
                 // 나머지는 인증 필요
                 .anyRequest().authenticated()
             )
+            
 
             // 로그아웃 필터 설정
             .logout(logout -> logout
