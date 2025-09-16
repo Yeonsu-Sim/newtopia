@@ -66,4 +66,4 @@ app:
       access-key: minio
       secret-key: minio123
       bucket-name: newtopia-img
-      public-base-url: http://minio:9000/newtopia-img
+      public-base-url: http://localhost:9000/newtopia-img
