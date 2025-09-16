@@ -221,8 +221,8 @@ services:
       GROUP_ID: newtopia.sentiment.v1
       AUTO_OFFSET_RESET: earliest
       KAFKA_SECURITY_PROTOCOL: PLAINTEXT
-      KAFKA_SASL_MECHANISM: ""
-      KAFKA_SASL_JAAS: ""
+      KAFKA_SASL_MECHANISM: "" # 사용자 인증 방식을 지정
+      KAFKA_SASL_JAAS: ""      # 자격증명
 
       # === MinIO / S3 === (BaseConfig + 확장)
       S3_ENDPOINT: http://minio:9000
