@@ -38,6 +38,14 @@ public class LocalFileStorage implements FileStorage{
     }
 
     @Override
+    public FileStat stat(String key) throws IOException {
+        Path p = resolveKey(key);
+        long size = Files.size(p);
+        String ct = Files.probeContentType(p);
+        return new FileStat(size, ct != null ? ct : "application/octet-stream", null);
+    }
+
+    @Override
     public boolean delete(String key) throws IOException {
         Path path = resolveKey(key);
         return Files.deleteIfExists(path);

@@ -214,7 +214,7 @@ public class GameService {
         NpcRefDoc npcRef = new NpcRefDoc(
                 npc.getId(),           // Long (PK)
                 npc.getName(),
-                npc.getImageS3Key()
+                npc.getImage().getUrl()
         );
 
         return new CardDoc(
