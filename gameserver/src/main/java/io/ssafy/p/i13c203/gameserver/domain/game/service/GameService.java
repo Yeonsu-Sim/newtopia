@@ -4,6 +4,7 @@ import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
 import io.ssafy.p.i13c203.gameserver.domain.ending.service.EndingService;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.*;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CardType;
+import io.ssafy.p.i13c203.gameserver.domain.ranking.service.RankingService;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.GameHistory;
@@ -38,6 +39,7 @@ public class GameService {
     private final NpcRepository npcRepo;
     private final ScenarioService scenarioService;
     private final EndingService endingService;
+    private final RankingService rankingService;
 
     @Transactional(readOnly = true)
     public Game findByIdOrThrow(Long gameId) {
@@ -159,7 +161,8 @@ public class GameService {
 
             try { gameRepo.saveAndFlush(game); }
             catch (OptimisticLockingFailureException e) { throw new BusinessException(ErrorCode.CONCURRENCY_CONFLICT); }
-
+            // TODO: Check Ranking Service 입력
+            rankingService.registerRanking(game);
             // 엔딩 응답: nextCard=null, 다음 턴 증가 없음
             return SubmitChoiceResult.ended(
                     finishedTurn, choiceCode, beforeStats, afterStats, ending
