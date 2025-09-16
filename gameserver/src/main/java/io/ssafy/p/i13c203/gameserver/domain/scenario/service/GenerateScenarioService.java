@@ -53,6 +53,7 @@ public class GenerateScenarioService {
             // User 메시지 (실제 프롬프트)
             Map<String, String> userMessage = new HashMap<>();
             userMessage.put("role", "user");
+
             userMessage.put("content", String.format("""
                 당신은 정치 시뮬레이션 게임의 시나리오 작가입니다. 주어진 뉴스를 바탕으로 대통령 게임 시나리오를 만들어주세요.
 
