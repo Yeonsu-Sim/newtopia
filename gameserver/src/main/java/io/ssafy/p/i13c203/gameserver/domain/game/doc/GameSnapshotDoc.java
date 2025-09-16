@@ -4,6 +4,7 @@ import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CountryStats;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.ChoiceWeights;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 public record GameSnapshotDoc(
         Long gameId,               // 게임 ID
@@ -14,7 +15,7 @@ public record GameSnapshotDoc(
         int turn,                  // 턴 번호
         String choosedCode,        // 선택한 코드
         boolean active,            // 활성화 상태
-        Instant endedAt,           // 종료 시간 (있으면 종료된 게임)
+        LocalDateTime endedAt,           // 종료 시간 (있으면 종료된 게임)
         String endingCode          // 엔딩 코드
 ) {
 

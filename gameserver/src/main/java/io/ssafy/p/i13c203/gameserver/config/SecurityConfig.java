@@ -66,7 +66,8 @@ public class SecurityConfig {
         http
             // CSRF 비활성화 (JWT + 쿠키 방식에서는 불필요)
             .csrf(AbstractHttpConfigurer::disable)
-            .cors(AbstractHttpConfigurer::disable)
+            .cors(AbstractHttpConfigurer::disable)  // CORS 비활성화
+//            .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // CORS 활성화
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             // 권한 설정
@@ -80,7 +81,6 @@ public class SecurityConfig {
                 // 나머지는 인증 필요
                 .anyRequest().authenticated()
             )
-            
 
             // 로그아웃 필터 설정
             .logout(logout -> logout

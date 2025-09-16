@@ -1,45 +1,62 @@
 package io.ssafy.p.i13c203.gameserver.domain.ending.service;
 
 import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
+import io.ssafy.p.i13c203.gameserver.domain.ending.entity.Ending;
+import io.ssafy.p.i13c203.gameserver.domain.ending.repository.EndingRepository;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
 import io.ssafy.p.i13c203.gameserver.global.exception.BusinessException;
 import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
+import io.ssafy.p.i13c203.gameserver.global.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.errors.ApiException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EndingService {
+
+    private final EndingRepository endingRepository;
 
     public EndingDoc getEndingOrNull(Game game) {
         var cs = game.getCountryStats();
+        List<String> hitCodes = new ArrayList<>();
 
-        if      (cs.getEconomy()        <= 0)   return getByCode("ECO_MIN");
-        else if (cs.getEconomy()        >= 100) return getByCode("ECO_MAX");
-        else if (cs.getDefense()        <= 0)   return getByCode("DEF_MIN");
-        else if (cs.getDefense()        >= 100) return getByCode("DEF_MAX");
-        else if (cs.getPublicSentiment()<= 0)   return getByCode("PUB_MIN");
-        else if (cs.getPublicSentiment()>= 100) return getByCode("PUB_MAX");
-        else if (cs.getEnvironment()    <= 0)   return getByCode("ENV_MIN");
-        else if (cs.getEnvironment()    >= 100) return getByCode("ENV_MAX");
+        if (cs.getEconomy()        <= 0)   hitCodes.add("ECO_MIN");
+        if (cs.getEconomy()        >= 100) hitCodes.add("ECO_MAX");
+        if (cs.getDefense()        <= 0)   hitCodes.add("DEF_MIN");
+        if (cs.getDefense()        >= 100) hitCodes.add("DEF_MAX");
+        if (cs.getPublicSentiment()<= 0)   hitCodes.add("PUB_MIN");
+        if (cs.getPublicSentiment()>= 100) hitCodes.add("PUB_MAX");
+        if (cs.getEnvironment()    <= 0)   hitCodes.add("ENV_MIN");
+        if (cs.getEnvironment()    >= 100) hitCodes.add("ENV_MAX");
 
-        return null;
+        int n = hitCodes.size();
+        if (n == 0) return null;
+
+        String code = switch (n) {
+            case 1 -> hitCodes.get(0);
+            case 2 -> "DOUBLE_OVER";
+            case 3 -> "TRIPLE_OVER";
+            case 4 -> "QUAD_OVER";
+            default -> null;
+        };
+        return getByCode(code);
     }
 
-    // TODO: DB 연결 후, 하드코딩 테스트 수거
-    public EndingDoc getByCode(String code) {
-        return switch (code) {
-            // 💰 경제
-            case "ECO_MAX" -> new EndingDoc("ECO_MAX","돈은 넘쳐났지만, 웃음은 사라졌다.","돈은 넘쳐났지만, 웃음은 사라졌다.","economy==100", "ending/economy_100.png");
-            case "ECO_MIN" -> new EndingDoc("ECO_MIN","부국강병? 아니, 그냥 부자국가.","부국강병? 아니, 그냥 부자국가.","economy==0",   "ending/economy_0.png");
-            // 🛡️ 국방
-            case "DEF_MAX" -> new EndingDoc("DEF_MAX","총과 탱크는 많았지만, 자유는 사라졌다.","총과 탱크는 많았지만, 자유는 사라졌다.","defense==100", "ending/defense_100.png");
-            case "DEF_MIN" -> new EndingDoc("DEF_MIN","당신은 장군인가, 지도자인가?","당신은 장군인가, 지도자인가?","defense==0", "ending/defense_0.png");
-            // 🗣️ 민심
-            case "PUB_MAX" -> new EndingDoc("PUB_MAX","모두가 당신을 사랑했다. 너무 지나치게.","모두가 당신을 사랑했다. 너무 지나치게.","publicSentiment==100","ending/opinion_100.png");
-            case "PUB_MIN" -> new EndingDoc("PUB_MIN","민주주의는 박수 소리에 잠식됐다.","민주주의는 박수 소리에 잠식됐다.","publicSentiment==0","ending/opinion_0.png");
-            // 🌱 환경
-            case "ENV_MAX" -> new EndingDoc("ENV_MAX","숲은 울창했지만, 도시는 텅 비었다.","숲은 울창했지만, 도시는 텅 비었다.","environment==100","ending/environment_100.png");
-            case "ENV_MIN" -> new EndingDoc("ENV_MIN","자연은 웃었고, 사람은 울었다.","자연은 웃었고, 사람은 울었다.","environment==0","ending/environment_0.png");
-            default -> throw new BusinessException(ErrorCode.NOT_FOUND, "존재하지 않는 엔딩 code: " + code);
-        };
+    @Transactional(readOnly = true)
+    public EndingDoc getByCode(String rawCode) {
+        if (rawCode == null) return null;
+        String code = rawCode.toUpperCase();
+
+        Ending e = endingRepository.findByCode(code)  // ← 위 메서드 사용
+                .orElseThrow(() -> new NotFoundException(
+                        ErrorCode.NOT_FOUND, "Ending with code %s not found".formatted(code)
+                ));
+
+        return EndingDoc.from(e);  // 네이밍은 from 권장(타입 변환 의미라 자연스러움)
     }
 }
