@@ -64,12 +64,12 @@ public class ScenarioServiceV2 implements ScenarioService{
                 return createScenarioFromNews(newsData);
             } else {
                 log.warn("적절한 뉴스를 찾지 못했습니다. 기본 시나리오를 반환합니다.");
-                return createDefaultScenario(game, nextTurn);
+                return null;
             }
             
         } catch (Exception e) {
             log.error("시나리오 생성 중 오류 발생", e);
-            return createDefaultScenario(game, nextTurn);
+            return null;
         }
     }
 
@@ -78,53 +78,85 @@ public class ScenarioServiceV2 implements ScenarioService{
      */
     private Scenario createScenarioFromNews(JsonNode newsData) {
         log.info("뉴스 기반 시나리오 생성: {}", newsData.get("title").asText());
-        
-        return generateScenarioService.createScenarioFromNews(newsData, null);
+
+        String s = generateScenarioService.processNewsWithGPT(newsData);
+
+        return null;
     }
 
-    /**
-     * 기본 시나리오 생성 (뉴스를 찾지 못한 경우)
-     */
-    private Scenario createDefaultScenario(Game game, int turn) {
-        log.info("기본 시나리오 생성 - 턴: {}", turn);
-        
-        // 기본 뉴스 데이터 구조 생성
-        JsonNode defaultNewsData = createDefaultNewsData(turn);
-        
-        return generateScenarioService.createScenarioFromNews(defaultNewsData, game);
-    }
-    
-    /**
-     * 기본 뉴스 데이터 생성
-     */
-    private JsonNode createDefaultNewsData(int turn) {
-        try {
-            String defaultJson = String.format("""
-                {
-                  "title": "제%d턴 정기 국정 현안",
-                  "content": "국정 운영 과정에서 중요한 결정이 필요한 시점입니다. 현재 상황을 종합적으로 검토하여 적절한 정책 방향을 결정해야 합니다.",
-                  "categories": {
-                    "major_categories": [
-                      {
-                        "category": "publicSentiment",
-                        "confidence": 0.8
-                      }
-                    ]
-                  },
-                  "sentiment": {
-                    "label": "neutral",
-                    "score": 0.5
-                  },
-                  "source_url": "internal://default-scenario"
-                }
-                """, turn);
-            
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readTree(defaultJson);
-            
-        } catch (Exception e) {
-            log.error("기본 뉴스 데이터 생성 실패", e);
-            return null;
-        }
-    }
+//    /**
+//     * 기본 시나리오 생성 (뉴스를 찾지 못한 경우)
+//     */
+//    private Scenario createDefaultScenario(Game game, int turn) {
+//        log.info("기본 시나리오 생성 - 턴: {}", turn);
+//
+//        // 기본 뉴스 데이터 구조 생성
+//        JsonNode defaultNewsData = createDefaultNewsData(turn);
+//
+//        return generateScenarioService.createScenarioFromNews(defaultNewsData, game);
+//    }
+
+//    /**
+//     * 기본 뉴스 데이터 생성
+//     */
+//    private JsonNode createDefaultNewsData(int turn) {
+//        try {
+//            ObjectMapper objectMapper = new ObjectMapper();
+//
+//            // 턴별 기본 시나리오 주제
+//            String[] defaultTitles = {
+//                "경제 정책 변화로 인한 시장 동향",
+//                "국방 예산 증액에 대한 국민 여론",
+//                "환경 보호 정책 강화 방안",
+//                "사회 복지 제도 개선 논의",
+//                "국제 관계 개선을 위한 외교적 노력"
+//            };
+//
+//            String[] defaultContents = {
+//                "최근 정부의 경제 정책 변화가 시장에 미치는 영향에 대해 각계각층의 의견이 분분합니다.",
+//                "국방 예산 증액에 대한 논의가 활발해지고 있으며, 국민들의 다양한 의견이 제시되고 있습니다.",
+//                "환경 보호를 위한 새로운 정책 방안이 제시되어 관련 업계의 관심이 집중되고 있습니다.",
+//                "사회 복지 제도의 개선 방안에 대한 논의가 진행되고 있으며, 다양한 관점이 제시되고 있습니다.",
+//                "국제 사회와의 관계 개선을 위한 외교적 노력이 계속되고 있어 주목받고 있습니다."
+//            };
+//
+//            String[] categories = {"economy", "defense", "environment", "publicSentiment", "defense"};
+//
+//            int index = turn % defaultTitles.length;
+//
+//            String defaultNewsJson = String.format("""
+//                {
+//                  "source_url": "https://default.news.example.com/article/%d",
+//                  "title": "%s",
+//                  "content": "%s",
+//                  "published_at": "2025.09.16. 오전 %d:00",
+//                  "categories": {
+//                    "major_categories": [
+//                      {
+//                        "category": "%s",
+//                        "confidence": 0.8
+//                      }
+//                    ]
+//                  },
+//                  "sentiment": {
+//                    "label": "neutral",
+//                    "score": 0.5
+//                  }
+//                }
+//                """,
+//                turn,
+//                defaultTitles[index],
+//                defaultContents[index],
+//                9 + (turn % 3),
+//                categories[index]
+//            );
+//
+//            return objectMapper.readTree(defaultNewsJson);
+//
+//        } catch (Exception e) {
+//            log.error("기본 뉴스 데이터 생성 중 오류 발생", e);
+//            return null;
+//        }
+//    }
+
 }
