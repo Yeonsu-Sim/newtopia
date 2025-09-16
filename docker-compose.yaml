@@ -9,6 +9,14 @@ services:
     ports:
       - "18080:8080"
 
+  react-nginx:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 80:80
+
   gameserver:
     build:
       context: ./gameserver

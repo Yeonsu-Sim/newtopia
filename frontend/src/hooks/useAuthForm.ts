@@ -10,16 +10,16 @@ interface FormData {
   confirmPassword: string;
 }
 
-export const useAuthForm = (initialMode: AuthMode = 'login') => {
+export const useAuthForm = (initialMode: AuthMode = 'login', initialEmail?: string, initialPassword?: string) => {
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [formData, setFormData] = useState<FormData>({
-    email: '',
-    password: '',
+    email: initialEmail || '',
+    password: initialPassword || '',
     nickname: '',
     confirmPassword: ''
   });
   const [error, setError] = useState<string>('');
-  
+
   const { login, signup, isLoading } = useAuthStore();
 
   // 폼 데이터 업데이트
@@ -53,7 +53,7 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   };
 
   // 폼 제출 처리
-  const handleSubmit = async (onSuccess?: () => void) => {
+  const handleSubmit = async (onSuccess?: () => void, onSignupSuccess?: (email: string, password: string) => void) => {
     setError('');
 
     try {
@@ -72,8 +72,8 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
 
         const success = await signup(formData.email, formData.password, formData.nickname);
         if (success) {
-          resetForm();
-          onSuccess?.();
+          // 회원가입 성공 시 이메일, 비밀번호 정보를 전달하고 폼은 초기화하지 않음
+          onSignupSuccess?.(formData.email, formData.password);
         }
       }
     } catch (err) {
@@ -87,6 +87,21 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     resetForm();
   };
 
+  // 로그인 모드로 전환 (회원가입 정보 유지)
+  const switchToLogin = (email?: string, password?: string) => {
+    setMode('login');
+    if (email && password) {
+      setFormData(prev => ({
+        ...prev,
+        email,
+        password,
+        nickname: '',
+        confirmPassword: ''
+      }));
+    }
+    setError('');
+  };
+
   return {
     mode,
     formData,
@@ -95,6 +110,7 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     handleInputChange,
     handleSubmit,
     switchMode,
+    switchToLogin,
     resetForm
   };
 };

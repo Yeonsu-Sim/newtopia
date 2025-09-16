@@ -66,21 +66,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   // 회원가입 함수
   signup: async (email: string, password: string, nickname: string) => {
     set({ isLoading: true });
-    
+
     try {
       const response = await signupApi({ email, password, nickname });
-      
+
       if (response.status === 'success' && response.data) {
-        const user: User = {
-          id: response.data.id,
-          email: response.data.email,
-          nickname: response.data.nickname,
-        };
-        
-        set({ user, isLoading: false });
+        // 회원가입 성공 시 자동 로그인하지 않음
+        set({ isLoading: false });
         return true;
       }
-      
+
       set({ isLoading: false });
       return false;
     } catch (error) {

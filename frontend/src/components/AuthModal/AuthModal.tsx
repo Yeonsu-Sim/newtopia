@@ -30,10 +30,10 @@ interface AuthModalProps {
   initialMode?: 'login' | 'signup';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  initialMode = 'login' 
+export const AuthModal: React.FC<AuthModalProps> = ({
+  isOpen,
+  onClose,
+  initialMode = 'login'
 }) => {
   const {
     mode,
@@ -42,14 +42,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     isLoading,
     handleInputChange,
     handleSubmit,
-    switchMode
+    switchMode,
+    switchToLogin
   } = useAuthForm(initialMode);
 
   if (!isOpen) return null;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await handleSubmit(onClose);
+    await handleSubmit(
+      onClose, // 로그인 성공 시 모달 닫기
+      (email: string, password: string) => {
+        // 회원가입 성공 시 로그인 모드로 전환하고 정보 자동 입력
+        switchToLogin(email, password);
+      }
+    );
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {

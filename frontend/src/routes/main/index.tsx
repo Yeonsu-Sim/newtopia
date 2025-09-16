@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { useAudio } from '@/hooks/useAudio';
 import { GameBackground } from '@/components/common/GameBackground';
 import { MenuButton } from '@/components/common/MenuButton';
 import { HotTopic } from '@/components/common/HotTopic';
+import { RankingModal } from '@/components/RankingModal';
 import {
   MainContainer,
   WelcomeSection,
@@ -22,6 +23,7 @@ function MainPage() {
   const { user, logout, isLoading } = useAuthStore();
   const navigate = useNavigate();
   const { playClickSound } = useAudio();
+  const [showRankingModal, setShowRankingModal] = useState(false);
 
   // 로그인되지 않은 사용자는 랜딩 페이지로 리다이렉트
   useEffect(() => {
@@ -45,6 +47,11 @@ function MainPage() {
     playClickSound();
     // TODO: 건의사항 페이지 구현 후 연결
     alert('건의하기 기능은 준비 중입니다.');
+  };
+
+  const handleRanking = () => {
+    playClickSound();
+    setShowRankingModal(true);
   };
 
   const handleLogout = async () => {
@@ -86,21 +93,31 @@ function MainPage() {
       
       {/* 메뉴 버튼들 */}
       <MenuContainer>
-        <MenuButton onClick={handleStartGame} variant="landing">
+        <MenuButton onClick={handleStartGame} variant="main">
           게임하기
         </MenuButton>
 
-        <MenuButton onClick={handleMyInfo} variant="landing">
+        <MenuButton onClick={handleMyInfo} variant="main">
           내정보
         </MenuButton>
 
-        <MenuButton onClick={handleSuggestion} variant="landing">
+        <MenuButton onClick={handleSuggestion} variant="main">
           건의하기
+        </MenuButton>
+
+        <MenuButton onClick={handleRanking} variant="main">
+          랭킹
         </MenuButton>
       </MenuContainer>
 
       {/* 이달의 핫토픽 뉴스 */}
       <HotTopic />
+
+      {/* 랭킹 모달 */}
+      <RankingModal
+        isOpen={showRankingModal}
+        onClose={() => setShowRankingModal(false)}
+      />
     </MainContainer>
   );
 }

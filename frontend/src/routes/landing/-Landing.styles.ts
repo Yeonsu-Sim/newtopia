@@ -20,7 +20,7 @@ export const GameLogo = styled.div`
   width: clamp(300px, 40vw, 725px);
   height: clamp(300px, 40vw, 725px);
   aspect-ratio: 1/1;
-  background-image: url('/src/assets/icons/CI.png');
+  background-image: url('/icons/CI.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
