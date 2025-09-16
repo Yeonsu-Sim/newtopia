@@ -1,5 +1,6 @@
 # workers/sentiment-worker/src/worker.py
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-\
+import re
 import asyncio
 import hashlib
 import logging
@@ -51,18 +52,47 @@ def make_s3():
         verify=cfg.S3_SSL_ENABLED if hasattr(cfg, "S3_SSL_ENABLED") else False,
     )
 
+def _extract_year(published_at: str | None) -> str:
+    """
+    '2025.08.29. 오전 11:11' 같이 지역 형식이 섞여도 연도 4자리만 뽑아냄.
+    실패하면 현재 UTC 연도.
+    """
+    if published_at:
+        m = re.search(r"\b(19|20)\d{2}\b", published_at)
+        if m:
+            return m.group(0)
+    return datetime.now(timezone.utc).strftime("%Y")
+
+
+def _extract_major(doc: Dict[str, Any]) -> str:
+    """
+    analyzer가 넣어준 카테고리에서 대분류 추출.
+    없으면 'unknown' 폴더로 보냄.
+    """
+    try:
+        majors = doc["categories"]["major_categories"]
+        if isinstance(majors, list) and majors:
+            c = majors[0].get("category")
+            if c:
+                return str(c)
+    except Exception:
+        pass
+    return "unknown"
+
+
 
 def s3_key_for(doc: Dict[str, Any]) -> str:
     """
-    파티셔닝 규칙:
-      <prefix>/year=YYYY/<sha1(source_url)>.json
+    파티셔닝 규칙 변경:
+      <prefix>/year=YYYY/major=<major>/<sha1(source_url)>.json
+    예) news/sentiment/year=2025/major=economy/3a1f....json
     """
-    pub = doc.get("published_at", now_iso_utc())
-    y = pub[:4]
+    y = _extract_year(doc.get("published_at"))
+    major = _extract_major(doc)
     prefix = getattr(cfg, "S3_PREFIX_SENTIMENT", "news/sentiment")
     url = doc.get("source_url", "")
     h = hashlib.sha1(url.encode("utf-8")).hexdigest() if url else hashlib.sha1(orjson.dumps(doc)).hexdigest()
-    return f"{prefix}/year={y}/{h}.json"
+    return f"{prefix}/year={y}/major={major}/{h}.json"
 
 
 def put_s3_json(s3, doc: Dict[str, Any]):
