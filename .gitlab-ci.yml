@@ -153,7 +153,7 @@ deploy:gameserver:
   image: bitnami/kubectl:latest
   tags:
     - runner
-  dependencies:
+  needs:
     - build:gameserver
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
@@ -169,7 +169,7 @@ deploy:gameserver:
     - cd ./kubernetes/app
     - sed -i "s|CI_COMMIT_SHA|$CI_COMMIT_SHA|g" gameserver-workload.yaml
     - kubectl apply -f gameserver-workload.yaml
-    - kubectl rollout status deployment/gameserver -n newtopia-app --timeout=300
+    - kubectl rollout status deployment/gameserver -n newtopia-app --timeout=300s
   after_script:
     - |
       if [ "$CI_JOB_STATUS" == "failed" ]; then
@@ -181,7 +181,7 @@ deploy:gameserver:
 
         # Rollback to previous version
         kubectl rollout undo deployment/gameserver -n newtopia-app
-        kubectl rollout status deployment/gameserver -n newtopia-app --timeout=300
+        kubectl rollout status deployment/gameserver -n newtopia-app --timeout=300s
 
         echo "=== Rollback completed ==="
         echo "=== Failure Analysis ==="
@@ -211,7 +211,7 @@ deploy:frontend:
   image: bitnami/kubectl:latest
   tags:
     - runner
-  dependencies:
+  needs:
     - build:frontend
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
@@ -227,7 +227,7 @@ deploy:frontend:
     - cd ./kubernetes/app
     - sed -i "s|CI_COMMIT_SHA|$CI_COMMIT_SHA|g" frontend-workload.yaml
     - kubectl apply -f frontend-workload.yaml
-    - kubectl rollout status deployment/frontend -n newtopia-app --timeout=300
+    - kubectl rollout status deployment/frontend -n newtopia-app --timeout=300s
   after_script:
     - |
       if [ "$CI_JOB_STATUS" == "failed" ]; then
@@ -239,7 +239,7 @@ deploy:frontend:
 
         # Rollback to previous version
         kubectl rollout undo deployment/frontend -n newtopia-app
-        kubectl rollout status deployment/frontend -n newtopia-app --timeout=300
+        kubectl rollout status deployment/frontend -n newtopia-app --timeout=300s
 
         echo "=== Rollback completed ==="
         echo "=== Failure Analysis ==="
