@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,6 +33,7 @@ public class SimpleNewsService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String bucketName = "newtopia";
     private final ExecutorService executor = Executors.newFixedThreadPool(10);
+    private final Random random = new Random();
     
     @PreDestroy
     public void cleanup() {
@@ -55,6 +57,32 @@ public class SimpleNewsService {
     public JsonNode getNewsForGame(Game game, String category, String sentiment) {
         List<JsonNode> results = getNewsByCondition(category, sentiment, 1);
         return results.isEmpty() ? null : results.get(0);
+    }
+
+    /**
+     * 무작위 뉴스 1개 조회
+     */
+    public JsonNode getRandomNews() {
+        try {
+            // MinIO에서 파일 목록 가져오기
+            List<String> fileNames = getFileList("sentiment/year=2025/");
+
+            if (fileNames.isEmpty()) {
+                log.warn("뉴스 파일이 없습니다.");
+                return null;
+            }
+
+            // 랜덤한 파일 선택
+            String randomFileName = fileNames.get(random.nextInt(fileNames.size()));
+            log.info("무작위 선택된 파일: {}", randomFileName);
+
+            // 선택된 파일에서 무작위 뉴스 아이템 가져오기
+            return getRandomNewsFromFile(randomFileName);
+
+        } catch (Exception e) {
+            log.error("무작위 뉴스 조회 중 오류 발생", e);
+            return null;
+        }
     }
 
     /**
@@ -298,6 +326,52 @@ public class SimpleNewsService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    /**
+     * 파일에서 무작위 뉴스 아이템 가져오기
+     */
+    private JsonNode getRandomNewsFromFile(String fileName) {
+        List<JsonNode> allNewsItems = new ArrayList<>();
+
+        try {
+            GetObjectArgs getObjectArgs = GetObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(fileName)
+                    .build();
+
+            InputStream stream = minioClient.getObject(getObjectArgs);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    try {
+                        JsonNode newsItem = objectMapper.readTree(line);
+                        allNewsItems.add(newsItem);
+                    } catch (Exception e) {
+                        log.debug("JSON 파싱 실패한 라인 스킵: {}", line.substring(0, Math.min(line.length(), 50)));
+                    }
+                }
+            }
+            reader.close();
+
+            if (allNewsItems.isEmpty()) {
+                log.warn("파일 {}에서 유효한 뉴스를 찾을 수 없습니다.", fileName);
+                return null;
+            }
+
+            // 무작위 뉴스 아이템 선택
+            JsonNode randomNews = allNewsItems.get(random.nextInt(allNewsItems.size()));
+            log.info("파일 {}에서 {}개 중 무작위 뉴스 선택: {}",
+                fileName, allNewsItems.size(), randomNews.get("title").asText());
+
+            return randomNews;
+
+        } catch (Exception e) {
+            log.error("파일 {}에서 무작위 뉴스 조회 중 오류 발생", fileName, e);
+            return null;
         }
     }
 }

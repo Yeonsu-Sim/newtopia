@@ -17,7 +17,7 @@ public interface ScenarioService {
 
 
     /** 게임 시작 시 선택할 첫 시나리오를 반환 (랜덤) */
-    public Scenario firstScenario() ;
+    public Scenario firstScenario();
 
     /**
      * 다음 턴에 사용할 시나리오를 반환 (랜덤)

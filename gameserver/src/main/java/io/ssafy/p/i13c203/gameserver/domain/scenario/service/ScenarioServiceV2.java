@@ -13,7 +13,18 @@ import io.minio.messages.JsonType;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CountryStats;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
+import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Npc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.repository.ScenarioRepository;
+import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
+import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.PressReleaseDoc;
+import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.SpawnConditionsDoc;
+import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.RelatedArticleDoc;
+import io.ssafy.p.i13c203.gameserver.domain.game.doc.EffectDoc;
+import io.ssafy.p.i13c203.gameserver.domain.game.doc.EffectScoresDoc;
+import io.ssafy.p.i13c203.gameserver.domain.game.doc.EffectWeightsDoc;
+import io.ssafy.p.i13c203.gameserver.domain.game.doc.ConditionEntryDoc;
+import io.ssafy.p.i13c203.gameserver.domain.game.model.ConditionOperator;
+import io.ssafy.p.i13c203.gameserver.domain.game.model.MinorCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +35,9 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -35,17 +48,19 @@ public class ScenarioServiceV2 implements ScenarioService{
 
     private final SimpleNewsService simpleNewsService;
     private final GenerateScenarioService generateScenarioService;
+    private final ObjectMapper objectMapper;
 
 
     @Override
     public Scenario firstScenario() {
-        return null;
+        JsonNode newsData = simpleNewsService.getRandomNews();
+        return createScenarioFromNews(newsData);
     }
 
 
 
 
-    // 1. 게임 상태를 분석하여 적절한 뉴스 데이터 조회 및 시나리오 생성
+    //
     @Override
     public Scenario nextScenario(Game game, int nextTurn) {
         try {
@@ -79,9 +94,21 @@ public class ScenarioServiceV2 implements ScenarioService{
     private Scenario createScenarioFromNews(JsonNode newsData) {
         log.info("뉴스 기반 시나리오 생성: {}", newsData.get("title").asText());
 
-        String s = generateScenarioService.processNewsWithGPT(newsData);
+        String gptResponse = generateScenarioService.processNewsWithGPT(newsData);
 
-        return null;
+        if (gptResponse == null || gptResponse.isEmpty()) {
+            log.warn("GPT API 응답이 null 또는 빈 값입니다.");
+            return null;
+        }
+
+        try {
+            return parseGptResponseToScenario(gptResponse, newsData);
+        } catch (Exception e) {
+            log.error("GPT 응답을 Scenario 객체로 변환 중 오류 발생", e);
+            return null;
+        }
+
+
     }
 
 //    /**
@@ -158,5 +185,174 @@ public class ScenarioServiceV2 implements ScenarioService{
 //            return null;
 //        }
 //    }
+
+    /**
+     * GPT API 응답을 Scenario 객체로 변환
+     */
+    private Scenario parseGptResponseToScenario(String gptResponse, JsonNode newsData) throws Exception {
+        JsonNode scenarioJson = objectMapper.readTree(gptResponse);
+
+        // 기본 시나리오 정보
+        String title = scenarioJson.path("title").asText();
+        String content = scenarioJson.path("content").asText();
+
+        // spawn conditions 파싱
+        SpawnConditionsDoc spawn = parseSpawnConditions(scenarioJson.path("conditions"));
+
+        // choices 파싱
+        Map<String, ChoiceDoc> choices = parseChoices(scenarioJson.path("choices"));
+
+        // related article 생성 (뉴스 기반)
+        RelatedArticleDoc relatedArticle = new RelatedArticleDoc(
+            newsData.path("title").asText(),
+            newsData.path("source_url").asText()
+        );
+
+        // 임시 NPC (실제로는 DB에서 조회하거나 별도 로직 필요)
+        Npc defaultNpc = createDefaultNpc();
+
+        return Scenario.builder()
+            .title(title)
+            .content(content)
+            .npc(defaultNpc)
+            .spawn(spawn)
+            .choices(choices)
+            .relatedArticle(relatedArticle)
+            .build();
+    }
+
+    /**
+     * spawn conditions 파싱
+     */
+    private SpawnConditionsDoc parseSpawnConditions(JsonNode conditionsNode) {
+        List<ConditionEntryDoc> conditions = new ArrayList<>();
+
+        if (conditionsNode.isArray()) {
+            for (JsonNode conditionNode : conditionsNode) {
+                String minorCategoryStr = conditionNode.path("minorCategory").asText();
+                String operatorStr = conditionNode.path("operator").asText();
+                double threshold = conditionNode.path("threshold").asDouble();
+
+                try {
+                    MinorCategory category = MinorCategory.valueOf(minorCategoryStr);
+                    ConditionOperator operator = ConditionOperator.valueOf(operatorStr);
+
+                    conditions.add(new ConditionEntryDoc(category, operator, threshold));
+                } catch (IllegalArgumentException e) {
+                    log.warn("잘못된 조건 파라미터: category={}, operator={}", minorCategoryStr, operatorStr);
+                }
+            }
+        }
+
+        return new SpawnConditionsDoc(conditions);
+    }
+
+    /**
+     * choices 파싱
+     */
+    private Map<String, ChoiceDoc> parseChoices(JsonNode choicesNode) {
+        Map<String, ChoiceDoc> choices = new HashMap<>();
+
+        if (choicesNode.isObject()) {
+            choicesNode.fields().forEachRemaining(entry -> {
+                String choiceKey = entry.getKey();
+                JsonNode choiceValue = entry.getValue();
+
+                try {
+                    ChoiceDoc choice = parseChoice(choiceValue);
+                    choices.put(choiceKey, choice);
+                } catch (Exception e) {
+                    log.warn("선택지 파싱 실패: key={}", choiceKey, e);
+                }
+            });
+        }
+
+        return choices;
+    }
+
+    /**
+     * 개별 choice 파싱
+     */
+    private ChoiceDoc parseChoice(JsonNode choiceNode) {
+        String code = choiceNode.path("code").asText();
+        String content = choiceNode.path("content").asText();
+
+        // effect 파싱
+        EffectDoc effect = parseEffect(choiceNode.path("effect"));
+
+        // pressRelease 파싱
+        PressReleaseDoc pressRelease = parsePressRelease(choiceNode.path("pressRelease"));
+
+        // comments 파싱
+        List<String> comments = new ArrayList<>();
+        JsonNode commentsNode = choiceNode.path("comments");
+        if (commentsNode.isArray()) {
+            commentsNode.forEach(comment -> comments.add(comment.asText()));
+        }
+
+        return new ChoiceDoc(code, content, effect, pressRelease, comments);
+    }
+
+    /**
+     * effect 파싱
+     */
+    private EffectDoc parseEffect(JsonNode effectNode) {
+        // scores 파싱
+        JsonNode scoresNode = effectNode.path("scores");
+        EffectScoresDoc scores = new EffectScoresDoc(
+            scoresNode.path("economy").asInt(),
+            scoresNode.path("defense").asInt(),
+            scoresNode.path("publicSentiment").asInt(),
+            scoresNode.path("environment").asInt()
+        );
+
+        // weights 파싱
+        JsonNode weightsNode = effectNode.path("weights");
+        EffectWeightsDoc weights = new EffectWeightsDoc(
+            weightsNode.path("macroeconomy").asDouble(),
+            weightsNode.path("fiscalPolicy").asDouble(),
+            weightsNode.path("financialMarkets").asDouble(),
+            weightsNode.path("industryBusiness").asDouble(),
+            weightsNode.path("militarySecurity").asDouble(),
+            weightsNode.path("alliances").asDouble(),
+            weightsNode.path("cyberSpace").asDouble(),
+            weightsNode.path("publicSafety").asDouble(),
+            weightsNode.path("publicOpinion").asDouble(),
+            weightsNode.path("socialIssues").asDouble(),
+            weightsNode.path("protestsStrikes").asDouble(),
+            weightsNode.path("healthWelfare").asDouble(),
+            weightsNode.path("climateChangeEnergy").asDouble(),
+            weightsNode.path("pollutionDisaster").asDouble(),
+            weightsNode.path("biodiversity").asDouble(),
+            weightsNode.path("resourceManagement").asDouble()
+        );
+
+        return new EffectDoc(scores, weights);
+    }
+
+    /**
+     * pressRelease 파싱
+     */
+    private PressReleaseDoc parsePressRelease(JsonNode pressReleaseNode) {
+        String title = pressReleaseNode.path("title").asText();
+        String content = pressReleaseNode.path("content").asText();
+
+        return new PressReleaseDoc(title, content, null); // imageUrl은 보류
+    }
+
+    /**
+     * 기본 NPC 생성 (임시)
+     * 실제로는 DB에서 조회하거나 별도 로직 필요
+     */
+    //(1,  'ECO_1', '과학자',         '["경제","과학"]'::jsonb,         NULL, now(), now()),
+    private Npc createDefaultNpc() {
+        return Npc.builder()
+            .id(1L) // 임시 ID
+            .name("과학자")
+            .imageS3Key("default-president.jpg")
+            .build();
+
+//        return null;
+    }
 
 }
