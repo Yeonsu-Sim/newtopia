@@ -98,6 +98,21 @@ public class MinioFileStorage implements FileStorage {
     }
 
     @Override
+    public FileStat stat(String key) throws IOException {
+        try {
+            var resp = minioClient.statObject(
+                    StatObjectArgs.builder().bucket(bucketName).object(key).build()
+            );
+            long size = resp.size();
+            String ct = resp.contentType();
+            String etag = resp.etag();
+            return new FileStat(size, ct, etag);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
     public boolean delete(String key) throws IOException {
         try {
             minioClient.removeObject(

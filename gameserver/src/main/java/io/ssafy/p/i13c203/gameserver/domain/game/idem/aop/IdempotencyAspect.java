@@ -145,7 +145,7 @@ public class IdempotencyAspect {
         String[] names = sig.getParameterNames();
         for (int i = 0; i < names.length; i++) argMap.put(names[i], args[i]);
         StringBuilder sb = new StringBuilder();
-        sb.append("member:").append(Objects.toString(currentMemberId())).append('|');
+        sb.append("member:").append(currentMemberId()).append('|');
         sb.append("method:").append(sig.getDeclaringTypeName()).append('#').append(sig.getName()).append('|');
         for (String n : hashArgs) sb.append(n).append('=').append(argMap.get(n)).append('|');
         return Integer.toHexString(sb.toString().hashCode());
