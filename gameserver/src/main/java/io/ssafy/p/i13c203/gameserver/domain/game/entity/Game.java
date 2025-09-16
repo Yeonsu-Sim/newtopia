@@ -3,17 +3,12 @@ package io.ssafy.p.i13c203.gameserver.domain.game.entity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.CardDoc;
+import io.ssafy.p.i13c203.gameserver.domain.ranking.entity.Ranking;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.ChoiceWeights;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CountryStats;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -70,11 +65,14 @@ public class Game {
     @Column(columnDefinition = "jsonb", nullable = false)
     private Map<String, ChoiceDoc> currentChoices;
 
+    @OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
+    private Ranking ranking;
+
     @Column(nullable = false)
     private boolean active;
 
     @Column
-    private LocalDateTime endedAt;
+    private Instant endedAt;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -86,7 +84,7 @@ public class Game {
 
     public void markEnded(EndingDoc ending) {
         this.endingCode = ending.code();
-        this.endedAt = LocalDateTime.now();
+        this.endedAt = Instant.now();
         this.active = false;
     }
 }
