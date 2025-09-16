@@ -15,9 +15,9 @@ let globalBgmPlaying = true; // 기본값을 true로 설정
 export const useAudio = (options: UseAudioOptions = {}) => {
   const {
     bgmTracks = [
-      '/src/assets/sounds/Edelstein_City_(NEWTRO Ver.).mp3',
-      '/src/assets/sounds/Newtro_Henesys.mp3',
-      '/src/assets/sounds/Newtro_Kingdom.mp3'
+      '/sounds/Edelstein_City_(NEWTRO Ver.).mp3',
+      '/sounds/Newtro_Henesys.mp3',
+      '/sounds/Newtro_Kingdom.mp3'
     ],
     enableBgm = true,
     bgmVolume = 0.5,
@@ -74,7 +74,7 @@ export const useAudio = (options: UseAudioOptions = {}) => {
 
   // 클릭 사운드 초기화
   useEffect(() => {
-    clickSoundRef.current = new Audio('/src/assets/sounds/click.mp3');
+    clickSoundRef.current = new Audio('/sounds/click.mp3');
     clickSoundRef.current.volume = clickSoundVolume;
 
     return () => {
