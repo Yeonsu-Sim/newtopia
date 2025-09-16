@@ -74,7 +74,7 @@ public class Game {
     private boolean active;
 
     @Column
-    private Instant endedAt;
+    private LocalDateTime endedAt;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -86,7 +86,7 @@ public class Game {
 
     public void markEnded(EndingDoc ending) {
         this.endingCode = ending.code();
-        this.endedAt = Instant.now();
+        this.endedAt = LocalDateTime.now();
         this.active = false;
     }
 }
