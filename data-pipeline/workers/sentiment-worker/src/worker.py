@@ -1,11 +1,11 @@
 # workers/sentiment-worker/src/worker.py
-# -*- coding: utf-8 -*-\
+# -*- coding: utf-8 -*-
 import re
 import asyncio
 import hashlib
 import logging
 from datetime import datetime, timezone
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Tuple
 
 import orjson
 import boto3
@@ -33,6 +33,75 @@ def setup_logging():
     )
 
 
+def iso_to_epoch_ms(iso_str: Optional[str]) -> Optional[int]:
+    """
+    ISO8601 문자열을 epoch(ms)로 변환. 실패 시 None
+    """
+    if not iso_str:
+        return None
+    try:
+        dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+        return int(dt.timestamp() * 1000)
+    except Exception:
+        return None
+
+
+def extract_major_and_conf(doc: Dict[str, Any]) -> Tuple[Optional[str], Optional[float]]:
+    """
+    categories.major_categories[0]에서 (category, confidence) 추출
+    """
+    try:
+        majors = doc.get("categories", {}).get("major_categories", [])
+        if isinstance(majors, list) and majors:
+            c = majors[0]
+            cat = c.get("category")
+            conf = c.get("confidence")
+            return (cat, float(conf) if conf is not None else None)
+    except Exception:
+        pass
+    return (None, None)
+
+
+# -----------------------
+# Kafka Connect(JDBC Sink)용 schema+payload 레코드 생성
+# -----------------------
+CONNECT_SCHEMA = {
+    "type": "struct",
+    "name": "news_event",
+    "optional": False,
+    "fields": [
+        {"type": "string", "optional": False, "field": "article_id"},
+        {"type": "string", "optional": True,  "field": "source_url"},
+        {"type": "string", "optional": True,  "field": "title"},
+        {"type": "string", "optional": True,  "field": "content"},
+        {"type": "string", "optional": True,  "field": "published_at"},
+        {"type": "string", "optional": True,  "field": "categories"},  # ← JSON 문자열로 보냄
+        {"type": "string", "optional": True,  "field": "sentiment"},   # ← JSON 문자열로 보냄
+        {"type": "int64",  "optional": True,  "name": "org.apache.kafka.connect.data.Timestamp", "version": 1, "field": "processed_at"}
+    ]
+}
+
+def to_connect_record(x: Dict[str, Any]) -> Dict[str, Any]:
+    categories_json = None
+    if x.get("categories") is not None:
+        categories_json = orjson.dumps(x["categories"]).decode("utf-8")
+
+    sent = x.get("sentiment") or {}
+    sentiment_json = orjson.dumps(sent).decode("utf-8") if sent else None
+
+    payload = {
+        "article_id":   str(x.get("article_id") or ""),
+        "source_url":   x.get("source_url"),
+        "title":        x.get("title"),
+        "content":      x.get("content"),
+        "published_at": x.get("published_at"),            # 원문 문자열 그대로
+        "categories":   categories_json,                  # 문자열 → PG가 jsonb로 파싱
+        "sentiment":    sentiment_json,                   # 문자열 → PG가 jsonb로 파싱
+        "processed_at": iso_to_epoch_ms(x.get("processed_at"))
+    }
+    return {"schema": CONNECT_SCHEMA, "payload": payload}
+
+
 # -----------------------
 # S3 / MinIO
 # -----------------------
@@ -52,7 +121,8 @@ def make_s3():
         verify=cfg.S3_SSL_ENABLED if hasattr(cfg, "S3_SSL_ENABLED") else False,
     )
 
-def _extract_year(published_at: str | None) -> str:
+
+def _extract_year(published_at: Optional[str]) -> str:
     """
     '2025.08.29. 오전 11:11' 같이 지역 형식이 섞여도 연도 4자리만 뽑아냄.
     실패하면 현재 UTC 연도.
@@ -80,10 +150,9 @@ def _extract_major(doc: Dict[str, Any]) -> str:
     return "unknown"
 
 
-
 def s3_key_for(doc: Dict[str, Any]) -> str:
     """
-    파티셔닝 규칙 변경:
+    파티셔닝 규칙:
       <prefix>/year=YYYY/major=<major>/<sha1(source_url)>.json
     예) news/sentiment/year=2025/major=economy/3a1f....json
     """
@@ -195,13 +264,13 @@ async def run():
 
                 x["sentiment"] = {"label": label, "score": round(score, 6)}
 
-                # Kafka 출력 (positive/negative 만)
+                # Kafka 출력 (positive/negative 만) - JDBC Sink용 schema+payload로 래핑
                 try:
                     await send_with_retry(
                         producer,
                         cfg.DST_TOPIC,
                         key=None,
-                        value=x,
+                        value=to_connect_record(x),
                         retries=getattr(cfg, "SEND_RETRIES", 2),
                         backoff_ms=getattr(cfg, "SEND_BACKOFF_MS", 400),
                     )
@@ -213,7 +282,7 @@ async def run():
                         log.error("DLQ send failed: %s", e2)
                     continue
 
-                # MinIO 스냅샷 저장 (positive/negative 만)
+                # MinIO 스냅샷 저장 (positive/negative 만) - 원문 JSON 그대로 저장
                 try:
                     await asyncio.get_event_loop().run_in_executor(None, put_s3_json, s3, x)
                 except ClientError as e:
