@@ -6,14 +6,16 @@ import { GameBackground } from '@/components/common/GameBackground';
 import { MenuButton } from '@/components/common/MenuButton';
 import { HotTopic } from '@/components/common/HotTopic';
 import { RankingModal } from '@/components/RankingModal';
+import { SuggestionModal } from '@/components/SuggestionModal';
 import {
   MainContainer,
   WelcomeSection,
   WelcomeTitle,
   WelcomeSubtitle,
   MenuContainer,
+  BgmToggleButton,
   LogoutButton
-} from './-Main.styles';
+} from '@/routes/main/-Main.styles';
 
 export const Route = createFileRoute('/main/')({
   component: MainPage,
@@ -22,8 +24,12 @@ export const Route = createFileRoute('/main/')({
 function MainPage() {
   const { user, logout, isLoading } = useAuthStore();
   const navigate = useNavigate();
-  const { playClickSound } = useAudio();
+  const { isBgmPlaying, playClickSound, toggleBgm } = useAudio({
+    bgmVolume: 0.5,
+    clickSoundVolume: 0.7
+  });
   const [showRankingModal, setShowRankingModal] = useState(false);
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
 
   // 로그인되지 않은 사용자는 랜딩 페이지로 리다이렉트
   useEffect(() => {
@@ -45,8 +51,7 @@ function MainPage() {
 
   const handleSuggestion = () => {
     playClickSound();
-    // TODO: 건의사항 페이지 구현 후 연결
-    alert('건의하기 기능은 준비 중입니다.');
+    setShowSuggestionModal(true);
   };
 
   const handleRanking = () => {
@@ -79,7 +84,12 @@ function MainPage() {
   return (
     <MainContainer>
       <GameBackground />
-      
+
+      {/* BGM 토글 버튼 */}
+      <BgmToggleButton onClick={toggleBgm}>
+        {isBgmPlaying ? '🔊' : '🔇'}
+      </BgmToggleButton>
+
       {/* 로그아웃 버튼 */}
       <LogoutButton onClick={handleLogout} disabled={isLoading}>
         {isLoading ? '처리 중...' : '로그아웃'}
@@ -117,6 +127,12 @@ function MainPage() {
       <RankingModal
         isOpen={showRankingModal}
         onClose={() => setShowRankingModal(false)}
+      />
+
+      {/* 건의사항 모달 */}
+      <SuggestionModal
+        isOpen={showSuggestionModal}
+        onClose={() => setShowSuggestionModal(false)}
       />
     </MainContainer>
   );

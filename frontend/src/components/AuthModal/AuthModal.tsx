@@ -22,7 +22,7 @@ import {
   ModalFrame,
   ModalBorder,
   CloseButton
-} from './AuthModal.styles';
+} from '@/components/AuthModal/AuthModal.styles';
 
 interface AuthModalProps {
   isOpen: boolean;

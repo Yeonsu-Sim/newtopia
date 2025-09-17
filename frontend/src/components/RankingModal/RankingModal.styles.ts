@@ -30,9 +30,9 @@ export const ModalContent = styled.div`
   min-height: 90vh;
   max-height: 95vh;
   border-radius: 40px;
-  border: 20px solid #F9BF26;
+  border: 10px solid #F9BF26;
   background: #E49000;
-  box-shadow: 24px 24px 20px 8px #A35400 inset, 12px 12px 0 4px #D57500;
+  box-shadow: 4px 4px 8px 4px #A35400 inset, 0px 0px 0 0px #D57500;
   z-index: 1001;
 
   @media (max-width: 768px) {

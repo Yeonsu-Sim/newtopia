@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { getMyRanking, getTopRanking, getGameRanking } from '@/services/rankingApi';
 import type { RankingItem } from '@/services/rankingApi';
 import {
-  ModalOverlay,
   ModalBackground,
+  ModalOverlay,
   ModalContent,
   ModalHeader,
   HeaderTab,
@@ -19,7 +19,7 @@ import {
   TableCell,
   LoadingSpinner,
   ErrorMessage
-} from './RankingModal.styles';
+} from '@/components/RankingModal/RankingModal.styles';
 
 export interface RankingModalProps {
   isOpen: boolean;
