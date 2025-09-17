@@ -57,7 +57,11 @@ spring:
 
 logging:
   level:
-    '[io.ssafy.p.i13c203.gameserver]': debug
+    '[io.ssafy.p.i13c203.gameserver]': trace
+    '[org.springframework.security]': debug
+    '[org.springframework.web.filter]': debug
+    '[org.springframework.security.web.FilterChainProxy]': trace
+    '[org.springframework.security.web.access.intercept.FilterSecurityInterceptor]': debug
 app:
   storage:
      minio:
