@@ -65,7 +65,7 @@ public class SimpleNewsService {
     public JsonNode getRandomNews() {
         try {
             // MinIO에서 파일 목록 가져오기
-            List<String> fileNames = getFileList("sentiment/year=2025/");
+            List<String> fileNames = getFileList("first/");
 
             if (fileNames.isEmpty()) {
                 log.warn("뉴스 파일이 없습니다.");
