@@ -12,6 +12,7 @@ import io.minio.messages.CompressionType;
 import io.minio.messages.JsonType;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CountryStats;
+import io.ssafy.p.i13c203.gameserver.domain.image.entity.Image;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Npc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.repository.ScenarioRepository;
@@ -49,6 +50,8 @@ public class ScenarioServiceV2 implements ScenarioService{
     private final SimpleNewsService simpleNewsService;
     private final GenerateScenarioService generateScenarioService;
     private final ObjectMapper objectMapper;
+
+
 
 
     @Override
@@ -349,9 +352,11 @@ public class ScenarioServiceV2 implements ScenarioService{
         return Npc.builder()
             .id(1L) // 임시 ID
             .name("과학자")
+                .image(Image.builder()
+                        .url("https://j13c203.p.ssafy.io/newtopia-img/public/public/2025/09/17/9ecb2ef7-b664-499e-b563-b24914d3e9de.jpg")
+                        .build())
             .build();
 
-//        return null;
     }
 
 }
