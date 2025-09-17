@@ -4,6 +4,8 @@ import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
 import io.ssafy.p.i13c203.gameserver.domain.ending.service.EndingService;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.*;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CardType;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.AppliedDoc;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.service.GameResultService;
 import io.ssafy.p.i13c203.gameserver.domain.ranking.service.RankingService;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
@@ -16,7 +18,6 @@ import io.ssafy.p.i13c203.gameserver.domain.game.repository.GameRepository;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.NpcRefDoc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Npc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.repository.NpcRepository;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.service.ScenarioService;
 import io.ssafy.p.i13c203.gameserver.global.exception.BusinessException;
 import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
@@ -36,10 +37,10 @@ public class GameService {
 
     private final GameRepository gameRepo;
     private final GameHistoryRepository historyRepo;
-    private final NpcRepository npcRepo;
     private final ScenarioService scenarioService;
     private final EndingService endingService;
     private final RankingService rankingService;
+    private final GameResultService gameResultService;
 
     @Transactional(readOnly = true)
     public Game findByIdOrThrow(Long gameId) {
@@ -90,9 +91,29 @@ public class GameService {
                 .currentCard(first)
                 .currentChoices(first.choices())
                 .active(true)
+                .turn(1)
                 .build();
 
-        return gameRepo.saveAndFlush(game);
+        Game savedGame = gameRepo.saveAndFlush(game);
+
+        // --------  히스토리 저장  ----------
+        HistoryEntryDoc entry = new HistoryEntryDoc(
+                0,
+                null,
+                CountryStatsDoc.from(stats),
+                ChoiceWeightsDoc.from(game.getChoiceWeights()),
+                null,
+                Instant.now(),
+                null,
+                null
+        );
+
+        historyRepo.save(GameHistory.builder()
+                .gameId(savedGame.getId())
+                .entry(entry)
+                .build());
+
+        return savedGame;
     }
 
     // ========== 9.3 선택 반영 (AOP 멱등성) ==========
@@ -111,12 +132,7 @@ public class GameService {
         if (chosen == null) throw new BusinessException(ErrorCode.INVALID_CHOICE_CODE);
 
         // -------- (0) 적용 "이전" 스냅샷 ----------
-        CountryStatsDoc beforeStats = new CountryStatsDoc(
-                game.getCountryStats().getEconomy(),
-                game.getCountryStats().getDefense(),
-                game.getCountryStats().getPublicSentiment(),
-                game.getCountryStats().getEnvironment()
-        );
+        CountryStatsDoc beforeStats = CountryStatsDoc.from(game.getCountryStats());
         int finishedTurn = game.getTurn();
 
         // -------- (1) effect 반영 ----------
@@ -130,21 +146,18 @@ public class GameService {
         game.getCountryStats().addDelta(dEco, dDef, dOpi, dEnv);
 
         // 적용 "이후" 스냅샷
-        CountryStatsDoc afterStats = new CountryStatsDoc(
-                game.getCountryStats().getEconomy(),
-                game.getCountryStats().getDefense(),
-                game.getCountryStats().getPublicSentiment(),
-                game.getCountryStats().getEnvironment()
-        );
+        CountryStatsDoc afterStats = CountryStatsDoc.from(game.getCountryStats());
 
         // -------- (2) 히스토리 저장 (after 기준 스냅샷) ----------
         HistoryEntryDoc entry = new HistoryEntryDoc(
                 finishedTurn,
                 choiceCode,
                 afterStats,
-                toWeightsDoc(game.getChoiceWeights()),
+                ChoiceWeightsDoc.from(game.getChoiceWeights()),
                 game.getCurrentCard(),
-                Instant.now()
+                Instant.now(),
+                AppliedDoc.of(beforeStats, afterStats),
+                game.getCurrentCard().choices().get(choiceCode).label()
         );
         historyRepo.save(GameHistory.builder()
                 .gameId(gameId)
@@ -159,10 +172,17 @@ public class GameService {
         if (ending != null) {
             game.markEnded(ending); // endingCode, endedAt, active=false
 
-            try { gameRepo.saveAndFlush(game); }
-            catch (OptimisticLockingFailureException e) { throw new BusinessException(ErrorCode.CONCURRENCY_CONFLICT); }
+            try {
+                gameRepo.saveAndFlush(game);
+            } catch (OptimisticLockingFailureException e) {
+                throw new BusinessException(ErrorCode.CONCURRENCY_CONFLICT);
+            }
+
+            gameResultService.createOnEnding(memberId, game);
+
             // TODO: Check Ranking Service 입력
             rankingService.registerRanking(game);
+
             // 엔딩 응답: nextCard=null, 다음 턴 증가 없음
             return SubmitChoiceResult.ended(
                     finishedTurn, choiceCode, beforeStats, afterStats, ending
@@ -198,16 +218,6 @@ public class GameService {
                 .build();
         base.add(delta);
         return base;
-    }
-
-
-    private static ChoiceWeightsDoc toWeightsDoc(ChoiceWeights w) {
-        return new ChoiceWeightsDoc(
-                w.getMacroeconomy(), w.getFiscalPolicy(), w.getFinancialMarkets(), w.getIndustryBusiness(),
-                w.getMilitarySecurity(), w.getAlliances(), w.getCyberSpace(), w.getPublicSafety(),
-                w.getPublicOpinion(), w.getSocialIssues(), w.getProtestsStrikes(), w.getHealthWelfare(),
-                w.getClimateChangeEnergy(), w.getPollutionDisaster(), w.getBiodiversity(), w.getResourceManagement()
-        );
     }
 
     private CardDoc toCardDoc(Scenario sc, CardType type) {

@@ -32,7 +32,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long gameId;
+    private Long id;
 
     @Column(nullable = false)
     private Long memberId;

@@ -41,7 +41,7 @@ public class GameControllerImpl implements GameController {
         return ResponseEntity.ok(APIResponse.success("진행 중인 게임을 불러왔습니다.",
                 GetMyGameResponse.of(
                         GameSummaryDto.of(
-                                g.getGameId(),
+                                g.getId(),
                                 g.getCountryName(),
                                 TurnSummaryDto.of(
                                         g.getTurn(),
