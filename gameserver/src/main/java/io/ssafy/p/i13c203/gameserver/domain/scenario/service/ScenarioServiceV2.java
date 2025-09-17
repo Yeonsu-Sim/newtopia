@@ -349,7 +349,6 @@ public class ScenarioServiceV2 implements ScenarioService{
         return Npc.builder()
             .id(1L) // 임시 ID
             .name("과학자")
-            .imageS3Key("default-president.jpg")
             .build();
 
 //        return null;
