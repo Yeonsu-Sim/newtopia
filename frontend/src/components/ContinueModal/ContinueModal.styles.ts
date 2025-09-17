@@ -15,6 +15,7 @@ export const ModalBox = styled.div`
   border-radius: 12px;
   width: 360px;
   text-align: center;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
 `;
 
 export const ButtonGroup = styled.div`

@@ -17,6 +17,14 @@ public class StorageKeyBuilder {
         return String.format("public/%s/%s/%s.%s", domain, date, fileId, ext.toLowerCase());
     }
 
+    /**
+     * 이미지 코드 기반 경로명 설정 (시드 데이터 멱등 확인용 고정 키)
+     */
+    public static String buildPublicByCode(String domain, String code, String ext) {
+        String safe = code.replaceAll("[^A-Za-z0-9_\\-\\.]", "_"); // 안전한 파일명
+        return String.format("public/%s/by-code/%s.%s", domain, code, ext.toLowerCase());
+    }
+
     public static String extOf(String originalName, String contentType) {
         if (originalName != null && originalName.contains(".")) {
             return originalName.substring(originalName.lastIndexOf('.') + 1);

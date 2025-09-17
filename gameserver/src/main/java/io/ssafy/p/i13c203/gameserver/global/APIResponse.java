@@ -1,5 +1,6 @@
 package io.ssafy.p.i13c203.gameserver.global;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,8 +11,10 @@ import lombok.ToString;
 @Getter
 @ToString
 public class APIResponse<T, K> {
+    @Schema(example = "success | error")
     private String status;   // "success" or "error"
     private T data;
+    @Schema(example = "응답에 관한 메세지")
     private String message;
     private APIError<K> error;
 

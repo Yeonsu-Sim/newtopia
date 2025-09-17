@@ -11,7 +11,7 @@ export const MainContainer = styled.div`
 
 export const WelcomeSection = styled.div`
   position: absolute;
-  top: 20%;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -22,10 +22,11 @@ export const WelcomeTitle = styled.h1`
   color: white;
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-size: clamp(32px, 8vw, 64px);
-  font-weight: bold;
+  font-weight: normal;
   text-shadow: #000000 4px 4px 10px;
   margin-bottom: 1rem;
   line-height: 1.2;
+  white-space: nowrap;
 `;
 
 export const WelcomeSubtitle = styled.p`
@@ -40,7 +41,7 @@ export const WelcomeSubtitle = styled.p`
 export const MenuContainer = styled.div`
   position: absolute;
   left: 50%;
-  top: 55%;
+  top: 60%;
   transform: translate(-50%, -50%);
   z-index: 10;
   display: flex;

@@ -17,7 +17,7 @@ public record CardBriefDto(
         return new CardBriefDto(
                 c.cardId(),
                 c.type().name(),
-                new NpcDto(c.npc().name(), c.npc().imageS3Key()),
+                new NpcDto(c.npc().name(), c.npc().imageUrl()),
                 c.content(),
                 c.choices().entrySet().stream()
                         .map(e -> new ChoiceLabelDto(e.getKey(), e.getValue().label()))

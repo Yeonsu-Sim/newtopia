@@ -12,16 +12,17 @@ import{
 interface GuestDialogProps {
   guestName: string;
   guestText: string;
+  guestImage: string;
   open: boolean;
   onClose: () => void;
   onSelect: () => void;
 }
 
-const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, onClose, onSelect }) => {
+const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, guestImage, onClose, onSelect }) => {
   return (
     <DialogOverlay>
       <GuestBox>
-        <GuestIcon></GuestIcon>
+        <GuestIcon src={guestImage}></GuestIcon>
         <DialogBox>
           <DialogHeader>{guestName}</DialogHeader>
           <DialogContent>{guestText}</DialogContent>

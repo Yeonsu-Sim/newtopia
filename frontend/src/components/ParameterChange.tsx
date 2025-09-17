@@ -1,5 +1,5 @@
 import{
-  ParameterWrapper,
+  ParameterChangeWrapper,
   ProgressBar,
   ProgressFill,
   ProgressBox,
@@ -29,7 +29,7 @@ const ParameterChange: React.FC<ParameterProps> = ({ type, value }) => {
   };
 
   return (
-    <ParameterWrapper>
+    <ParameterChangeWrapper>
       <ParameterEmoji>{getEmoji(type)}</ParameterEmoji>
       <ProgressBox>
         <ProgressBar>
@@ -37,7 +37,7 @@ const ParameterChange: React.FC<ParameterProps> = ({ type, value }) => {
         </ProgressBar>
         <ProgressValue>{value}</ProgressValue>
       </ProgressBox>
-    </ParameterWrapper>
+    </ParameterChangeWrapper>
   );
 };
 

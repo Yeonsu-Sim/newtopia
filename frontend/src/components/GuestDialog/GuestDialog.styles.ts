@@ -60,10 +60,7 @@ export const DialogActions = styled.div`
   }
 `;
 
-export const GuestIcon = styled.img.attrs({
-    src: "src/assets/icons/사람1.png",
-    alt: "",
-})`
+export const GuestIcon = styled.img`
     width: 150px;
     height: auto;
 `;

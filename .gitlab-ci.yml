@@ -6,20 +6,10 @@ stages:
 variables:
   FRONTEND_DOCKER_IMAGE: "$DOCKER_HUB_USER/frontend-app"
   GAMESERVER_DOCKER_IMAGE: "$DOCKER_HUB_USER/gameserver-app"
-  # Data pipe line 쪽아직 올라온게 없어서 
-  # DATA_DOCKER_IMAGE: "$DOCKER_HUB_USER/data-app"
   NEWS_CRAWLER_DOCKER_IMAGE: "$DOCKER_HUB_USER/crawler-app"
+  DATA_PIPELINE_DOCKER_IMAGE: "$DOCKER_HUB_USER/data-pipeline"
   GIT_STRATEGY: clone
   GIT_DEPTH: 0
-
-test:connection:
-  stage: test
-  image: alpine:latest
-  script:
-    - echo "CI/CD 파이프라인 테스트"
-    - echo "커밋:" $CI_COMMIT_SHA
-  tags:
-    - runner
 
 build:gameserver:
   stage: build
@@ -28,12 +18,6 @@ build:gameserver:
     entrypoint: [""]
   tags:
     - runner
-  # rules:
-  #   # only master 랑 똑같이 브랜치가 master일 때만 동작 
-  #   - if: '$CI_COMMIT_BRANCH == "master"'
-  #   - changes:
-  #     - gameserver/**
-  #   - when: never
   rules:
   - if: '$CI_COMMIT_BRANCH == "master"'
     changes:
@@ -48,31 +32,18 @@ build:gameserver:
   before_script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_HUB_USER:$DOCKER_HUB_TOKEN | base64)\"}}}" > /kaniko/.docker/config.json
-    - echo "현재 작업 디렉토리 확인:"
-    - pwd
-    - ls -al
-    - echo "Git 정보 확인:"
-    - git log --oneline -n 5 || echo "Git 로그를 확인할 수 없습니다."
-    - echo "gameserver 디렉토리 확인"
-    - ls -la gameserver/ || echo "gameserver 디렉토리가 없습니다."
   script:
     - cd gameserver
-    - echo "Backend 빌드 시작 "
-    - echo "빌드 컨텍스트 확인.."
-    - ls -la
-    
-    # Dockerfile 확인
-    - if [ ! -f Dockerfile ]; then echo "❌  Dockerfile이 없습니다!"; exit 1; fi
-    - echo "✅ Dockerfile 발견"
-
-    # Docker build
     - /kaniko/executor
         --context .
         --dockerfile Dockerfile
         --destination $GAMESERVER_DOCKER_IMAGE:$CI_COMMIT_SHA
-        --destination $GAMESERVER_DOCKER_IMAGE:latest 
-
-    - echo "Gameserver build & push completed "
+        --destination $GAMESERVER_DOCKER_IMAGE:latest
+        --cache=true
+        --cache-repo $GAMESERVER_DOCKER_IMAGE-cache
+        --cache-ttl=300h
+        --snapshotMode=redo
+        --cache-copy-layers
 
 build:frontend:
   stage: build
@@ -95,13 +66,200 @@ build:frontend:
   before_script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_HUB_USER:$DOCKER_HUB_TOKEN | base64)\"}}}" > /kaniko/.docker/config.json
-    - ls -la frontend/ || echo "frontend 디렉토리가 없습니다."
   script:
     - cd frontend
-    - echo "Frontend 빌드 시작 "
     - /kaniko/executor
         --context .
         --dockerfile Dockerfile
         --destination $FRONTEND_DOCKER_IMAGE:$CI_COMMIT_SHA
         --destination $FRONTEND_DOCKER_IMAGE:latest
         --build-arg NGINX_CONF=$NGINX_CONF
+        --cache=true
+        --cache-repo $FRONTEND_DOCKER_IMAGE-cache
+        --cache-ttl=300h
+        --snapshotMode=redo
+        --cache-copy-layers
+
+build:news-crawler:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  tags:
+    - runner
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "master"'
+    changes:
+      - "news-crawler/**/*"
+    when: on_success
+  - if: '$CI_COMMIT_BRANCH == "master"'
+    when: manual
+  - when: never
+  variables:
+    GIT_STRATEGY: clone
+    DOCKER_BUILDKIT: 1
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_HUB_USER:$DOCKER_HUB_TOKEN | base64)\"}}}" > /kaniko/.docker/config.json
+  script:
+    - cd news-crawler
+    - /kaniko/executor
+        --context .
+        --dockerfile Dockerfile
+        --destination $NEWS_CRAWLER_DOCKER_IMAGE:$CI_COMMIT_SHA
+        --destination $NEWS_CRAWLER_DOCKER_IMAGE:latest
+        --cache=true
+        --cache-repo $NEWS_CRAWLER_DOCKER_IMAGE-cache
+        --cache-ttl=300h
+        --snapshotMode=redo
+        --cache-copy-layers
+
+build:data-pipeline:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  tags:
+    - runner
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "master"'
+    changes:
+      - "data-pipeline/**/*"
+    when: on_success
+  - if: '$CI_COMMIT_BRANCH == "master"'
+    when: manual
+  - when: never
+  variables:
+    GIT_STRATEGY: clone
+    DOCKER_BUILDKIT: 1
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_HUB_USER:$DOCKER_HUB_TOKEN | base64)\"}}}" > /kaniko/.docker/config.json
+  script:
+    - cd data-pipeline
+    - /kaniko/executor
+        --context .
+        --dockerfile Dockerfile
+        --destination $DATA_PIPELINE_DOCKER_IMAGE:$CI_COMMIT_SHA
+        --destination $DATA_PIPELINE_DOCKER_IMAGE:latest
+        --cache=true
+        --cache-repo $DATA_PIPELINE_DOCKER_IMAGE-cache
+        --cache-ttl=300h
+        --snapshotMode=redo
+        --cache-copy-layers
+
+deploy:gameserver:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  tags:
+    - runner
+  needs:
+    - build:gameserver
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+    - when: never
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+    - kubectl version --client
+  script:
+    - cd ./kubernetes/app
+    - sed -i "s|CI_COMMIT_SHA|$CI_COMMIT_SHA|g" gameserver-workload.yaml
+    - kubectl apply -f gameserver-workload.yaml
+    - kubectl rollout status deployment/gameserver -n newtopia-app --timeout=300s
+  after_script:
+    - |
+      if [ "$CI_JOB_STATUS" == "failed" ]; then
+        echo "=== Deployment failed, starting rollback ==="
+
+        # Get previous revision
+        PREVIOUS_REVISION=$(kubectl rollout history deployment/gameserver -n newtopia-app | tail -n 2 | head -n 1 | awk '{print $1}')
+        echo "Rolling back to revision: $PREVIOUS_REVISION"
+
+        # Rollback to previous version
+        kubectl rollout undo deployment/gameserver -n newtopia-app
+        kubectl rollout status deployment/gameserver -n newtopia-app --timeout=300s
+
+        echo "=== Rollback completed ==="
+        echo "=== Failure Analysis ==="
+
+        # Get pod logs for debugging
+        echo "--- Pod Status ---"
+        kubectl get pods -n newtopia-app -l app=gameserver
+
+        echo "--- Recent Events ---"
+        kubectl get events -n newtopia-app --sort-by='.lastTimestamp' | tail -20
+
+        echo "--- Failed Pod Logs ---"
+        FAILED_PODS=$(kubectl get pods -n newtopia-app -l app=gameserver --field-selector=status.phase!=Running -o jsonpath='{.items[*].metadata.name}')
+        for pod in $FAILED_PODS; do
+          echo "=== Logs for $pod ==="
+          kubectl logs $pod -n newtopia-app --tail=50 || echo "No logs available for $pod"
+          echo "=== Describe $pod ==="
+          kubectl describe pod $pod -n newtopia-app
+        done
+
+        echo "=== Deployment Description ==="
+        kubectl describe deployment/gameserver -n newtopia-app
+      fi
+
+deploy:frontend:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  tags:
+    - runner
+  needs:
+    - build:frontend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+    - when: never
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+    - kubectl version --client
+  script:
+    - cd ./kubernetes/app
+    - sed -i "s|CI_COMMIT_SHA|$CI_COMMIT_SHA|g" frontend-workload.yaml
+    - kubectl apply -f frontend-workload.yaml
+    - kubectl rollout status deployment/frontend -n newtopia-app --timeout=300s
+  after_script:
+    - |
+      if [ "$CI_JOB_STATUS" == "failed" ]; then
+        echo "=== Deployment failed, starting rollback ==="
+
+        # Get previous revision
+        PREVIOUS_REVISION=$(kubectl rollout history deployment/frontend -n newtopia-app | tail -n 2 | head -n 1 | awk '{print $1}')
+        echo "Rolling back to revision: $PREVIOUS_REVISION"
+
+        # Rollback to previous version
+        kubectl rollout undo deployment/frontend -n newtopia-app
+        kubectl rollout status deployment/frontend -n newtopia-app --timeout=300s
+
+        echo "=== Rollback completed ==="
+        echo "=== Failure Analysis ==="
+
+        # Get pod logs for debugging
+        echo "--- Pod Status ---"
+        kubectl get pods -n newtopia-app -l app=frontend
+
+        echo "--- Recent Events ---"
+        kubectl get events -n newtopia-app --sort-by='.lastTimestamp' | tail -20
+
+        echo "--- Failed Pod Logs ---"
+        FAILED_PODS=$(kubectl get pods -n newtopia-app -l app=frontend --field-selector=status.phase!=Running -o jsonpath='{.items[*].metadata.name}')
+        for pod in $FAILED_PODS; do
+          echo "=== Logs for $pod ==="
+          kubectl logs $pod -n newtopia-app --tail=50 || echo "No logs available for $pod"
+          echo "=== Describe $pod ==="
+          kubectl describe pod $pod -n newtopia-app
+        done
+
+        echo "=== Deployment Description ==="
+        kubectl describe deployment/frontend -n newtopia-app
+      fi

@@ -2,15 +2,12 @@ package io.ssafy.p.i13c203.gameserver.domain.ending.entity;
 
 import java.time.LocalDateTime;
 
+import io.ssafy.p.i13c203.gameserver.domain.image.entity.Image;
+import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,12 +38,13 @@ public class Ending {
     @Column(nullable=false, columnDefinition = "TEXT")
     private String condition;          // 설명용 (ex. economy==100)
 
-    @Column(name="ending_s3_key")
-    private String endingS3Key;
+    @OneToOne(fetch = FetchType.EAGER)
+    private Image image;
 
     @Column(nullable=false)
+    @ColumnDefault("0")
     @Builder.Default
-    private Integer count = 0;         // 수집횟수
+    private Integer count = 0;         // TODO: 수집횟수 관련 기능 추가
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

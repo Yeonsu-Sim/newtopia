@@ -16,6 +16,11 @@ public interface FileStorage {
 
     String publicUrl(String key);
 
+    FileStat stat(String key) throws IOException;
+
     boolean delete(String key) throws IOException;
     boolean exists(String key) throws IOException;
+
+    /** 파일 크기/콘텐츠타입 등을 담기 위한 레코드 */
+    record FileStat(long sizeBytes, String contentType, String etag) {}
 }
