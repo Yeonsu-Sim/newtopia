@@ -7,11 +7,15 @@ import { GameBackground } from '@/components/common/GameBackground';
 import { MenuButton } from '@/components/common/MenuButton';
 import {
   LandingContainer,
+  GameLogoSection,
   GameLogo,
   PressStartButton,
   MenuContainer,
-  BgmToggleButton
-} from './-Landing.styles';
+  BgmToggleButton,
+  WelcomeSection,
+  WelcomeTitle,
+  WelcomeSubtitle
+} from '@/routes/landing/-Landing.styles';
 
 export const Route = createFileRoute('/landing/')({
   component: LandingPage,
@@ -45,7 +49,7 @@ function LandingPage() {
   
   const handleTryGame = () => {
     playClickSound();
-    navigate({ to: '/game/setup' });
+    alert('체험하기 기능은 현재 준비중입니다.');
   };
   
   const handleShowAuth = () => {
@@ -59,20 +63,21 @@ function LandingPage() {
       <>
         <LandingContainer>
           <GameBackground />
-          
+
           <BgmToggleButton onClick={toggleBgm}>
             {isBgmPlaying ? '🔊' : '🔇'}
           </BgmToggleButton>
-          
-          <GameLogo />
-          
-          <PressStartButton onClick={handlePressStart}>
-            press start
-          </PressStartButton>
+
+          <GameLogoSection>
+            <GameLogo />
+            <PressStartButton onClick={handlePressStart}>
+              press start
+            </PressStartButton>
+          </GameLogoSection>
         </LandingContainer>
 
-        <AuthModal 
-          isOpen={showAuthModal} 
+        <AuthModal
+          isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           initialMode={authMode}
         />
@@ -85,11 +90,17 @@ function LandingPage() {
     <>
       <LandingContainer>
         <GameBackground />
-        
+
         <BgmToggleButton onClick={toggleBgm}>
           {isBgmPlaying ? '🔊' : '🔇'}
         </BgmToggleButton>
-        
+
+        {/* 환영 메시지 */}
+        <WelcomeSection>
+          <WelcomeTitle>환영합니다!</WelcomeTitle>
+          <WelcomeSubtitle>뉴토피아에서 당신만의 통치를 시작해보세요</WelcomeSubtitle>
+        </WelcomeSection>
+
         <MenuContainer>
           <MenuButton onClick={handleTryGame} variant="landing">
             체험하기
@@ -101,8 +112,8 @@ function LandingPage() {
         </MenuContainer>
       </LandingContainer>
 
-      <AuthModal 
-        isOpen={showAuthModal} 
+      <AuthModal
+        isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode={authMode}
       />

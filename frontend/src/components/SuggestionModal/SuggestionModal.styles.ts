@@ -33,7 +33,7 @@ export const ModalInner = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 600px;
+  min-height: 700px;
 `;
 
 export const ModalHeader = styled.div`
@@ -48,15 +48,16 @@ export const ModalHeader = styled.div`
   flex-shrink: 0;
   text-align: center;
   width: 100%;
-  padding-top: 60px;
+  padding-top: 40px;
   padding-bottom: 20px;
-
 `;
 
 export const HeaderTitle = styled.div`
   font-family: "DNF Bit Bit v2", 'Noto Sans KR', sans-serif;
   font-weight: 400;
   position: relative;
+  padding-top: 10px;
+  padding-bottom: 10px;
   flex-shrink: 0;
   color: #FFF;
   text-align: center;
@@ -65,9 +66,8 @@ export const HeaderTitle = styled.div`
   -webkit-text-stroke-color: #A35400;
   font-size: 40px;
   font-style: normal;
-  padding-bottom: 10px;
   line-height: 32px;
-  letter-spacing: 0px;
+  letter-spacing: 4px;
 
   p {
     line-height: 32px;
@@ -81,7 +81,7 @@ export const HeaderSubtitle = styled.div`
   font-weight: 800;
   min-width: 100%;
   position: relative;
-    padding-bottom: 20px;
+  padding-bottom: 20px;
   flex-shrink: 0;
   color: #FFF;
   text-align: center;
@@ -108,27 +108,45 @@ export const ModalForm = styled.form`
   padding: 0 40px 40px 40px;
 `;
 
-export const ErrorMessage = styled.div`
-  width: 100%;
-  max-width: 500px;
-  padding: 1rem;
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
-  color: #991b1b;
-  border-radius: 8px;
-  font-family: 'Noto Sans KR', sans-serif;
-`;
-
 export const FormFields = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   align-items: start;
   justify-content: start;
   position: relative;
   flex-shrink: 0;
   width: 100%;
   max-width: 500px;
+`;
+
+export const SelectWrapper = styled.div`
+  background: white;
+  height: 52px;
+  position: relative;
+  border-radius: 8px;
+  flex-shrink: 0;
+  width: 100%;
+`;
+
+export const Select = styled.select`
+  width: 100%;
+  height: 52px;
+  padding: 0 1rem;
+  border-radius: 8px;
+  border: 3px solid #909090;
+  outline: none;
+  color: black;
+  font-size: 16px;
+  letter-spacing: 1px;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: white;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: #629eff;
+  }
 `;
 
 export const InputWrapper = styled.div`
@@ -158,6 +176,111 @@ export const Input = styled.input`
   }
 `;
 
+export const TextareaWrapper = styled.div`
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+`;
+
+export const Textarea = styled.textarea`
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 3px solid #909090;
+  outline: none;
+  color: black;
+  font-size: 16px;
+  letter-spacing: 1px;
+  font-family: 'Noto Sans KR', sans-serif;
+  resize: vertical;
+  min-height: 120px;
+  box-sizing: border-box;
+  background: white;
+
+  &:focus {
+    border-color: #629eff;
+  }
+`;
+
+export const FileUploadWrapper = styled.div`
+  width: 100%;
+`;
+
+export const FileUploadButton = styled.div`
+  background: white;
+  border: 3px solid #909090;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  &:hover {
+    border-color: #629eff;
+  }
+
+  &:focus-within {
+    border-color: #629eff;
+  }
+`;
+
+export const FileUploadText = styled.span`
+  color: #666;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  letter-spacing: 1px;
+`;
+
+export const HiddenFileInput = styled.input`
+  display: none;
+`;
+
+export const FileList = styled.div`
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const FileItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+`;
+
+export const FileItemText = styled.span`
+  color: #333;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+`;
+
+export const FileItemRemove = styled.button`
+  color: #dc2626;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+
+  &:hover {
+    color: #b91c1c;
+  }
+`;
+
 export const SubmitButtonWrapper = styled.div`
   background: #f9bf26;
   position: relative;
@@ -180,11 +303,11 @@ export const SubmitButton = styled.button`
   height: 52px;
   cursor: pointer;
   transition: background-color 0.2s;
-  
+
   &:hover:not(:disabled) {
     background: #fcd34d;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -211,29 +334,10 @@ export const SubmitButtonText = styled.div`
   font-size: 18px;
   text-wrap: nowrap;
   color: white;
-  
+
   p {
     line-height: 20px;
     white-space: pre;
-  }
-`;
-
-export const ModeSwitch = styled.div`
-  text-align: center;
-`;
-
-export const ModeSwitchButton = styled.button`
-  color: white;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 16px;
-  background: none;
-  border: none;
-  text-decoration: underline;
-  cursor: pointer;
-  transition: color 0.2s;
-  
-  &:hover {
-    color: #fef3c7;
   }
 `;
 
@@ -270,7 +374,7 @@ export const CloseButton = styled.button`
   justify-content: center;
   transition: all 0.2s;
   cursor: pointer;
-  
+
   &:hover {
     color: #fca5a5;
     background: #b91c1c;

@@ -55,6 +55,35 @@ export const MenuContainer = styled.div`
 
 
 
+export const BgmToggleButton = styled.button`
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 20;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
 export const LogoutButton = styled.button`
   position: absolute;
   top: 2rem;
@@ -70,12 +99,12 @@ export const LogoutButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 20;
-  
+
   &:hover {
     background: #b91c1c;
     transform: translateY(-1px);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
