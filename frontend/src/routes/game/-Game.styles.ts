@@ -204,3 +204,16 @@ export const MessageIcon = styled.img.attrs({
     right: -30px;
     transform: translateY(-50%);
 `;
+
+export const EventIcon = styled.img<{ x: number; y: number }>`
+  position: absolute;
+  top: ${({ y }) => y}%;
+  left: ${({ x }) => x}%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+
+  width: 10%; 
+`;
