@@ -50,31 +50,50 @@ public class JwtUtil {
     }
 
     public Long getMemberIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            log.trace("토큰에서 회원 ID 추출 시작");
+            Claims claims = Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
 
-        return Long.parseLong(claims.getSubject());
+            String subject = claims.getSubject();
+            log.trace("토큰 Subject 추출 성공: {}", subject);
+
+            Long memberId = Long.parseLong(subject);
+            log.trace("회원 ID 파싱 성공: {}", memberId);
+
+            return memberId;
+        } catch (Exception e) {
+            log.trace("토큰에서 회원 ID 추출 실패 - 예외: {} - {}", e.getClass().getSimpleName(), e.getMessage());
+            throw e;
+        }
     }
 
     public boolean validateToken(String token) {
         try {
+            log.trace("JWT 토큰 검증 시작");
             Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token);
+            log.trace("JWT 토큰 검증 성공 - 토큰이 유효함");
             return true;
         } catch (SecurityException | MalformedJwtException e) {
+            log.trace("JWT 토큰 검증 실패 - 잘못된 서명: {}", e.getMessage());
             log.debug("Invalid JWT signature: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
+            log.trace("JWT 토큰 검증 실패 - 토큰 만료: {}", e.getMessage());
             log.debug("JWT token is expired: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
+            log.trace("JWT 토큰 검증 실패 - 지원되지 않는 토큰: {}", e.getMessage());
             log.debug("JWT token is unsupported: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
+            log.trace("JWT 토큰 검증 실패 - 빈 토큰: {}", e.getMessage());
             log.debug("JWT claims string is empty: {}", e.getMessage());
         }
+        log.trace("JWT 토큰 검증 최종 결과: 무효");
         return false;
     }
 

@@ -3,6 +3,7 @@ package io.ssafy.p.i13c203.gameserver.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ssafy.p.i13c203.gameserver.auth.filter.JsonAuthenticationFilter;
 import io.ssafy.p.i13c203.gameserver.auth.filter.JwtCookieAuthenticationFilter;
+import io.ssafy.p.i13c203.gameserver.auth.handler.CustomAccessDeniedHandler;
 import io.ssafy.p.i13c203.gameserver.auth.handler.CustomAuthenticationFailureHandler;
 import io.ssafy.p.i13c203.gameserver.auth.handler.CustomAuthenticationSuccessHandler;
 import io.ssafy.p.i13c203.gameserver.auth.handler.CustomLogoutHandler;
@@ -39,6 +40,7 @@ public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler successHandler;
     private final CustomAuthenticationFailureHandler failureHandler;
     private final CustomLogoutHandler logoutHandler;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
     private final ObjectMapper objectMapper;
     private final Environment environment;
 
@@ -99,7 +101,12 @@ public class SecurityConfig {
             .addFilterBefore(jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
             // JSON 로그인 필터 설정
-            .addFilterAt(jsonAuthenticationFilter(authenticationManager(null)), UsernamePasswordAuthenticationFilter.class);
+            .addFilterAt(jsonAuthenticationFilter(authenticationManager(null)), UsernamePasswordAuthenticationFilter.class)
+
+            // 커스텀 AccessDeniedHandler 설정
+            .exceptionHandling(exceptions -> exceptions
+                .accessDeniedHandler(accessDeniedHandler)
+            );
 
         return http.build();
     }

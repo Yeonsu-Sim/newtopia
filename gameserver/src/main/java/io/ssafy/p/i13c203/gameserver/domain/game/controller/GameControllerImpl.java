@@ -10,10 +10,12 @@ import io.ssafy.p.i13c203.gameserver.domain.game.service.SubmitChoiceResult;
 import io.ssafy.p.i13c203.gameserver.global.APIResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/games")
 @RequiredArgsConstructor
