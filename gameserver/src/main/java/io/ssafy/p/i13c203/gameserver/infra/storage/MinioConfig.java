@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @Slf4j
@@ -20,12 +21,17 @@ public class MinioConfig {
     @Value("${app.storage.minio.secret-key}")
     private String secretKey;
 
+
     @Bean
     public MinioClient minioClient() {
-        log.info("Initializing Minio client with endpoint: {}", endpoint);
         return MinioClient.builder()
                 .endpoint(endpoint)
                 .credentials(accessKey, secretKey)
                 .build();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
