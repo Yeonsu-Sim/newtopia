@@ -21,7 +21,7 @@ public record RankingDto(
   public static RankingDto from(Ranking ranking, Long order) {
     var game = ranking.getGame();
     return RankingDto.builder()
-      .gameId(game.getGameId())
+      .gameId(game.getId())
       .countryName(game.getCountryName())
       .turn(game.getTurn())
       .endedAt(game.getEndedAt())

@@ -21,7 +21,7 @@ public record GameSnapshotDoc(
     // Game 객체에서 Snapshot을 생성
     public static GameSnapshotDoc from(Game game) {
         return new GameSnapshotDoc(
-                game.getGameId(),
+                game.getId(),
                 game.getMemberId(),
                 game.getCountryName(),
                 game.getCountryStats(),

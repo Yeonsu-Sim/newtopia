@@ -1,5 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.game.doc;
 
+import io.ssafy.p.i13c203.gameserver.domain.game.model.ChoiceWeights;
+
 public record ChoiceWeightsDoc(
 
         double macroeconomy,
@@ -22,4 +24,13 @@ public record ChoiceWeightsDoc(
         double biodiversity,
         double resourceManagement
 
-) {}
+) {
+    public static ChoiceWeightsDoc from(ChoiceWeights w) {
+        return new ChoiceWeightsDoc(
+                w.getMacroeconomy(), w.getFiscalPolicy(), w.getFinancialMarkets(), w.getIndustryBusiness(),
+                w.getMilitarySecurity(), w.getAlliances(), w.getCyberSpace(), w.getPublicSafety(),
+                w.getPublicOpinion(), w.getSocialIssues(), w.getProtestsStrikes(), w.getHealthWelfare(),
+                w.getClimateChangeEnergy(), w.getPollutionDisaster(), w.getBiodiversity(), w.getResourceManagement()
+        );
+    }
+}

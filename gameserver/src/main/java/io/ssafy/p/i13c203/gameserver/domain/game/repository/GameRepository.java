@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
     Optional<Game> findFirstByMemberIdAndActiveTrueOrderByCreatedAtDesc(Long memberId);
+    boolean existsByIdAndMemberId(Long id, Long memberId);  // 소유권 확인
 }

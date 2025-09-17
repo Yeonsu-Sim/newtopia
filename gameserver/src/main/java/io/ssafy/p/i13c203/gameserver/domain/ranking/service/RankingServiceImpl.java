@@ -39,7 +39,7 @@ public class RankingServiceImpl implements RankingService {
   @Override
   @Transactional
   public void registerRanking(Game game) {
-    log.trace("Registering ranking for game {}", game.getGameId());
+    log.trace("Registering ranking for game {}", game.getId());
     var score = game.getTurn() * 1_000_000_000L - game.getEndedAt().getEpochSecond();
     rankingRepository.save(Ranking.builder()
       .score(score)

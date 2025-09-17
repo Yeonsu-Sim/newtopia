@@ -12,7 +12,7 @@ public record GameDetailResponse(
     public static GameDetailResponse from(Game g) {
         return new GameDetailResponse(
                 new GameDto(
-                        g.getGameId(),
+                        g.getId(),
                         g.getCountryName(),
                         new TurnDetailDto(
                                 g.getTurn(),

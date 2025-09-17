@@ -32,7 +32,8 @@ public class GameHistory {
     private Long gameId;
 
     @Column(name = "turn_number", nullable = false)
-    private int turn;
+    @Builder.Default
+    private int turn = 0;
 
     @Type(JsonType.class)
     @Column(name = "entry", columnDefinition = "jsonb", nullable = false)
