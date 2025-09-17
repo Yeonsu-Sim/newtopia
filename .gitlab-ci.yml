@@ -11,6 +11,7 @@ variables:
   GIT_STRATEGY: clone
   GIT_DEPTH: 0
 
+# 통합된 빌드 작업 (MR과 master 모두 처리)
 build:gameserver:
   stage: build
   image:
@@ -19,13 +20,20 @@ build:gameserver:
   tags:
     - runner
   rules:
-  - if: '$CI_COMMIT_BRANCH == "master"'
-    changes:
-      - "gameserver/**/*"
-    when: on_success
-  - if: '$CI_COMMIT_BRANCH == "master"'
-    when: manual
-  - when: never
+    # MR에서 변경사항이 있을 때 실행
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "gameserver/**/*"
+      when: on_success
+    # master 브랜치에서 변경사항이 있을 때 실행
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - "gameserver/**/*"
+      when: on_success
+    # master 브랜치에서 수동 실행
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+    - when: never
   variables:
     GIT_STRATEGY: clone
     DOCKER_BUILDKIT: 1
@@ -34,16 +42,31 @@ build:gameserver:
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_HUB_USER:$DOCKER_HUB_TOKEN | base64)\"}}}" > /kaniko/.docker/config.json
   script:
     - cd gameserver
-    - /kaniko/executor
-        --context .
-        --dockerfile Dockerfile
-        --destination $GAMESERVER_DOCKER_IMAGE:$CI_COMMIT_SHA
-        --destination $GAMESERVER_DOCKER_IMAGE:latest
-        --cache=true
-        --cache-repo $GAMESERVER_DOCKER_IMAGE-cache
-        --cache-ttl=300h
-        --snapshotMode=redo
-        --cache-copy-layers
+    - |
+      if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
+        # MR에서는 테스트용 태그로 빌드 (실제 푸시)
+        /kaniko/executor \
+          --context . \
+          --dockerfile Dockerfile \
+          --destination $GAMESERVER_DOCKER_IMAGE:mr-$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA \
+          --cache=true \
+          --cache-repo $GAMESERVER_DOCKER_IMAGE-cache \
+          --cache-ttl=300h \
+          --snapshotMode=redo \
+          --cache-copy-layers
+      else
+        # master에서는 production 태그로 빌드
+        /kaniko/executor \
+          --context . \
+          --dockerfile Dockerfile \
+          --destination $GAMESERVER_DOCKER_IMAGE:$CI_COMMIT_SHA \
+          --destination $GAMESERVER_DOCKER_IMAGE:latest \
+          --cache=true \
+          --cache-repo $GAMESERVER_DOCKER_IMAGE-cache \
+          --cache-ttl=300h \
+          --snapshotMode=redo \
+          --cache-copy-layers
+      fi
 
 build:frontend:
   stage: build
@@ -53,13 +76,17 @@ build:frontend:
   tags:
     - runner
   rules:
-  - if: '$CI_COMMIT_BRANCH == "master"'
-    changes:
-      - "frontend/**/*"
-    when: on_success
-  - if: '$CI_COMMIT_BRANCH == "master"'
-    when: manual
-  - when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "frontend/**/*"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - "frontend/**/*"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+    - when: never
   variables:
     GIT_STRATEGY: clone
     DOCKER_BUILDKIT: 1
@@ -68,17 +95,31 @@ build:frontend:
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_HUB_USER:$DOCKER_HUB_TOKEN | base64)\"}}}" > /kaniko/.docker/config.json
   script:
     - cd frontend
-    - /kaniko/executor
-        --context .
-        --dockerfile Dockerfile
-        --destination $FRONTEND_DOCKER_IMAGE:$CI_COMMIT_SHA
-        --destination $FRONTEND_DOCKER_IMAGE:latest
-        --build-arg NGINX_CONF=$NGINX_CONF
-        --cache=true
-        --cache-repo $FRONTEND_DOCKER_IMAGE-cache
-        --cache-ttl=300h
-        --snapshotMode=redo
-        --cache-copy-layers
+    - |
+      if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
+        /kaniko/executor \
+          --context . \
+          --dockerfile Dockerfile \
+          --destination $FRONTEND_DOCKER_IMAGE:mr-$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA \
+          --build-arg NGINX_CONF=$NGINX_CONF \
+          --cache=true \
+          --cache-repo $FRONTEND_DOCKER_IMAGE-cache \
+          --cache-ttl=300h \
+          --snapshotMode=redo \
+          --cache-copy-layers
+      else
+        /kaniko/executor \
+          --context . \
+          --dockerfile Dockerfile \
+          --destination $FRONTEND_DOCKER_IMAGE:$CI_COMMIT_SHA \
+          --destination $FRONTEND_DOCKER_IMAGE:latest \
+          --build-arg NGINX_CONF=$NGINX_CONF \
+          --cache=true \
+          --cache-repo $FRONTEND_DOCKER_IMAGE-cache \
+          --cache-ttl=300h \
+          --snapshotMode=redo \
+          --cache-copy-layers
+      fi
 
 build:news-crawler:
   stage: build
@@ -88,13 +129,17 @@ build:news-crawler:
   tags:
     - runner
   rules:
-  - if: '$CI_COMMIT_BRANCH == "master"'
-    changes:
-      - "news-crawler/**/*"
-    when: on_success
-  - if: '$CI_COMMIT_BRANCH == "master"'
-    when: manual
-  - when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "news-crawler/**/*"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - "news-crawler/**/*"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+    - when: never
   variables:
     GIT_STRATEGY: clone
     DOCKER_BUILDKIT: 1
@@ -103,16 +148,29 @@ build:news-crawler:
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_HUB_USER:$DOCKER_HUB_TOKEN | base64)\"}}}" > /kaniko/.docker/config.json
   script:
     - cd news-crawler
-    - /kaniko/executor
-        --context .
-        --dockerfile Dockerfile
-        --destination $NEWS_CRAWLER_DOCKER_IMAGE:$CI_COMMIT_SHA
-        --destination $NEWS_CRAWLER_DOCKER_IMAGE:latest
-        --cache=true
-        --cache-repo $NEWS_CRAWLER_DOCKER_IMAGE-cache
-        --cache-ttl=300h
-        --snapshotMode=redo
-        --cache-copy-layers
+    - |
+      if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
+        /kaniko/executor \
+          --context . \
+          --dockerfile Dockerfile \
+          --destination $NEWS_CRAWLER_DOCKER_IMAGE:mr-$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA \
+          --cache=true \
+          --cache-repo $NEWS_CRAWLER_DOCKER_IMAGE-cache \
+          --cache-ttl=300h \
+          --snapshotMode=redo \
+          --cache-copy-layers
+      else
+        /kaniko/executor \
+          --context . \
+          --dockerfile Dockerfile \
+          --destination $NEWS_CRAWLER_DOCKER_IMAGE:$CI_COMMIT_SHA \
+          --destination $NEWS_CRAWLER_DOCKER_IMAGE:latest \
+          --cache=true \
+          --cache-repo $NEWS_CRAWLER_DOCKER_IMAGE-cache \
+          --cache-ttl=300h \
+          --snapshotMode=redo \
+          --cache-copy-layers
+      fi
 
 build:data-pipeline:
   stage: build
@@ -122,13 +180,17 @@ build:data-pipeline:
   tags:
     - runner
   rules:
-  - if: '$CI_COMMIT_BRANCH == "master"'
-    changes:
-      - "data-pipeline/**/*"
-    when: on_success
-  - if: '$CI_COMMIT_BRANCH == "master"'
-    when: manual
-  - when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "data-pipeline/**/*"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - "data-pipeline/**/*"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+    - when: never
   variables:
     GIT_STRATEGY: clone
     DOCKER_BUILDKIT: 1
@@ -137,16 +199,83 @@ build:data-pipeline:
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(echo -n $DOCKER_HUB_USER:$DOCKER_HUB_TOKEN | base64)\"}}}" > /kaniko/.docker/config.json
   script:
     - cd data-pipeline
-    - /kaniko/executor
-        --context .
-        --dockerfile Dockerfile
-        --destination $DATA_PIPELINE_DOCKER_IMAGE:$CI_COMMIT_SHA
-        --destination $DATA_PIPELINE_DOCKER_IMAGE:latest
-        --cache=true
-        --cache-repo $DATA_PIPELINE_DOCKER_IMAGE-cache
-        --cache-ttl=300h
-        --snapshotMode=redo
-        --cache-copy-layers
+    - |
+      if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
+        /kaniko/executor \
+          --context . \
+          --dockerfile Dockerfile \
+          --destination $DATA_PIPELINE_DOCKER_IMAGE:mr-$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA \
+          --cache=true \
+          --cache-repo $DATA_PIPELINE_DOCKER_IMAGE-cache \
+          --cache-ttl=300h \
+          --snapshotMode=redo \
+          --cache-copy-layers
+      else
+        /kaniko/executor \
+          --context . \
+          --dockerfile Dockerfile \
+          --destination $DATA_PIPELINE_DOCKER_IMAGE:$CI_COMMIT_SHA \
+          --destination $DATA_PIPELINE_DOCKER_IMAGE:latest \
+          --cache=true \
+          --cache-repo $DATA_PIPELINE_DOCKER_IMAGE-cache \
+          --cache-ttl=300h \
+          --snapshotMode=redo \
+          --cache-copy-layers
+      fi
+
+# Master 브랜치에서 MR 이미지를 promotion하는 작업
+promote:gameserver:
+  stage: deploy
+  image: gcr.io/go-containerregistry/crane:debug
+  tags:
+    - runner
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - "gameserver/**/*"
+      when: on_success
+  variables:
+    SOURCE_TAG: "mr-$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA"
+  before_script:
+    - echo "$DOCKER_HUB_TOKEN" | crane auth login index.docker.io -u "$DOCKER_HUB_USER" --password-stdin
+  script:
+    - |
+      # MR에서 빌드된 이미지가 있는지 확인하고 promotion
+      if crane manifest $GAMESERVER_DOCKER_IMAGE:$SOURCE_TAG > /dev/null 2>&1; then
+        echo "Promoting MR image to production tags..."
+        crane tag $GAMESERVER_DOCKER_IMAGE:$SOURCE_TAG $CI_COMMIT_SHA
+        crane tag $GAMESERVER_DOCKER_IMAGE:$SOURCE_TAG latest
+        echo "Image promotion completed"
+      else
+        echo "MR image not found, this might be a direct push to master"
+      fi
+  allow_failure: true
+
+promote:frontend:
+  stage: deploy
+  image: gcr.io/go-containerregistry/crane:debug
+  tags:
+    - runner
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      changes:
+        - "frontend/**/*"
+      when: on_success
+  variables:
+    SOURCE_TAG: "mr-$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA"
+  before_script:
+    - echo "$DOCKER_HUB_TOKEN" | crane auth login index.docker.io -u "$DOCKER_HUB_USER" --password-stdin
+  script:
+    - |
+      if crane manifest $FRONTEND_DOCKER_IMAGE:$SOURCE_TAG > /dev/null 2>&1; then
+        echo "Promoting MR image to production tags..."
+        crane tag $FRONTEND_DOCKER_IMAGE:$SOURCE_TAG $CI_COMMIT_SHA
+        crane tag $FRONTEND_DOCKER_IMAGE:$SOURCE_TAG latest
+        echo "Image promotion completed"
+      else
+        echo "MR image not found, this might be a direct push to master"
+      fi
+  allow_failure: true
 
 deploy:gameserver:
   stage: deploy
@@ -154,7 +283,10 @@ deploy:gameserver:
   tags:
     - runner
   needs:
-    - build:gameserver
+    - job: build:gameserver
+      optional: true
+    - job: promote:gameserver
+      optional: true
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
       when: on_success
@@ -212,7 +344,10 @@ deploy:frontend:
   tags:
     - runner
   needs:
-    - build:frontend
+    - job: build:frontend
+      optional: true
+    - job: promote:frontend
+      optional: true
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
       when: on_success
