@@ -15,14 +15,20 @@ interface GuestDialogProps {
   guestImage: string;
   open: boolean;
   onClose: () => void;
-  onSelect: () => void;
+  onSelect: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, guestImage, onClose, onSelect }) => {
+  const code = guestImage.split("by-code/")[1];
+
   return (
     <DialogOverlay>
       <GuestBox>
-        <GuestIcon src={guestImage}></GuestIcon>
+        <GuestIcon 
+          // TODO: minIO 해결되면 수정
+          // src={guestImage}
+          src={`/npc/${code}`}
+        ></GuestIcon>
         <DialogBox>
           <DialogHeader>{guestName}</DialogHeader>
           <DialogContent>{guestText}</DialogContent>
@@ -31,7 +37,7 @@ const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, guestIma
               <button onClick={onClose}>닫기</button>
             </DialogActions>
             <DialogActions>
-              <button onClick={onSelect}>선택</button>
+              <button onClick={(e) => onSelect(e)}>선택</button>
             </DialogActions>
           </DialogActionsBox>
 

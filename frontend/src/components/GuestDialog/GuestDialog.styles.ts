@@ -61,7 +61,7 @@ export const DialogActions = styled.div`
 `;
 
 export const GuestIcon = styled.img`
-    width: 150px;
+    width: 500px;
     height: auto;
 `;
 

@@ -9,13 +9,12 @@ import {
   InfoBox,
   InfoText,
   TurnText,
-  GameMessage,
   BackgroundWrapper,
-  BackgroundImage
+  BackgroundImage,
+  EventIcon,
 } from '@/routes/game/-Game.styles';
 
 import Parameter from "@/components/Parameter";
-import Message from "@/components/Message";
 import GuestDialog from '@/components/GuestDialog/GuestDialog';
 import ChoiceDialog from '@/components/ChoiceDialog/ChoiceDIalog';
 import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
@@ -42,6 +41,8 @@ function RouteComponent() {
   const { submitChoice } = useGamePlay();
   const { user } = useAuthStore();
   const navigate = useNavigate();
+
+  const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -137,6 +138,7 @@ function RouteComponent() {
 
       <BackgroundWrapper>
         <BackgroundImage src="/backgrounds/game_background.png" />
+          <EventIcon src="/icons/말풍선.png" x={50} y={20} onClick={() => setGuestOpen(true)}></EventIcon>
           {currentStats && (
             <>
               <Parameter type="eco" value={currentStats.eco} x={10} y={53} />
@@ -147,10 +149,6 @@ function RouteComponent() {
           )}
       </BackgroundWrapper>
 
-      <GameMessage onClick={() => setGuestOpen(true)}>
-        <Message text="새로운 손님이 도착했습니다!" />
-      </GameMessage>
-
       {guestOpen && currentCard && (
         <GuestDialog
           guestName={currentCard.npc.name}
@@ -158,7 +156,8 @@ function RouteComponent() {
           guestImage={currentCard.npc.imageUrl}
           open
           onClose={() => setGuestOpen(false)}
-          onSelect={() => {
+          onSelect={(e) => {
+            setClickPos({ x: e.clientX, y: e.clientY });
             setGuestOpen(false);
             setChoiceOpen(true);
           }}
@@ -171,11 +170,12 @@ function RouteComponent() {
           choices={currentCard.choices}
           currentStats={currentStats!}
           open
+          initialMousePos={clickPos}
           onBack={() => {
             setChoiceOpen(false);
             setGuestOpen(true);
           }}
-          onSelect={handleChoiceWrapper} // 타입 안전하게
+          onSelect={handleChoiceWrapper}
         />
       )}
 

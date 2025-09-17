@@ -13,8 +13,8 @@ export const Container = styled.div`
 `;
 
 export const EndingImage = styled.img`
-  max-width: 60%;
-  max-height: 40%;
+  width: 400px;
+  height: auto;
   object-fit: contain;
   margin-bottom: 2rem;
 `;

@@ -25,7 +25,7 @@ const Parameter: React.FC<ParameterProps> = ({ type, value, x, y }) => {
       <ParameterIcon
         type={type}
         level={level}
-        src={`src/assets/parameters/${type}_${level}.png`}
+        src={`/parameters/${type}_${level}.png`}
         alt={`${type} parameter icon`}
       />
       <ProgressBox>
