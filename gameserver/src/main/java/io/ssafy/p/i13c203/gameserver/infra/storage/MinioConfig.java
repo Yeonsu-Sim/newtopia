@@ -12,11 +12,21 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class MinioConfig {
 
+    @Value("${app.storage.minio.endpoint}")
+    private String endpoint;
+
+    @Value("${app.storage.minio.access-key}")
+    private String accessKey;
+
+    @Value("${app.storage.minio.secret-key}")
+    private String secretKey;
+
+
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
-                .endpoint("http://localhost:9000")
-                .credentials("minio", "minio123")
+                .endpoint(endpoint)
+                .credentials(accessKey, secretKey)
                 .build();
     }
 

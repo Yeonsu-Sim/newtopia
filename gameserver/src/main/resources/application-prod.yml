@@ -78,3 +78,6 @@ app:
       secret-key: ${MINIO_SECRET_KEY}
       bucket-name: ${MINIO_BUCKET_NAME}
       public-base-url: ${MINIO_PUBLIC_BASE_URL}
+
+    openapi:
+      secret-key: ${OPENAPI_SECRET_KEY}
