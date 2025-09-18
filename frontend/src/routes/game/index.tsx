@@ -12,6 +12,7 @@ import {
   BackgroundWrapper,
   BackgroundImage,
   EventIcon,
+  LodingIcon,
 } from '@/routes/game/-Game.styles';
 
 import Parameter from "@/components/Parameter";
@@ -22,6 +23,7 @@ import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
 import { useGame } from '@/hooks/useGame';
 import { useGamePlay } from '@/hooks/useGamePlay';
 import { useAuthStore } from '@/store/authStore';
+import FeedbackToastContainer from '@/components/FeedbackToast/FeedbackToastContainer';
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
@@ -31,6 +33,7 @@ function RouteComponent() {
   const [guestOpen, setGuestOpen] = useState(false);
   const [choiceOpen, setChoiceOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { currentStats, currentTurn, countryName, playerName, setGameStart, setStats, setTurn } = useGameStore();
   const [currentArticle, setCurrentArticle] = useState<any>(null);
@@ -43,6 +46,14 @@ function RouteComponent() {
   const navigate = useNavigate();
 
   const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null);
+
+  const [toastMessages, setToastMessages] = useState<string[]>([]);
+
+  const dummyComments = [
+    "이럴 때 부양 가자! 내 노후자금 회복 좀!",
+    "외국인 들어올 때 규제 푸는 건 위험. 빠질 땐 누가 책임?",
+    "반도체 세액공제 확대 찬성, 일자리 늘어난다."
+  ];
 
   useEffect(() => {
     if (!user) return;
@@ -92,7 +103,13 @@ function RouteComponent() {
   const handleChoice = async (choiceCode: "A" | "B") => {
     if (!gameId || !currentCard) return;
 
+    setCurrentArticle(currentCard.relatedArticle);
+    setGuestOpen(false);
+    setChoiceOpen(false);
+    setFeedbackOpen(true);
+
     try {
+      setLoading(true);
       const result = await submitChoice(gameId, currentCard.cardId, choiceCode);
 
       if (result.gameOver && result.ending?.code) {
@@ -105,21 +122,24 @@ function RouteComponent() {
       const nextTurn = result.nextTurn;
       if (nextTurn) {
         setCurrentCard(nextTurn.card);
-        setCurrentArticle(nextTurn.card.relatedArticle);
         setStats(nextTurn.countryStats);
         setTurn(nextTurn.number);
-
-        setGuestOpen(false);
-        setChoiceOpen(false);
-        setFeedbackOpen(true);
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChoiceWrapper = (choiceCode: string) => {
     handleChoice(choiceCode as "A" | "B");
+  };
+
+  const handleFeedbackClose = () => {
+    setFeedbackOpen(false);
+    const messages = currentCard?.comments || dummyComments;
+    setToastMessages(messages);
   };
 
   return (
@@ -138,7 +158,11 @@ function RouteComponent() {
 
       <BackgroundWrapper>
         <BackgroundImage src="/backgrounds/game_background.png" />
-          <EventIcon src="/icons/말풍선.png" x={50} y={20} onClick={() => setGuestOpen(true)}></EventIcon>
+          {loading ? (
+            <LodingIcon src="/icons/로딩중.png" x={50} y={20} />
+          ) : (
+            <EventIcon src="/icons/말풍선.png" x={50} y={20} onClick={() => setGuestOpen(true)} />
+          )}
           {currentStats && (
             <>
               <Parameter type="eco" value={currentStats.eco} x={10} y={53} />
@@ -183,9 +207,15 @@ function RouteComponent() {
         <FeedbackDialog
           open
           article={currentArticle}
-          onClose={() => setFeedbackOpen(false)}
+          onClose={handleFeedbackClose}
         />
       )}
+      
+    {toastMessages.length > 0 && (
+      <FeedbackToastContainer 
+        messages={toastMessages}
+      />
+    )}
     </MainContainer>
   );
 }

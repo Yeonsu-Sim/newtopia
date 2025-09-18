@@ -217,3 +217,15 @@ export const EventIcon = styled.img<{ x: number; y: number }>`
 
   width: 10%; 
 `;
+
+export const LodingIcon = styled.img<{ x: number; y: number }>`
+  position: absolute;
+  top: ${({ y }) => y}%;
+  left: ${({ x }) => x}%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 30%; 
+`;
