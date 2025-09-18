@@ -59,24 +59,17 @@ public class MemberService {
         
         return SignupResponseDto.from(savedMember);
     }
-    
-    public LoginResponseDto login(LoginRequestDto request) {
-        // 이메일로 회원 조회
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 이메일입니다."));
-        
-        // 삭제된 회원 체크
-        if (member.getIsDeleted()) {
-            throw new MemberNotFoundException("탈퇴한 회원입니다.");
+
+    public LoginResponseDto me(Long memberId) {
+        if (memberId == null) {
+            return LoginResponseDto.builder().build();
         }
-        
-        // 비밀번호 확인
-        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
-            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+        var member = memberRepository.findById(memberId);
+        log.info(member.toString());
+        if (member.isPresent()) {
+            return LoginResponseDto.from(member.get());
+        } else {
+            throw new MemberNotFoundException();
         }
-        
-        log.info("로그인 성공: email={}, nickname={}", member.getEmail(), member.getNickname());
-        
-        return LoginResponseDto.from(member);
     }
 }

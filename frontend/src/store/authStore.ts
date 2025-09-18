@@ -1,21 +1,20 @@
 import { create } from "zustand";
-import { loginApi, signupApi, logoutApi, getCurrentUser } from "@/services/authApi";
+import { loginApi, signupApi, logoutApi, checkAuthApi } from "@/services/authApi";
 
 export interface User {
   id: string;
   email: string;
   nickname: string;
-  age?: string;
-  gender?: string;
   role?: string;
 }
 
 interface AuthState {
   user: User | null;
   isLoading: boolean;
-  
+  isInitialized: boolean; // 초기화 완료 여부
+
   // 액션 함수들
-  initializeAuth: () => void;
+  initializeAuth: () => Promise<void>;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, nickname: string) => Promise<boolean>;
   logout: () => Promise<void>;
@@ -25,12 +24,32 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: false,
+  isInitialized: false,
 
-  // 앱 시작시 쿠키에서 사용자 정보 복원
-  initializeAuth: () => {
-    const user = getCurrentUser();
-    if (user) {
-      set({ user });
+  // 앱 시작시 서버에서 로그인 상태 확인
+  initializeAuth: async () => {
+    set({ isLoading: true });
+
+    try {
+      const response = await checkAuthApi();
+
+      if (response.status === 'success' && response.data) {
+        const user: User = {
+          id: response.data.id.toString(),
+          email: response.data.email,
+          nickname: response.data.nickname,
+          role: response.data.role,
+        };
+
+        set({ user, isLoading: false, isInitialized: true });
+      } else {
+        // 로그인되지 않은 상태
+        set({ user: null, isLoading: false, isInitialized: true });
+      }
+    } catch (error) {
+      console.error('로그인 상태 확인 실패:', error);
+      // 에러 발생 시에도 초기화 완료로 처리
+      set({ user: null, isLoading: false, isInitialized: true });
     }
   },
 
@@ -46,8 +65,6 @@ export const useAuthStore = create<AuthState>((set) => ({
           id: response.data.id,
           email: response.data.email,
           nickname: response.data.nickname,
-          age: response.data.age,
-          gender: response.data.gender,
           role: response.data.role,
         };
         
