@@ -33,9 +33,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const response = await checkAuthApi();
 
-      if (response.status === 'success' && response.data) {
+      if (response.status === 'success' && response.data && response.data.id) {
         const user: User = {
-          id: response.data.id.toString(),
+          id: String(response.data.id),
           email: response.data.email,
           nickname: response.data.nickname,
           role: response.data.role,
@@ -60,17 +60,21 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const response = await loginApi({ email, password });
 
-      if (response.status === 'success' && response.data) {
-        const user: User = {
-          id: response.data.id.toString(),
-          email: response.data.email,
-          nickname: response.data.nickname,
-          role: response.data.role,
-        };
+      if (response.status === 'success') {
+        // 로그인 성공 후 사용자 정보를 가져오기 위해 checkAuthApi 호출
+        const userResponse = await checkAuthApi();
 
-        // 로그인 성공 시 즉시 사용자 정보 저장
-        set({ user, isLoading: false });
-        return true;
+        if (userResponse.status === 'success' && userResponse.data && userResponse.data.id) {
+          const user: User = {
+            id: String(userResponse.data.id),
+            email: userResponse.data.email,
+            nickname: userResponse.data.nickname,
+            role: userResponse.data.role,
+          };
+
+          set({ user, isLoading: false });
+          return true;
+        }
       }
 
       set({ isLoading: false });

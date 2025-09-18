@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuthForm } from '@/hooks/useAuthForm';
 import {
   ModalOverlay,
@@ -35,6 +36,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   initialMode = 'login'
 }) => {
+  const navigate = useNavigate();
   const {
     mode,
     formData,
@@ -48,10 +50,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   if (!isOpen) return null;
 
+  const handleLoginSuccess = () => {
+    onClose(); // 모달 닫기
+    navigate({ to: '/main' }); // 메인 페이지로 이동
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await handleSubmit(
-      onClose, // 로그인 성공 시 모달 닫기
+      handleLoginSuccess, // 로그인 성공 시 메인 페이지로 이동
       (email: string, password: string) => {
         // 회원가입 성공 시 로그인 모드로 전환하고 정보 자동 입력
         switchToLogin(email, password);
