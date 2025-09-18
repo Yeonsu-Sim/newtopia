@@ -19,7 +19,6 @@ interface GuestDialogProps {
 }
 
 const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, guestImage, onClose, onSelect }) => {
-  const code = guestImage.split("by-code/")[1];
 
   return (
     <DialogOverlay>

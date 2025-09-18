@@ -56,22 +56,23 @@ export const useAuthStore = create<AuthState>((set) => ({
   // 로그인 함수
   login: async (email: string, password: string) => {
     set({ isLoading: true });
-    
+
     try {
       const response = await loginApi({ email, password });
-      
+
       if (response.status === 'success' && response.data) {
         const user: User = {
-          id: response.data.id,
+          id: response.data.id.toString(),
           email: response.data.email,
           nickname: response.data.nickname,
           role: response.data.role,
         };
-        
+
+        // 로그인 성공 시 즉시 사용자 정보 저장
         set({ user, isLoading: false });
         return true;
       }
-      
+
       set({ isLoading: false });
       return false;
     } catch (error) {

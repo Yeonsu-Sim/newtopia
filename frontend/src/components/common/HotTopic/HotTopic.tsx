@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fetchHotNews } from '@/services/hotNewsService';
 import {
   HotTopicContainer,
   HotTopicTitle,
@@ -10,40 +11,41 @@ import {
 } from './HotTopic.styles';
 
 interface NewsData {
-  id: number;
   title: string;
   url: string;
 }
 
-// 더미 데이터
-const DUMMY_NEWS: NewsData[] = [
-  {
-    id: 1,
-    title: '"50억 유지" 양도세 우려 풀리자…"이제 더 뛴다" 코스피, 3400선 돌파',
-    url: 'https://n.news.naver.com/mnews/article/009/0005558498'
-  },
-  {
-    id: 2,
-    title: '"돈 필요 없어요" 끝까지 안 받은 53만명…소비쿠폰, 국민 99%에 지급',
-    url: 'https://n.news.naver.com/mnews/article/009/0005558573'
-  },
-  {
-    id: 3,
-    title: "살얼음판 걷는 위기의 프롭테크…'기술혁신·글로벌', 돌파구 될까",
-    url: 'https://n.news.naver.com/mnews/article/009/0005558620'
-  }
-];
-
 export interface HotTopicProps {
-  newsData?: NewsData[];
   scrollInterval?: number;
 }
 
 export const HotTopic: React.FC<HotTopicProps> = ({
-  newsData = DUMMY_NEWS,
   scrollInterval = 5000
 }) => {
+  const [newsData, setNewsData] = useState<NewsData[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadHotNews = async () => {
+      try {
+        setIsLoading(true);
+        const hotNewsData = await fetchHotNews(20);
+        const formattedNews: NewsData[] = hotNewsData.map((item) => ({
+          title: item.title,
+          url: item.sourceUrl
+        }));
+        setNewsData(formattedNews);
+      } catch (error) {
+        console.error('Failed to load hot news:', error);
+        setNewsData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadHotNews();
+  }, []);
 
   useEffect(() => {
     if (newsData.length === 0) return;
@@ -57,8 +59,50 @@ export const HotTopic: React.FC<HotTopicProps> = ({
     return () => clearInterval(interval);
   }, [newsData.length, scrollInterval]);
 
+  if (isLoading) {
+    return (
+      <HotTopicContainer>
+        <ContentWrapper>
+          <HotTopicTitle>📰 이달의 핫토픽 뉴스</HotTopicTitle>
+          <NewsScrollContainer>
+            <NewsItem
+              $isVisible={true}
+              $index={0}
+              $currentIndex={0}
+              $totalItems={1}
+            >
+              <NewsLink>
+                <NewsIcon>⏳</NewsIcon>
+                뉴스를 불러오는 중...
+              </NewsLink>
+            </NewsItem>
+          </NewsScrollContainer>
+        </ContentWrapper>
+      </HotTopicContainer>
+    );
+  }
+
   if (newsData.length === 0) {
-    return null;
+    return (
+      <HotTopicContainer>
+        <ContentWrapper>
+          <HotTopicTitle>📰 이달의 핫토픽 뉴스</HotTopicTitle>
+          <NewsScrollContainer>
+            <NewsItem
+              $isVisible={true}
+              $index={0}
+              $currentIndex={0}
+              $totalItems={1}
+            >
+              <NewsLink>
+                <NewsIcon>❌</NewsIcon>
+                뉴스를 불러올 수 없습니다
+              </NewsLink>
+            </NewsItem>
+          </NewsScrollContainer>
+        </ContentWrapper>
+      </HotTopicContainer>
+    );
   }
 
   const handleNewsClick = (url: string) => {
@@ -73,7 +117,7 @@ export const HotTopic: React.FC<HotTopicProps> = ({
         <NewsScrollContainer>
           {newsData.map((news, index) => (
             <NewsItem
-              key={news.id}
+              key={index}
               $isVisible={index === currentIndex}
               $index={index}
               $currentIndex={currentIndex}
