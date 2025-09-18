@@ -15,8 +15,6 @@ import io.ssafy.p.i13c203.gameserver.domain.game.model.ChoiceWeights;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CountryStats;
 import io.ssafy.p.i13c203.gameserver.domain.game.repository.GameHistoryRepository;
 import io.ssafy.p.i13c203.gameserver.domain.game.repository.GameRepository;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.NpcRefDoc;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Npc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.service.ScenarioService;
 import io.ssafy.p.i13c203.gameserver.global.exception.BusinessException;
@@ -81,7 +79,7 @@ public class GameService {
         Scenario sc = scenarioService.firstScenario();
 
         // 2) CardDoc 생성은 GameService가 담당
-        CardDoc first = toCardDoc(sc, CardType.ORIGIN);
+        CardDoc first = CardDoc.of(sc, CardType.ORIGIN);
 
         Game game = Game.builder()
                 .memberId(memberId)
@@ -192,7 +190,7 @@ public class GameService {
         // -------- (4) 다음 카드 선정 ----------
         int nextTurn = finishedTurn + 1;
         Scenario nextScenario = scenarioService.nextScenario(game, nextTurn);
-        CardDoc next = toCardDoc(nextScenario, CardType.ORIGIN);
+        CardDoc next = CardDoc.of(nextScenario, CardType.ORIGIN);
 
         game.setTurn(nextTurn);
         game.setCurrentCard(next);
@@ -208,7 +206,6 @@ public class GameService {
         );
     }
 
-
     private ChoiceWeights addWeights(ChoiceWeights base, EffectWeightsDoc d) {
         ChoiceWeights delta = ChoiceWeights.builder()
                 .macroeconomy(d.macroeconomy()).fiscalPolicy(d.fiscalPolicy()).financialMarkets(d.financialMarkets()).industryBusiness(d.industryBusiness())
@@ -218,29 +215,6 @@ public class GameService {
                 .build();
         base.add(delta);
         return base;
-    }
-
-    private CardDoc toCardDoc(Scenario sc, CardType type) {
-        Npc npc = sc.getNpc();
-        if (npc == null) throw new BusinessException(ErrorCode.NPC_NOT_FOUND);
-
-        NpcRefDoc npcRef = new NpcRefDoc(
-                npc.getId(),           // Long (PK)
-                npc.getName(),
-                npc.getImage().getUrl()
-        );
-
-        return new CardDoc(
-                java.util.UUID.randomUUID(), // cardId: 런타임 UUID
-                sc.getId(),                  // scenarioId: Long
-                type,
-                sc.getTitle(),
-                sc.getContent(),
-                npcRef,
-                sc.getSpawn(),
-                sc.getChoices(),
-                sc.getRelatedArticle()
-        );
     }
 
 }
