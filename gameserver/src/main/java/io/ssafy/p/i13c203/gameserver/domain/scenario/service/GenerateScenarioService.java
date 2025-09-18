@@ -55,7 +55,7 @@ public class GenerateScenarioService {
             // model 확인
             // "gpt-4.1",  "gpt-5-mini"
             // 요청 객체 생성
-            ChatRequest chatRequest = new ChatRequest("gpt-4.1", messages);
+            ChatRequest chatRequest = new ChatRequest("gpt-5-mini", messages);
 
             // JSON 문자열로 변환 (UTF-8 보장)
             String jsonBody = objectMapper.writeValueAsString(chatRequest);
@@ -132,11 +132,63 @@ public class GenerateScenarioService {
 
     /**
      * 뉴스 데이터로부터 GPT API 메시지 생성
+     *  1.  중분류 카테고리 제거
+     *          0.5로 하드코딩
+     *  2.  보도 자료 제거
+     *
      */
     private List<Message> createMessages(JsonNode newsData) {
+
+//        return createMessagesRemoveMinorCategory(newsData);
+        return createMessagesRemoveMinorCategoryAndPressRelease(newsData);
+//        return List.of(
+
+//            new Message("developer", "당신은 정치 시뮬레이션 게임의 시나리오작가입니다. 반드시 유효한 JSON 형식으로만 응답해주세요."),
+//            new Message("user", String.format("""
+//                당신은 정치 시뮬레이션 게임의 시나리오 작가입니다.
+//                주어진 뉴스를 바탕으로 아래 시나리오 객체 형식에 맞게 JSON을 생성해주세요.
+//
+//                【뉴스 정보】
+//                제목: %s
+//                내용: %s
+//                카테고리: %s
+//                감정: %s
+//
+//                【시나리오 객체 구조】
+//                - title: 시나리오 제목 (20자 이내)
+//                - content: 상황 설명 (50자 이내, 게임다운 톤앤매너)
+//                - conditions: 등장 조건 (배열, 각 조건은 다음을 포함)
+//                  - minorCategory: 16개 중분류 중 하나
+//                  - operator: "LESS_THAN" | "MORE_THAN"
+//                  - threshold: 정수
+//                - choices: { "A": Choice, "B": Choice }
+//                  - code: "A" 또는 "B"
+//                  - content: 선택지 설명
+//                  - effect:
+//                    - scores: { economy, defense, environment, publicSentiment } (정수 -100~100)
+//                  - pressRelease: { title, content } (기사 느낌)
+//                  - comments: 국민 반응 문자열 배열
+//
+//                【요구사항】
+//                1. 반드시 유효한 JSON만 응답할 것
+//                2. scores와 weights는 각각 의미 있는 수치를 설정할 것
+//                3. comments는 최소 2개만 , 실제 시민 반응처럼 작성할 것
+//                4. pressRelease.content는 임시로 비워둘 수 있음
+//                5. 16개 중분류: macroeconomy, fiscalPolicy, financialMarkets, industryBusiness, militarySecurity, alliances, cyberSpace, publicSafety, publicOpinion, socialIssues, protestsStrikes, healthWelfare, climateChangeEnergy, pollutionDisaster, biodiversity, resourceManagement
+//                """,
+//                newsData.path("title").asText(),
+//                newsData.path("content").asText(),
+//                newsData.path("categories").path("major_categories").get(0).path("category").asText(),
+//                newsData.path("sentiment").path("label").asText()
+//            ))
+//        );
+    }
+
+    // 중분류 카테고리 제거
+    private List<Message> createMessagesRemoveMinorCategory(JsonNode newsData) {
         return List.of(
-            new Message("developer", "당신은 정치 시뮬레이션 게임의 시나리오작가입니다. 반드시 유효한 JSON 형식으로만 응답해주세요."),
-            new Message("user", String.format("""
+                new Message("developer", "당신은 정치 시뮬레이션 게임의 시나리오작가입니다. 반드시 유효한 JSON 형식으로만 응답해주세요."),
+                new Message("user", String.format("""
                 당신은 정치 시뮬레이션 게임의 시나리오 작가입니다.
                 주어진 뉴스를 바탕으로 아래 시나리오 객체 형식에 맞게 JSON을 생성해주세요.
 
@@ -150,7 +202,6 @@ public class GenerateScenarioService {
                 - title: 시나리오 제목 (20자 이내)
                 - content: 상황 설명 (50자 이내, 게임다운 톤앤매너)
                 - conditions: 등장 조건 (배열, 각 조건은 다음을 포함)
-                  - minorCategory: 16개 중분류 중 하나
                   - operator: "LESS_THAN" | "MORE_THAN"
                   - threshold: 정수
                 - choices: { "A": Choice, "B": Choice }
@@ -158,7 +209,6 @@ public class GenerateScenarioService {
                   - content: 선택지 설명
                   - effect:
                     - scores: { economy, defense, environment, publicSentiment } (정수 -100~100)
-                    - weights: { 16개 중분류 가중치, 실수 0.0~1.0 }
                   - pressRelease: { title, content } (기사 느낌)
                   - comments: 국민 반응 문자열 배열
 
@@ -167,13 +217,52 @@ public class GenerateScenarioService {
                 2. scores와 weights는 각각 의미 있는 수치를 설정할 것
                 3. comments는 최소 2개만 , 실제 시민 반응처럼 작성할 것
                 4. pressRelease.content는 임시로 비워둘 수 있음
-                5. 16개 중분류: macroeconomy, fiscalPolicy, financialMarkets, industryBusiness, militarySecurity, alliances, cyberSpace, publicSafety, publicOpinion, socialIssues, protestsStrikes, healthWelfare, climateChangeEnergy, pollutionDisaster, biodiversity, resourceManagement
                 """,
-                newsData.path("title").asText(),
-                newsData.path("content").asText(),
-                newsData.path("categories").path("major_categories").get(0).path("category").asText(),
-                newsData.path("sentiment").path("label").asText()
-            ))
+                        newsData.path("title").asText(),
+                        newsData.path("content").asText(),
+                        newsData.path("categories").path("major_categories").get(0).path("category").asText(),
+                        newsData.path("sentiment").path("label").asText()
+                ))
+        );
+    }
+
+    //  카테고리 + 보도 자료 제거
+    private List<Message> createMessagesRemoveMinorCategoryAndPressRelease(JsonNode newsData) {
+        return List.of(
+                new Message("developer", "당신은 정치 시뮬레이션 게임의 시나리오작가입니다. 반드시 유효한 JSON 형식으로만 응답해주세요."),
+                new Message("user", String.format("""
+                당신은 정치 시뮬레이션 게임의 시나리오 작가입니다.
+                주어진 뉴스를 바탕으로 아래 시나리오 객체 형식에 맞게 JSON을 생성해주세요.
+
+                【뉴스 정보】
+                제목: %s
+                내용: %s
+                카테고리: %s
+                감정: %s
+
+                【시나리오 객체 구조】
+                - title: 시나리오 제목 (20자 이내)
+                - content: 상황 설명 (50자 이내, 게임다운 톤앤매너)
+                - conditions: 등장 조건 (배열, 각 조건은 다음을 포함)
+                  - operator: "LESS_THAN" | "MORE_THAN"
+                  - threshold: 정수
+                - choices: { "A": Choice, "B": Choice }
+                  - code: "A" 또는 "B"
+                  - content: 선택지 설명
+                  - effect:
+                    - scores: { economy, defense, environment, publicSentiment } (정수 -100~100)
+                  - comments: 국민 반응 문자열 배열
+
+                【요구사항】
+                1. 반드시 유효한 JSON만 응답할 것
+                2. scores와 weights는 각각 의미 있는 수치를 설정할 것
+                3. comments는 최소 2개만 , 실제 시민 반응처럼 작성할 것
+                """,
+                        newsData.path("title").asText(),
+                        newsData.path("content").asText(),
+                        newsData.path("categories").path("major_categories").get(0).path("category").asText(),
+                        newsData.path("sentiment").path("label").asText()
+                ))
         );
     }
 

@@ -203,9 +203,14 @@ public class ScenarioServiceV2 implements ScenarioService{
         Map<String, ChoiceDoc> choices = parseChoices(scenarioJson.path("choices"));
 
         // related article 생성 (뉴스 기반)
+//        RelatedArticleDoc relatedArticle = new RelatedArticleDoc(
+//            newsData.path("title").asText(),
+//            newsData.path("source_url").asText()
+//        );
+        // 보도자료 패스
         RelatedArticleDoc relatedArticle = new RelatedArticleDoc(
-            newsData.path("title").asText(),
-            newsData.path("source_url").asText()
+                "",
+                ""
         );
 
         // 임시 NPC (실제로는 DB에서 조회하거나 별도 로직 필요)
@@ -293,8 +298,12 @@ public class ScenarioServiceV2 implements ScenarioService{
         return new ChoiceDoc(code, content, effect, pressRelease, comments);
     }
 
+
+    static final double WEIGHT_VALUE = 0.5;
     /**
      * effect 파싱
+     *
+     *  원래값 남겨두려다 그냥 지워버림
      */
     private EffectDoc parseEffect(JsonNode effectNode) {
         // scores 파싱
@@ -307,24 +316,58 @@ public class ScenarioServiceV2 implements ScenarioService{
         );
 
         // weights 파싱
-        JsonNode weightsNode = effectNode.path("weights");
+//        JsonNode weightsNode = effectNode.path("weights");
         EffectWeightsDoc weights = new EffectWeightsDoc(
-            weightsNode.path("macroeconomy").asDouble(),
-            weightsNode.path("fiscalPolicy").asDouble(),
-            weightsNode.path("financialMarkets").asDouble(),
-            weightsNode.path("industryBusiness").asDouble(),
-            weightsNode.path("militarySecurity").asDouble(),
-            weightsNode.path("alliances").asDouble(),
-            weightsNode.path("cyberSpace").asDouble(),
-            weightsNode.path("publicSafety").asDouble(),
-            weightsNode.path("publicOpinion").asDouble(),
-            weightsNode.path("socialIssues").asDouble(),
-            weightsNode.path("protestsStrikes").asDouble(),
-            weightsNode.path("healthWelfare").asDouble(),
-            weightsNode.path("climateChangeEnergy").asDouble(),
-            weightsNode.path("pollutionDisaster").asDouble(),
-            weightsNode.path("biodiversity").asDouble(),
-            weightsNode.path("resourceManagement").asDouble()
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE
+        );
+
+        return new EffectDoc(scores, weights);
+    }
+
+    private EffectDoc parseEffectExceptWeights(JsonNode effectNode) {
+        // scores 파싱
+        JsonNode scoresNode = effectNode.path("scores");
+        EffectScoresDoc scores = new EffectScoresDoc(
+                scoresNode.path("economy").asInt(),
+                scoresNode.path("defense").asInt(),
+                scoresNode.path("publicSentiment").asInt(),
+                scoresNode.path("environment").asInt()
+        );
+
+        // weights 파싱
+//        JsonNode weightsNode = effectNode.path("weights");
+        EffectWeightsDoc weights = new EffectWeightsDoc(
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE,
+                WEIGHT_VALUE
         );
 
         return new EffectDoc(scores, weights);
