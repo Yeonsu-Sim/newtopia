@@ -6,8 +6,12 @@ const slideIn = keyframes`
   to { transform: translateX(0); opacity: 1; }
 `;
 
-
-type Toast = { id: string; message: string };
+type Toast = { 
+  id: string; 
+  message: string; 
+  like: number; 
+  icon: string; 
+};
 
 interface FeedbackToastContainerProps {
   messages: string[];
@@ -34,7 +38,10 @@ export default function FeedbackToastContainer({
       const showTimer = setTimeout(() => {
         if (isCancelled) return;
         const id = `${Date.now()}-${idx}`;
-        setToasts(prev => [...prev, { id, message: msg }]);
+        const like = Math.floor(Math.random() * 100) + 1; // 1~100 랜덤
+        const icon = `/icons/${Math.floor(Math.random() * 4) + 1}.png`; // 1~4 랜덤
+
+        setToasts(prev => [...prev, { id, message: msg, like, icon }]);
 
         const hideTimer = setTimeout(() => {
           if (isCancelled) return;
@@ -54,26 +61,33 @@ export default function FeedbackToastContainer({
   }, [messages, intervalTime, displayTime]);
 
   return (
-    <ToastWrapper>
+    <ToastContainer>
       {toasts.map(t => (
-        <ToastItem key={t.id}>{t.message}</ToastItem>
+        <ToastItem key={t.id}>
+          <NpcIcon src={t.icon} alt="npc" />
+          <TextWrapper>
+            <NpcMessage>{t.message}</NpcMessage>
+            <Like>❤️ {t.like}</Like>
+          </TextWrapper>
+        </ToastItem>
       ))}
-    </ToastWrapper>
+    </ToastContainer>
   );
 }
 
-const ToastWrapper = styled.div`
-  position: absolute; // BackgroundWrapper 기준
+const ToastContainer = styled.div`
+  position: fixed;
   bottom: 20px;
   left: 20px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  pointer-events: none;
-  z-index: 999;
+  gap: 10px;
 `;
 
 const ToastItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: rgba(0,0,0,0.8);
   color: white;
   padding: 8px 12px;
@@ -81,4 +95,27 @@ const ToastItem = styled.div`
   font-size: 0.9rem;
   pointer-events: auto;
   animation: ${slideIn} 0.4s ease forwards;
+`;
+
+const NpcIcon = styled.img`
+  border-radius: 100%;
+  width: 50px;
+  height: auto;
+`;
+
+const TextWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const NpcMessage = styled.div`
+  text-align: start;
+`;
+
+const Like = styled.div`
+  text-align: end;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  opacity: 0.9;
 `;
