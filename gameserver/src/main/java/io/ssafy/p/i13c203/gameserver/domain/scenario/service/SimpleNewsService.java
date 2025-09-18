@@ -92,7 +92,7 @@ public class SimpleNewsService {
         try {
             // MinIO에서 파일 목록 가져오기
 
-            // prifix 고치기.
+            // prifix 안에 또 150개 있음
             List<String> fileNames = getFileList("sentiment/year=2025/");
 
             log.info("file name isEmpty : {}", fileNames.isEmpty());

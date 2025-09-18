@@ -55,7 +55,7 @@ public class GenerateScenarioService {
             // model 확인
             // "gpt-4.1",  "gpt-5-mini"
             // 요청 객체 생성
-            ChatRequest chatRequest = new ChatRequest("gpt-5-mini", messages);
+            ChatRequest chatRequest = new ChatRequest("gpt-4.1", messages);
 
             // JSON 문자열로 변환 (UTF-8 보장)
             String jsonBody = objectMapper.writeValueAsString(chatRequest);

@@ -50,6 +50,7 @@ public class ScenarioServiceV2 implements ScenarioService{
     private final SimpleNewsService simpleNewsService;
     private final GenerateScenarioService generateScenarioService;
     private final ObjectMapper objectMapper;
+    private final NpcService npcService;
 
 
 
@@ -77,8 +78,7 @@ public class ScenarioServiceV2 implements ScenarioService{
                 // 1. 뉴스 제목, 내용을 시나리오 카드로 변환
                 // 2. 선택지 생성 (뉴스 카테고리에 맞는 정책 선택지)
                 // 3. NPC 설정
-                // 4. 효과 설정 (countryStats, choiceWeights 변화)
-                
+
                 return createScenarioFromNews(newsData);
             } else {
                 log.warn("적절한 뉴스를 찾지 못했습니다. 기본 시나리오를 반환합니다.");
@@ -110,8 +110,6 @@ public class ScenarioServiceV2 implements ScenarioService{
             log.error("GPT 응답을 Scenario 객체로 변환 중 오류 발생", e);
             return null;
         }
-
-
     }
 
 //    /**
@@ -218,16 +216,22 @@ public class ScenarioServiceV2 implements ScenarioService{
 
         // 임시 NPC (실제로는 DB에서 조회하거나 별도 로직 필요)
         Npc defaultNpc = createDefaultNpc();
+        // category = newsData.path("categories").path("major_categories").get(0).path("category").asText()
+        // 교체 가능
+        Npc npc = npcService.getNpcByCategoryPlainJava(newsData.path("categories").path("major_categories").get(0).path("category").asText());
+
+        log.info("here");
 
         return Scenario.builder()
             .title(title)
             .content(content)
-            .npc(defaultNpc)
+            .npc(npc)
             .spawn(spawn)
             .choices(choices)
             .relatedArticle(relatedArticle)
             .build();
     }
+
 
     /**
      * spawn conditions 파싱
@@ -241,14 +245,14 @@ public class ScenarioServiceV2 implements ScenarioService{
                 String operatorStr = conditionNode.path("operator").asText();
                 double threshold = conditionNode.path("threshold").asDouble();
 
-                try {
-                    MinorCategory category = MinorCategory.valueOf(minorCategoryStr);
-                    ConditionOperator operator = ConditionOperator.valueOf(operatorStr);
-
-                    conditions.add(new ConditionEntryDoc(category, operator, threshold));
-                } catch (IllegalArgumentException e) {
-                    log.warn("잘못된 조건 파라미터: category={}, operator={}", minorCategoryStr, operatorStr);
-                }
+//                try {
+//                    MinorCategory category = MinorCategory.valueOf(minorCategoryStr);
+//                    ConditionOperator operator = ConditionOperator.valueOf(operatorStr);
+//
+//                    conditions.add(new ConditionEntryDoc(category, operator, threshold));
+//                } catch (IllegalArgumentException e) {
+//                    log.warn("잘못된 조건 파라미터: category={}, operator={}", minorCategoryStr, operatorStr);
+//                }
             }
         }
 
