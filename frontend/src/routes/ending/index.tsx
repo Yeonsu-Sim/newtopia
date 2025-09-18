@@ -47,9 +47,7 @@ useEffect(() => {
         메인으로
       </TopRightButton>
       <EndingImage 
-        // TODO: minIO 해결되면 수정
-        // src={ending.assets.imageUrl} 
-        src={`/ending/${ending.code}.png`}
+        src={ending.assets.imageUrl}
         alt={ending.code} />
       <EndingText>
         <h2>{ending.content}</h2>

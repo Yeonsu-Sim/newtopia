@@ -25,9 +25,7 @@ const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, guestIma
     <DialogOverlay>
       <GuestBox>
         <GuestIcon 
-          // TODO: minIO 해결되면 수정
-          // src={guestImage}
-          src={`/npc/${code}`}
+          src={guestImage}
         ></GuestIcon>
         <DialogBox>
           <DialogHeader>{guestName}</DialogHeader>
