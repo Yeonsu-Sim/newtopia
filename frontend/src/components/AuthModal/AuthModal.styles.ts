@@ -54,7 +54,7 @@ export const ModalHeader = styled.div`
 `;
 
 export const HeaderTitle = styled.div`
-  font-family: "DNF Bit Bit v2", 'Noto Sans KR', sans-serif;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-weight: 400;
   position: relative;
   flex-shrink: 0;
@@ -77,7 +77,7 @@ export const HeaderTitle = styled.div`
 `;
 
 export const HeaderSubtitle = styled.div`
-  font-family: "PF Stardust ExtraBold", 'Noto Sans KR', sans-serif;
+  font-family: 'PFStardustExtraBold', 'Noto Sans KR', sans-serif;
   font-weight: 800;
   min-width: 100%;
   position: relative;
@@ -202,7 +202,7 @@ export const SubmitButtonInner = styled.div`
 `;
 
 export const SubmitButtonText = styled.div`
-  font-family: 'Galmuri14', 'Noto Sans KR', sans-serif;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-weight: bold;
   line-height: 0;
   font-style: normal;
