@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 
 const slideIn = keyframes`
@@ -6,10 +6,6 @@ const slideIn = keyframes`
   to { transform: translateX(0); opacity: 1; }
 `;
 
-const slideOut = keyframes`
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(-120%); opacity: 0; }
-`;
 
 type Toast = { id: string; message: string };
 

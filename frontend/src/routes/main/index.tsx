@@ -97,7 +97,8 @@ function MainPage() {
 
       {/* 환영 메시지 */}
       <WelcomeSection>
-        <WelcomeTitle>환영합니다, {user.nickname}님!</WelcomeTitle>
+        <WelcomeTitle>환영합니다!</WelcomeTitle>
+        {/* 추후 웰컴메시지에 사용자명 추가 필요! [환영합니다, {user.nickname}님]  */}
         <WelcomeSubtitle>뉴토피아에서 당신만의 통치를 시작해보세요</WelcomeSubtitle>
       </WelcomeSection>
       
