@@ -92,7 +92,7 @@ public final class NpcPicker {
         // 각 카테고리별로 관련 태그들을 확인
         switch (key) {
             case "economy":
-                return npcTags.contains("과학") || npcTags.contains("노동") ||
+                return npcTags.contains("노동") ||
                        npcTags.contains("직장인") || npcTags.contains("정부") ||
                        npcTags.contains("장관");
 
