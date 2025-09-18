@@ -150,7 +150,7 @@ build:data-pipeline:
 
 deploy:gameserver:
   stage: deploy
-  image: bitnami/kubectl:latest
+  image: alpine/k8s:1.28.2
   tags:
     - runner
   needs:
@@ -208,7 +208,7 @@ deploy:gameserver:
 
 deploy:frontend:
   stage: deploy
-  image: bitnami/kubectl:latest
+  image: alpine/k8s:1.28.2
   tags:
     - runner
   needs:
