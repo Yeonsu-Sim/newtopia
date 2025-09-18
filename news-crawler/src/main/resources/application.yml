@@ -5,6 +5,11 @@ spring:
   profiles:
     active: local
 
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
 client:
   naver:
     id: viMeyB3tqE4cS91Pxbn6
