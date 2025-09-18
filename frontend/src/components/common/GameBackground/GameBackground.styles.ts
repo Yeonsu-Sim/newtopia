@@ -12,7 +12,7 @@ export const BackgroundImage = styled.div`
   inset: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/backgrounds/background.png');
+  background-image: url('/backgrounds/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

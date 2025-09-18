@@ -4,6 +4,7 @@ import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
 import { useAuthStore } from '../store/authStore'
+import { LoadingScreen } from '@/components/common/LoadingScreen'
 
 // import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
@@ -23,20 +24,7 @@ function RootComponent() {
 
   // 초기화가 완료되지 않았으면 로딩 화면 표시
   if (!isInitialized) {
-    return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        fontSize: '24px',
-        fontFamily: 'DNFBitBitv2, Noto Sans KR, sans-serif'
-      }}>
-        뉴토피아 로딩 중...
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

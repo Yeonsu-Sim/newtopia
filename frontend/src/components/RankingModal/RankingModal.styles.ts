@@ -93,7 +93,7 @@ export const HeaderTab = styled.button<HeaderTabProps>`
   text-shadow: 3px 3px 0 #6E3400;
   -webkit-text-stroke-width: 2px;
   -webkit-text-stroke-color: #8E4600;
-  font-family: "DNF Bit Bit v2", 'Noto Sans KR', sans-serif;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-size: 42px;
   font-style: normal;
   font-weight: 400;
@@ -136,7 +136,7 @@ export const SearchInput = styled.input<SearchInputProps>`
   border: 3px solid #6E3400;
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.9);
-  font-family: "PF Stardust ExtraBold", 'Noto Sans KR', sans-serif;
+  font-family: 'PFStardustExtraBold', 'Noto Sans KR', sans-serif;
   font-size: 24px;
   font-weight: 400;
   color: #333;
@@ -164,7 +164,7 @@ export const SearchButton = styled.button`
   border-radius: 15px;
   background: #F9BF26;
   color: #6E3400;
-  font-family: "DNF Bit Bit v2", 'Noto Sans KR', sans-serif;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-size: 24px;
   font-weight: 400;
   cursor: pointer;
@@ -260,7 +260,7 @@ export const TableCell = styled.div`
   -webkit-text-stroke-width: 0px;
   -webkit-text-stroke-color: #6E3400;
   // 이거 쉐도우가 왜 피그마랑 반대로 적용되는지 확인필요
-  font-family: "PF Stardust", 'Noto Sans KR', sans-serif;
+  font-family: 'PFStardust', 'Noto Sans KR', sans-serif;
   font-size: 32px;
   font-style: normal;
   font-weight: 800;
@@ -293,7 +293,7 @@ export const LoadingSpinner = styled.div`
   justify-content: center;
   height: 200px;
   color: #FFF;
-  font-family: "DNF Bit Bit v2", 'Noto Sans KR', sans-serif;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-size: 32px;
   text-shadow: 4px 4px 0 #6E3400;
 `;
@@ -305,7 +305,7 @@ export const ErrorMessage = styled.div`
   border-radius: 10px;
   margin-bottom: 20px;
   text-align: center;
-  font-family: "DNF Bit Bit v2", 'Noto Sans KR', sans-serif;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-size: 24px;
   font-weight: 400;
 
