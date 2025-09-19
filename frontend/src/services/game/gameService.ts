@@ -3,7 +3,7 @@ const API_BASE_URL = '/api/v1';
 export const gameService = {
   fetchOngoingGame: async () => {
     const res = await fetch(`${API_BASE_URL}/games/me`, { credentials: 'include' });
-    if (!res.ok) throw new Error('진행 중 게임 조회 실패');
+    if (!res.ok) throw new Error('진행 중 게임 조회  실패');
     return await res.json();
   },
 
