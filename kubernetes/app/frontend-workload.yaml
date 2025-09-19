@@ -16,6 +16,8 @@ spec:
       labels:
         app: frontend
     spec:
+      nodeSelector:
+        location: aws
       containers:
       - name: frontend
         image: dudgh614/frontend-app:CI_COMMIT_SHA

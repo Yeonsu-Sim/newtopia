@@ -20,6 +20,8 @@ spec:
       labels:
         app: gitlab-agent
     spec:
+      nodeSelector:
+        location: aws
       serviceAccountName: gitlab-agent
       containers:
       - name: agent

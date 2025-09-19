@@ -16,6 +16,8 @@ spec:
       labels:
         app: crawlingserver
     spec:
+      nodeSelector:
+        location: aws
       containers:
       - name: crawlingserver
         image: dudgh614/crawler-app:CI_COMMIT_SHA

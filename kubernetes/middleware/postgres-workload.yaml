@@ -18,6 +18,8 @@ spec:
         app: newtopia-db # has to match .spec.selector.matchLabels
         component: postgres
     spec:
+      nodeSelector:
+        location: aws
       containers:
       - name: postgres
         image: postgres:alpine3.22
