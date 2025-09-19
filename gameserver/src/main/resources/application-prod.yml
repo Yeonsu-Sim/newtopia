@@ -13,7 +13,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create  # TODO: 임시 설정 수거 -> none
+      ddl-auto: none
     show-sql: false
 
   sql:
