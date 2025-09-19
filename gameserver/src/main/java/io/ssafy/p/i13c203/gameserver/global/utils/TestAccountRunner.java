@@ -31,39 +31,39 @@ public class TestAccountRunner implements CommandLineRunner {
         memberService.signup(signupRequestDto);
 
         SignupRequestDto signupRequestDto1 = new SignupRequestDto();
-        signupRequestDto.setEmail("ssafy1@ssafy.com");
-        signupRequestDto.setPassword("ssafy123");
-        signupRequestDto.setNickname("치킨은국룰");
+        signupRequestDto1.setEmail("ssafy1@ssafy.com");
+        signupRequestDto1.setPassword("ssafy123");
+        signupRequestDto1.setNickname("치킨은국룰");
         memberService.signup(signupRequestDto1);
 
 
         SignupRequestDto signupRequestDto2 = new SignupRequestDto();
-        signupRequestDto.setEmail("ssafy2@ssafy.com");
-        signupRequestDto.setPassword("ssafy123");
-        signupRequestDto.setNickname("버그제조기");
+        signupRequestDto2.setEmail("ssafy2@ssafy.com");
+        signupRequestDto2.setPassword("ssafy123");
+        signupRequestDto2.setNickname("버그제조기");
         memberService.signup(signupRequestDto2);
 
         SignupRequestDto signupRequestDto3 = new SignupRequestDto();
-        signupRequestDto.setEmail("ssafy3@ssafy.com");
-        signupRequestDto.setPassword("ssafy123");
-        signupRequestDto.setNickname("코딩하다잠듦");
+        signupRequestDto3.setEmail("ssafy3@ssafy.com");
+        signupRequestDto3.setPassword("ssafy123");
+        signupRequestDto3.setNickname("코딩하다잠듦");
         memberService.signup(signupRequestDto3);
 
         SignupRequestDto signupRequestDto4 = new SignupRequestDto();
-        signupRequestDto.setEmail("ssafy4@ssafy.com");
-        signupRequestDto.setPassword("ssafy123");
-        signupRequestDto.setNickname("라면물맨");
+        signupRequestDto4.setEmail("ssafy4@ssafy.com");
+        signupRequestDto4.setPassword("ssafy123");
+        signupRequestDto4.setNickname("라면물맨");
         memberService.signup(signupRequestDto4);
         SignupRequestDto signupRequestDto5 = new SignupRequestDto();
-        signupRequestDto.setEmail("ssafy5@ssafy.com");
-        signupRequestDto.setPassword("ssafy123");
-        signupRequestDto.setNickname("실수의달인");
+        signupRequestDto5.setEmail("ssafy5@ssafy.com");
+        signupRequestDto5.setPassword("ssafy123");
+        signupRequestDto5.setNickname("실수의달인");
         memberService.signup(signupRequestDto5);
 
         SignupRequestDto signupRequestDto6 = new SignupRequestDto();
-        signupRequestDto.setEmail("ssafy6@ssafy.com");
-        signupRequestDto.setPassword("ssafy123");
-        signupRequestDto.setNickname("집가고싶다왕");
+        signupRequestDto6.setEmail("ssafy6@ssafy.com");
+        signupRequestDto6.setPassword("ssafy123");
+        signupRequestDto6.setNickname("집가고싶다왕");
         memberService.signup(signupRequestDto6);
 
 
