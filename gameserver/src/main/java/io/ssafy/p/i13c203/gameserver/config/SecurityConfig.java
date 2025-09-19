@@ -73,17 +73,17 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             // 권한 설정
-            .authorizeHttpRequests(auth -> auth
-                // 인증 없이 접근 가능한 경로
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/public/**").permitAll()
-                .requestMatchers("/api/v1/files/public").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // 나머지는 인증 필요
-                .anyRequest().authenticated()
-            )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/games/**").authenticated()
+                        .requestMatchers("/api/v1/game-results/**").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/ranking/me").authenticated()
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/files").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/files").authenticated()
+
+                        .anyRequest().permitAll()
+                )
 
             // 로그아웃 필터 설정
             .logout(logout -> logout
