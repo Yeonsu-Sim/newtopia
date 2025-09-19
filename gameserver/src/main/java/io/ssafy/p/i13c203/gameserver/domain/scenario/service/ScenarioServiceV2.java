@@ -64,31 +64,35 @@ public class ScenarioServiceV2 implements ScenarioService{
 
 
 
-    //
+    // 속도가 안나서 랜덤으로 하고
+    // 후에 db 로 바꾸면 로직 바꿀게요
     @Override
     public Scenario nextScenario(Game game, int nextTurn) {
-        try {
-            // 게임 상태에 따라 적절한 뉴스 조회
-            JsonNode newsData = simpleNewsService.getNewsForGameState(game);
-            
-            if (newsData != null) {
-                log.info("뉴스 조회 성공: {}", newsData.get("title").asText());
-                
-                // TODO: JsonNode(뉴스 데이터)를 기반으로 Scenario 객체 생성
-                // 1. 뉴스 제목, 내용을 시나리오 카드로 변환
-                // 2. 선택지 생성 (뉴스 카테고리에 맞는 정책 선택지)
-                // 3. NPC 설정
 
-                return createScenarioFromNews(newsData);
-            } else {
-                log.warn("적절한 뉴스를 찾지 못했습니다. 기본 시나리오를 반환합니다.");
-                return null;
-            }
-            
-        } catch (Exception e) {
-            log.error("시나리오 생성 중 오류 발생", e);
-            return null;
-        }
+        JsonNode newsData = simpleNewsService.getRandomNews();
+        return createScenarioFromNews(newsData);
+//        try {
+//            // 게임 상태에 따라 적절한 뉴스 조회
+//            JsonNode newsData = simpleNewsService.getNewsForGameState(game);
+//
+//            if (newsData != null) {
+//                log.info("뉴스 조회 성공: {}", newsData.get("title").asText());
+//
+//                // TODO: JsonNode(뉴스 데이터)를 기반으로 Scenario 객체 생성
+//                // 1. 뉴스 제목, 내용을 시나리오 카드로 변환
+//                // 2. 선택지 생성 (뉴스 카테고리에 맞는 정책 선택지)
+//                // 3. NPC 설정
+//
+//                return createScenarioFromNews(newsData);
+//            } else {
+//                log.warn("적절한 뉴스를 찾지 못했습니다. 기본 시나리오를 반환합니다.");
+//                return null;
+//            }
+//
+//        } catch (Exception e) {
+//            log.error("시나리오 생성 중 오류 발생", e);
+//            return null;
+//        }
     }
 
     /**

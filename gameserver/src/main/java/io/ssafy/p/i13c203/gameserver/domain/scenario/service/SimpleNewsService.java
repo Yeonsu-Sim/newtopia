@@ -65,7 +65,7 @@ public class SimpleNewsService {
     public JsonNode getRandomNews() {
         try {
             // MinIO에서 파일 목록 가져오기
-            List<String> fileNames = getFileList("first/");
+            List<String> fileNames = getFileList("sentiment/first/");
 
             if (fileNames.isEmpty()) {
                 log.warn("뉴스 파일이 없습니다.");
@@ -93,7 +93,12 @@ public class SimpleNewsService {
             // MinIO에서 파일 목록 가져오기
 
             // prifix 안에 또 150개 있음
-            List<String> fileNames = getFileList("sentiment/year=2025/");
+
+
+            // sentiment/split/1~80
+
+            int random = (int)(Math.random() * 80) + 1;
+            List<String> fileNames = getFileList("sentiment/split/" + random);
 
             log.info("file name isEmpty : {}", fileNames.isEmpty());
             
