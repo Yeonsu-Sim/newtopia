@@ -24,6 +24,7 @@ import { useGame } from '@/hooks/useGame';
 import { useGamePlay } from '@/hooks/useGamePlay';
 import { useAuthStore } from '@/store/authStore';
 import FeedbackToastContainer from '@/components/FeedbackToast/FeedbackToastContainer';
+import { HotTopic } from '@/components/common/HotTopic/HotTopic';
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
@@ -212,10 +213,12 @@ function RouteComponent() {
       )}
       
     {toastMessages.length > 0 && (
-      <FeedbackToastContainer 
+      <FeedbackToastContainer
         messages={toastMessages}
       />
     )}
+
+    <HotTopic />
     </MainContainer>
   );
 }

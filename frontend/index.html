@@ -29,6 +29,30 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-NTX9XN2G');</script>
     <!-- End Google Tag Manager -->
+
+    <!-- Maze User Testing Tracking -->
+    <script>
+    (function (m, a, z, e) {
+      var s, t;
+      try {
+        t = m.sessionStorage.getItem('maze-us');
+      } catch (err) {}
+
+      if (!t) {
+        t = new Date().getTime();
+        try {
+          m.sessionStorage.setItem('maze-us', t);
+        } catch (err) {}
+      }
+
+      s = a.createElement('script');
+      s.src = z + '?apiKey=' + e;
+      s.async = true;
+      a.getElementsByTagName('head')[0].appendChild(s);
+      m.mazeUniversalSnippetApiKey = e;
+    })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', 'dc1c0473-307d-4acb-b46d-fe922251521f');
+    </script>
+    <!-- End Maze User Testing Tracking -->
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->
