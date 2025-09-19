@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@Profile({"local","docker"})
 public class TestAccountRunner implements CommandLineRunner {
 
     private final MemberService memberService;
