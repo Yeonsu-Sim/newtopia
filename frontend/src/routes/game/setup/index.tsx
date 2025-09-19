@@ -17,6 +17,8 @@ import {
   CountryNameInput,
   InstructionText,
   BackButton,
+  IntroTextContainer,
+  IntroTextLine,
 } from '@/routes/game/setup/-GameSetup.styles';
 
 export const Route = createFileRoute('/game/setup/')({
@@ -33,6 +35,11 @@ function GameSetupPage() {
   const [countryName, setCountryName] = useState('');
   const [showNameInput, setShowNameInput] = useState(false);
   const [ongoingGame, setOngoingGame] = useState<any>(null);
+  const [showIntroAnimation, setShowIntroAnimation] = useState(false);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [gameData, setGameData] = useState<any>(null);
+  const [isApiLoading, setIsApiLoading] = useState(false);
 
   useEffect(() => {
     const checkGame = async () => {
@@ -50,6 +57,34 @@ function GameSetupPage() {
     };
     checkGame();
   }, []);
+
+  const introTexts = [
+    "당신은 이 세계의 지도자가 되었습니다...",
+    "이제는 국가를 운영하며",
+    "국가운영지표를 균형 있게 유지하면서",
+    "임기를 마쳐야합니다..."
+  ];
+
+  useEffect(() => {
+    if (showIntroAnimation && currentTextIndex < introTexts.length) {
+      const timer = setTimeout(() => {
+        setCurrentTextIndex(currentTextIndex + 1);
+      }, 2000);
+      return () => clearTimeout(timer);
+    } else if (showIntroAnimation && currentTextIndex >= introTexts.length) {
+      const timer = setTimeout(() => {
+        setAnimationComplete(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [showIntroAnimation, currentTextIndex, introTexts.length]);
+
+  // 애니메이션과 API 둘 다 완료되면 자동으로 게임 시작
+  useEffect(() => {
+    if (animationComplete && gameData && !isApiLoading) {
+      startGame(gameData);
+    }
+  }, [animationComplete, gameData, isApiLoading]);
 
   const startGame = (game: any) => {
     const turn = game.turn;
@@ -92,15 +127,26 @@ function GameSetupPage() {
       return;
     }
 
+    // 인트로 애니메이션과 API 호출을 동시에 시작
+    setShowNameInput(false);
+    setShowIntroAnimation(true);
+    setCurrentTextIndex(0);
+    setAnimationComplete(false);
+    setIsApiLoading(true);
+
+    // 백그라운드에서 API 호출 시작
     try {
       const data = await createNewGame(countryName.trim());
       if (data?.data?.game) {
-        startGame(data.data.game);
+        setGameData(data.data.game);
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsApiLoading(false);
     }
   };
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCountryName(e.target.value);
@@ -156,6 +202,33 @@ function GameSetupPage() {
             <p>Enter를 눌러 계속하기</p>
           </InstructionText>
         </>
+      )}
+
+      {showIntroAnimation && (
+        <IntroTextContainer>
+          <div>
+            {introTexts.slice(0, currentTextIndex + 1).map((text, index) => (
+              <IntroTextLine
+                key={index}
+                $isActive={index === currentTextIndex}
+                style={{
+                  opacity: index <= currentTextIndex ? 1 : 0,
+                  transform: index <= currentTextIndex ? 'translateY(0)' : 'translateY(20px)',
+                  transition: 'all 1s ease',
+                  transitionDelay: '0.2s'
+                }}
+              >
+                {text}
+              </IntroTextLine>
+            ))}
+          </div>
+
+          {animationComplete && (isApiLoading || !gameData) && (
+            <InstructionText>
+              <p>시나리오 준비 중...</p>
+            </InstructionText>
+          )}
+        </IntroTextContainer>
       )}
     </SetupContainer>
   );

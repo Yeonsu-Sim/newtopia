@@ -7,6 +7,7 @@ import {
 import {
     DialogOverlay,
     DialogBox,
+    DialogText,
     ChoiceCards,
     CloseButton,
     ChoiceCardA,
@@ -72,7 +73,7 @@ const ChoiceDialog: React.FC<ChoiceDialogProps> = ({ guestText, choices, current
       </ParameterChangeBox>
         
       <DialogBox>
-        <h2>{guestText}</h2>
+        <DialogText>{guestText}</DialogText>
         <ChoiceCards>
           {choices[0] && <ChoiceCardA onClick={() => onSelect(choices[0].code)}>{choices[0].label}</ChoiceCardA>}
           {choices[1] && <ChoiceCardB onClick={() => onSelect(choices[1].code)}>{choices[1].label}</ChoiceCardB>}
