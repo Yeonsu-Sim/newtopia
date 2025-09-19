@@ -12,16 +12,20 @@ import{
 interface GuestDialogProps {
   guestName: string;
   guestText: string;
+  guestImage: string;
   open: boolean;
   onClose: () => void;
-  onSelect: () => void;
+  onSelect: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, onClose, onSelect }) => {
+const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, guestImage, onClose, onSelect }) => {
+
   return (
     <DialogOverlay>
       <GuestBox>
-        <GuestIcon></GuestIcon>
+        <GuestIcon 
+          src={guestImage}
+        ></GuestIcon>
         <DialogBox>
           <DialogHeader>{guestName}</DialogHeader>
           <DialogContent>{guestText}</DialogContent>
@@ -30,7 +34,7 @@ const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, onClose,
               <button onClick={onClose}>닫기</button>
             </DialogActions>
             <DialogActions>
-              <button onClick={onSelect}>선택</button>
+              <button onClick={(e) => onSelect(e)}>선택</button>
             </DialogActions>
           </DialogActionsBox>
 

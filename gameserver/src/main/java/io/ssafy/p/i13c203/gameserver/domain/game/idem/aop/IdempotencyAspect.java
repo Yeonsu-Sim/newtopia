@@ -1,9 +1,9 @@
 package io.ssafy.p.i13c203.gameserver.domain.game.idem.aop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.ssafy.p.i13c203.gameserver.auth.CurrentMemberContext;
+import io.ssafy.p.i13c203.gameserver.auth.security.CustomUserDetails;
 import io.ssafy.p.i13c203.gameserver.domain.game.idem.annotation.IdempotentOperation;
-import io.ssafy.p.i13c203.gameserver.domain.game.redis.IdemRecord;
+import io.ssafy.p.i13c203.gameserver.domain.game.idem.redis.IdemRecord;
 import io.ssafy.p.i13c203.gameserver.domain.game.repository.IdemRecordRepository;
 import io.ssafy.p.i13c203.gameserver.global.exception.BusinessException;
 import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
@@ -20,6 +20,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -142,9 +145,25 @@ public class IdempotencyAspect {
         String[] names = sig.getParameterNames();
         for (int i = 0; i < names.length; i++) argMap.put(names[i], args[i]);
         StringBuilder sb = new StringBuilder();
-        sb.append("member:").append(Objects.toString(CurrentMemberContext.get(), "anonymous")).append('|');
+        sb.append("member:").append(currentMemberId()).append('|');
         sb.append("method:").append(sig.getDeclaringTypeName()).append('#').append(sig.getName()).append('|');
         for (String n : hashArgs) sb.append(n).append('=').append(argMap.get(n)).append('|');
         return Integer.toHexString(sb.toString().hashCode());
+    }
+
+    private String currentMemberId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return "anonymous";
+        }
+        Object principal = auth.getPrincipal();
+
+        if (principal instanceof CustomUserDetails cud) {
+            Long id = cud.getMemberId();
+            return (id == null) ? "anonymous" : String.valueOf(id);
+        }
+
+        // JWT에서 username만 실린 경우나 다른 Provider인 경우 대비
+        return auth.getName(); // 필요 시 "anonymous" 처리 로직 추가
     }
 }

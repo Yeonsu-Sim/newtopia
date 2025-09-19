@@ -18,6 +18,8 @@ spec:
         app: newtopia-db # has to match .spec.selector.matchLabels
         component: redis
     spec:
+      nodeSelector:
+        location: aws
       containers:
       - name: redis
         image: redis:7-alpine
@@ -31,3 +33,21 @@ spec:
       - name: redis-pv
         persistentVolumeClaim:
           claimName: redis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: newtopia-db
+  labels:
+    app: newtopia-db
+    component: redis
+spec:
+  type: ClusterIP
+  selector:
+    app: newtopia-db
+    component: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis

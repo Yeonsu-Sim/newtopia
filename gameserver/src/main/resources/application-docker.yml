@@ -11,6 +11,15 @@ spring:
       idle-timeout: 300000
       max-lifetime: 1200000
 
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:sql/data.sql
+
 
   data:
     redis:
@@ -49,3 +58,12 @@ spring:
 logging:
   level:
     '[io.ssafy.p.i13c203.gameserver]': trace
+
+app:
+  storage:
+    minio:
+      endpoint: http://minio:9000
+      access-key: minio
+      secret-key: minio123
+      bucket-name: newtopia-img
+      public-base-url: http://localhost:9000/newtopia-img

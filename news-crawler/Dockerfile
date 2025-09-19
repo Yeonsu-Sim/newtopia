@@ -44,8 +44,11 @@ COPY --from=builder-jre /jre $JAVA_HOME
 # Set working directory
 WORKDIR /app
 
-# Copy the built JAR from the Gradle build stage
-COPY --from=builder-app /workspace/build/libs/*.jar app.jar
+# Copy the built JAR from the Gradle build stage (excluding plain jar)
+COPY --from=builder-app /workspace/build/libs/ ./libs/
+
+# Find and copy the executable Spring Boot jar (the larger one, not the plain jar)
+RUN find ./libs -name "*.jar" ! -name "*-plain.jar" -exec cp {} app.jar \;
 
 RUN mkdir -p /app/resources && chmod -R 755 /app/resources
 

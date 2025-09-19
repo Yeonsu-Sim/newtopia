@@ -56,16 +56,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         setAuthenticationCookie(response, accessTokenCookieName, accessToken, 15 * 60); // 15분
         setAuthenticationCookie(response, refreshTokenCookieName, refreshToken, 7 * 24 * 60 * 60); // 7일
 
-        // 기존 사용중인 쿠키 데이터 추가
-        setAuthenticationCookie(response, "memberId", memberId.toString(), 7 * 24 * 60 * 60);
-        setAuthenticationCookie(response, "email", userDetails.getMember().getEmail(), 7 * 24 * 60 * 60);
-        setAuthenticationCookie(response, "nickname", userDetails.getMember().getNickname(), 7 * 24 * 60 * 60);
-
         // JSON 응답 생성
         Map<String, Object> responseData = new HashMap<>();
-        responseData.put("id", memberId);
-        responseData.put("email", userDetails.getMember().getEmail());
-        responseData.put("nickname", userDetails.getMember().getNickname());
 
         APIResponse<Map<String, Object>, Void> apiResponse =
             APIResponse.success("로그인에 성공했습니다", responseData);

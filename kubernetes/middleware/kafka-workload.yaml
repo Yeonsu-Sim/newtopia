@@ -31,6 +31,17 @@ metadata:
     strimzi.io/cluster: newtopia-kafka-cluster
 spec:
   replicas: 3
+  template:
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: location
+                operator: In
+                values:
+                - aws
   roles:
     - controller
     - broker
@@ -40,5 +51,5 @@ spec:
       - id: 0
         type: persistent-claim
         size: 20Gi
-        class: nfs-kafka
+        class: nfs-storage
         deleteClaim: false

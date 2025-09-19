@@ -48,39 +48,51 @@ export const ModalHeader = styled.div`
   flex-shrink: 0;
   text-align: center;
   width: 100%;
-  padding-top: 40px;
+  padding-top: 60px;
   padding-bottom: 20px;
+
 `;
 
 export const HeaderTitle = styled.div`
-  font-family: 'Galmuri14', 'Noto Sans KR', sans-serif;
-  font-weight: bold;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
+  font-weight: 400;
   position: relative;
   flex-shrink: 0;
-  color: white;
-  letter-spacing: 2px;
-  text-shadow: rgba(0, 0, 0, 0.5) 4px 4px 4px;
-  font-size: clamp(24px, 5vw, 32px);
-  
+  color: #FFF;
+  text-align: center;
+  text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.50);
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: #A35400;
+  font-size: 40px;
+  font-style: normal;
+  padding-bottom: 10px;
+  line-height: 32px;
+  letter-spacing: 0px;
+
   p {
-    line-height: 1.2;
+    line-height: 32px;
     text-wrap: nowrap;
     white-space: pre;
   }
 `;
 
 export const HeaderSubtitle = styled.div`
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 500;
+  font-family: 'PFStardustExtraBold', 'Noto Sans KR', sans-serif;
+  font-weight: 800;
   min-width: 100%;
   position: relative;
+    padding-bottom: 20px;
   flex-shrink: 0;
-  color: rgba(0, 0, 0, 0.8);
-  font-size: clamp(16px, 3vw, 20px);
+  color: #FFF;
+  text-align: center;
+  text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.75);
+  font-size: 28px;
+  font-style: normal;
+  line-height: 20px;
   width: min-content;
-  
+
   p {
-    line-height: 1.3;
+    line-height: 20px;
   }
 `;
 
@@ -110,7 +122,7 @@ export const ErrorMessage = styled.div`
 export const FormFields = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: start;
   justify-content: start;
   position: relative;
@@ -133,23 +145,16 @@ export const Input = styled.input`
   height: 52px;
   padding: 0 1rem;
   border-radius: 8px;
-  border: 3px solid #629eff;
+  border: 3px solid #909090;
   outline: none;
   color: black;
   font-size: 16px;
   letter-spacing: 1px;
   font-family: 'Noto Sans KR', sans-serif;
-  
+  box-sizing: border-box;
+
   &:focus {
-    border-color: #3b82f6;
-  }
-  
-  &[type="password"] {
-    border-color: #909090;
-    
-    &:focus {
-      border-color: #3b82f6;
-    }
+    border-color: #629eff;
   }
 `;
 
@@ -197,7 +202,7 @@ export const SubmitButtonInner = styled.div`
 `;
 
 export const SubmitButtonText = styled.div`
-  font-family: 'Galmuri14', 'Noto Sans KR', sans-serif;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-weight: bold;
   line-height: 0;
   font-style: normal;

@@ -13,8 +13,8 @@ export const Container = styled.div`
 `;
 
 export const EndingImage = styled.img`
-  max-width: 60%;
-  max-height: 40%;
+  width: 400px;
+  height: auto;
   object-fit: contain;
   margin-bottom: 2rem;
 `;
@@ -22,6 +22,7 @@ export const EndingImage = styled.img`
 export const EndingText = styled.div`
   text-align: center;
   font-size: 1.5rem;
+  font-family: 'Galmuri14', 'Noto Sans KR', sans-serif;
 `;
 
 export const TopRightButton = styled.button`
@@ -30,4 +31,5 @@ export const TopRightButton = styled.button`
   right: 1rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
+  font-family: 'Galmuri14', 'Noto Sans KR', sans-serif;
 `;

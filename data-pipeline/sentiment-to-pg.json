@@ -1,0 +1,36 @@
+{
+  "name": "sentiment-to-pg-insert",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+    "topics": "newtopia.news.sentiment",
+
+    "connection.url": "jdbc:postgresql://postgres:5432/newtopia",
+    "connection.user": "newtopia",
+    "connection.password": "newtopia",
+
+    "table.name.format": "news_events",
+    "auto.create": "false",
+    "auto.evolve": "false",
+
+    "insert.mode": "upsert",
+    "pk.mode": "record_value",
+    "pk.fields": "article_id",
+    "delete.enabled": "false",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "true",
+
+    "consumer.override.auto.offset.reset": "earliest",
+
+    "batch.size": "3000",
+    "max.retries": "10",
+    "retry.backoff.ms": "3000",
+
+    "errors.tolerance": "all",
+    "errors.deadletterqueue.topic.name": "newtopia.news.sentiment.dlq",
+    "errors.deadletterqueue.topic.replication.factor": "1",
+    "errors.deadletterqueue.context.headers.enable": "true"
+  }
+}

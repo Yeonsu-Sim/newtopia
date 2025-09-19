@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: image-ing
+  namespace: newtopia-minio
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/redirect-to-https: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - j13c203.p.ssafy.io
+    secretName: j13c203-tls
+  rules:
+  - host: j13c203.p.ssafy.io
+    http:
+      paths:
+      - path: /newtopia-img
+        pathType: Prefix
+        backend:
+          service:
+            name: minio-api-service
+            port:
+              number: 9000
+

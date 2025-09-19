@@ -29,7 +29,7 @@ public class Image {
     @Column(name = "public_id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID publicId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String storageKey;
 
 

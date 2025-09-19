@@ -27,6 +27,7 @@ useEffect(() => {
       });
       if (!res.ok) throw new Error('엔딩 불러오기 실패');
       const data = await res.json();
+      console.log(data.data);
       setEnding(data.data);
     } catch (err) {
       console.error(err);
@@ -45,9 +46,11 @@ useEffect(() => {
       <TopRightButton onClick={() => navigate({ to: '/' })}>
         메인으로
       </TopRightButton>
-      <EndingImage src={ending.assets.imageUrl} alt={ending.title} />
+      <EndingImage 
+        src={ending.assets.imageUrl}
+        alt={ending.code} />
       <EndingText>
-        <h2>{ending.title}</h2>
+        <h2>{ending.content}</h2>
       </EndingText>
     </Container>
   );

@@ -1,20 +1,24 @@
 import styled from "styled-components";
 
 export const DialogOverlay = styled.div`
-    position: fixed;
+  position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.6); 
   display: flex;
   flex-direction: column;
   align-items: center;
   z-index: 20;
+  cursor: none;
 `;
 
 export const DialogBox = styled.div`
+  display: flex;
   padding: 2rem;
   width: 600px;
   border-radius: 12px;
   text-align: center;
+  flex-direction: column;
+  gap: 50px;
 `;
 
 export const ChoiceCards = styled.div`
@@ -23,27 +27,70 @@ export const ChoiceCards = styled.div`
   margin: 1rem 0;
 `;
 
-export const CardA = styled.div`
-  flex: 1;
+export const ChoiceCardA = styled.button`
+  flex: 1;  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transform: rotate(-20deg);
+  background-color: #1a95d4;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
   height:300px;
-  padding: 1rem;
-  background: #3e508aff;
-  border-radius: 8px;
-  cursor: pointer;
+  padding: 20px 40px;
+  border: 10px solid #33cfff;
+  border-radius: 12px;
+  cursor: none;
+  box-shadow: 6px 6px 0px #004080;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
+
+  text-shadow: 2px 2px #000080;
+
+  transition: all 0.2s ease;
+
   &:hover {
-    background: #ddd;
+    transform: rotate(-20deg) translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #004080;
+  }
+
+  &:active {
+    transform: rotate(-20deg) translate(2px, 2px);
+    box-shadow: 2px 2px 0px #004080;
   }
 `;
 
-export const CardB = styled.div`
-  flex: 1;
+export const ChoiceCardB = styled.button`
+  flex: 1;  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transform: rotate(15deg);
+  background-color: #E49000;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
   height:300px;
-  padding: 1rem;
-  background: #b7a05cff;
-  border-radius: 8px;
-  cursor: pointer;
+  padding: 20px 40px;
+  border: 10px solid #F9BF26;
+  border-radius: 12px;
+  cursor: none;
+  box-shadow: 6px 6px 0px #D57500;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
+
+  text-shadow: 2px 2px #8E4600;
+  transition: all 0.2s ease;
+
   &:hover {
-    background: #ddd;
+    transform: rotate(15deg) translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #D57500;
+  }
+
+  &:active {
+    transform: rotate(15deg) translate(2px, 2px);
+    box-shadow: 2px 2px 0px #004080;
   }
 `;
 
@@ -54,10 +101,19 @@ export const CloseButton = styled.button`
   border: none;
   background: #3498db;
   color: #fff;
-  cursor: pointer;
+  cursor: none;
   font-weight: bold;
   margin-top: 1rem;
   &:hover {
     background: #2980b9;
   }
+`;
+
+export const CustomCursorImg = styled.img`
+  position: fixed;
+  pointer-events: none;
+  width: 300px;
+  height: auto;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
 `;

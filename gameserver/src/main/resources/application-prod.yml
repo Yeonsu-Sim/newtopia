@@ -11,11 +11,22 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+  sql:
+    init:
+      mode: always  # TODO: 임시 설정 수거 -> never
+      data-locations: classpath:sql/data.sql
+
+
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-      timeout: 2000ms
+      timeout: 2000
       lettuce:
         pool:
           max-active: 8
@@ -69,3 +80,6 @@ app:
       secret-key: ${MINIO_SECRET_KEY}
       bucket-name: ${MINIO_BUCKET_NAME}
       public-base-url: ${MINIO_PUBLIC_BASE_URL}
+
+    openapi:
+      secret-key: ${OPENAPI_SECRET_KEY}

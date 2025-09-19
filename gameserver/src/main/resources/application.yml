@@ -7,14 +7,35 @@ spring:
 
   jpa:
     show-sql: true
-    hibernate:
-      ddl-auto: create  # TODO: 임시 설정
+#    hibernate:
+#      ddl-auto: create  # 각 profile의 yml 파일로 이동
     open-in-view: false
     properties:
       hibernate:
         "[format_sql]": true
         "[default_batch_fetch_size]": 500
         "[highlight_sql]": true
+    defer-datasource-initialization: true
+
+# 시드 이미지 업로드 설정
+app:
+  seed:
+    enabled: true
+    npc:
+      enabled: true
+      overwrite: if_changed                     # never | if_changed | always
+      location: classpath:seed/npc/*.*     # 또는 file:/opt/seed/npc/*.*
+      match-by: code                       # code | id  (파일명 규칙과 맞추기: SLIME.png 또는 10.png)
+      storage:
+        domain: npc
+    ending:
+      enabled: true
+      overwrite: if_changed
+      location: classpath:seed/ending/*.*
+      match-by: code
+      storage:
+        domain: ending
+
 
 management:
   endpoints:

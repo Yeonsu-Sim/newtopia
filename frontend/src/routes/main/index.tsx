@@ -1,17 +1,21 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { useAudio } from '@/hooks/useAudio';
 import { GameBackground } from '@/components/common/GameBackground';
 import { MenuButton } from '@/components/common/MenuButton';
+import { HotTopic } from '@/components/common/HotTopic';
+import { RankingModal } from '@/components/RankingModal';
+import { SuggestionModal } from '@/components/SuggestionModal';
 import {
   MainContainer,
   WelcomeSection,
   WelcomeTitle,
   WelcomeSubtitle,
   MenuContainer,
+  BgmToggleButton,
   LogoutButton
-} from './-Main.styles';
+} from '@/routes/main/-Main.styles';
 
 export const Route = createFileRoute('/main/')({
   component: MainPage,
@@ -20,7 +24,12 @@ export const Route = createFileRoute('/main/')({
 function MainPage() {
   const { user, logout, isLoading } = useAuthStore();
   const navigate = useNavigate();
-  const { playClickSound } = useAudio();
+  const { isBgmPlaying, playClickSound, toggleBgm } = useAudio({
+    bgmVolume: 0.5,
+    clickSoundVolume: 0.7
+  });
+  const [showRankingModal, setShowRankingModal] = useState(false);
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
 
   // 로그인되지 않은 사용자는 랜딩 페이지로 리다이렉트
   useEffect(() => {
@@ -42,8 +51,12 @@ function MainPage() {
 
   const handleSuggestion = () => {
     playClickSound();
-    // TODO: 건의사항 페이지 구현 후 연결
-    alert('건의하기 기능은 준비 중입니다.');
+    setShowSuggestionModal(true);
+  };
+
+  const handleRanking = () => {
+    playClickSound();
+    setShowRankingModal(true);
   };
 
   const handleLogout = async () => {
@@ -71,7 +84,12 @@ function MainPage() {
   return (
     <MainContainer>
       <GameBackground />
-      
+
+      {/* BGM 토글 버튼 */}
+      <BgmToggleButton onClick={toggleBgm}>
+        {isBgmPlaying ? '🔊' : '🔇'}
+      </BgmToggleButton>
+
       {/* 로그아웃 버튼 */}
       <LogoutButton onClick={handleLogout} disabled={isLoading}>
         {isLoading ? '처리 중...' : '로그아웃'}
@@ -79,7 +97,8 @@ function MainPage() {
 
       {/* 환영 메시지 */}
       <WelcomeSection>
-        <WelcomeTitle>환영합니다, {user.nickname}님!</WelcomeTitle>
+        <WelcomeTitle>환영합니다!</WelcomeTitle>
+        {/* 추후 웰컴메시지에 사용자명 추가 필요! [환영합니다, {user.nickname}님]  */}
         <WelcomeSubtitle>뉴토피아에서 당신만의 통치를 시작해보세요</WelcomeSubtitle>
       </WelcomeSection>
       
@@ -96,7 +115,26 @@ function MainPage() {
         <MenuButton onClick={handleSuggestion} variant="main">
           건의하기
         </MenuButton>
+
+        <MenuButton onClick={handleRanking} variant="main">
+          랭킹
+        </MenuButton>
       </MenuContainer>
+
+      {/* 이달의 핫토픽 뉴스 */}
+      <HotTopic />
+
+      {/* 랭킹 모달 */}
+      <RankingModal
+        isOpen={showRankingModal}
+        onClose={() => setShowRankingModal(false)}
+      />
+
+      {/* 건의사항 모달 */}
+      <SuggestionModal
+        isOpen={showSuggestionModal}
+        onClose={() => setShowSuggestionModal(false)}
+      />
     </MainContainer>
   );
 }

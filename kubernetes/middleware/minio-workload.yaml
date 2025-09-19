@@ -18,6 +18,8 @@ spec:
         app: newtopia-minio
         component: minio
     spec:
+      nodeSelector:
+        location: aws
       containers:
       - name: minio
         image: minio/minio:latest
@@ -45,7 +47,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: minio-service
+  name: minio-api-service 
   namespace: newtopia-minio
   labels:
     app: newtopia-minio
@@ -55,12 +57,29 @@ spec:
   - name: api
     port: 9000
     targetPort: 9000
-    protocol: TCP
-  - name: console
-    port: 9001
-    targetPort: 9001
+    nodePort: 30900
     protocol: TCP
   selector:
     app: newtopia-minio
     component: minio
-  type: ClusterIP
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console-nodeport
+  namespace: newtopia-minio
+  labels:
+    app: newtopia-minio
+    component: minio
+spec:
+  ports:
+  - name: console
+    port: 9001
+    nodePort: 30901
+    protocol: TCP
+  selector:
+    app: newtopia-minio
+    component: minio
+  type: NodePort
+---

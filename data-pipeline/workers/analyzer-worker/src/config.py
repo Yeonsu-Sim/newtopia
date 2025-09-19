@@ -25,8 +25,8 @@ class AnalyzerConfig(BaseConfig):
 
     # Biz thresholds
     ACCEPTED_MAJORS  = set(os.getenv("ACCEPTED_MAJORS", "economy,defense,publicSentiment,environment").split(","))
-    MIN_MAJOR_CONF   = float(os.getenv("MIN_MAJOR_CONF", "0.30"))
-    MIN_MINOR_CONF   = float(os.getenv("MIN_MINOR_CONF", "0.30"))
+    MIN_MAJOR_CONF   = float(os.getenv("MIN_MAJOR_CONF", "0.60"))
+    MIN_MINOR_CONF   = float(os.getenv("MIN_MINOR_CONF", "0.60"))
     SAVE_REJECTED_TO_MINIO = os.getenv("SAVE_REJECTED_TO_MINIO", "true").lower() == "true"
 
     # Tuning

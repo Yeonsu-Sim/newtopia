@@ -11,8 +11,6 @@ export interface LoginResponse {
     id: string;
     email: string;
     nickname: string;
-    age?: string;
-    gender?: string;
     role: string;
   };
   message: string;
@@ -54,14 +52,6 @@ export interface ApiError {
 }
 
 const API_BASE_URL = '/api/v1';
-
-// 쿠키 값 추출 유틸리티
-export const getCookie = (name: string): string | null => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-  return null;
-};
 
 // 로그인 API
 export const loginApi = async (loginData: LoginRequest): Promise<LoginResponse> => {
@@ -115,19 +105,31 @@ export const logoutApi = async (): Promise<void> => {
   }
 };
 
-// 현재 로그인 상태 확인
-export const getCurrentUser = () => {
-  const memberId = getCookie('memberId');
-  const email = getCookie('email');
-  const nickname = getCookie('nickname');
+// 로그인 확인 API 응답 타입
+export interface CheckAuthResponse {
+  status: 'success' | 'error';
+  data: {
+    id: number;
+    email: string;
+    nickname: string;
+    age?: number;
+    gender?: 'MALE' | 'FEMALE';
+    role?: 'ADMIN' | 'USER';
+  } | null;
+  message: string;
+  error?: {
+    code: string;
+    details: object;
+  };
+}
 
-  if (memberId && email && nickname) {
-    return {
-      id: memberId,
-      email: email,
-      nickname: nickname,
-    };
-  }
+// 서버에서 로그인 상태 확인 
+export const checkAuthApi = async (): Promise<CheckAuthResponse> => {
+  const response = await fetch(`${API_BASE_URL}/public/me`, {
+    method: 'GET',
+    credentials: 'include', // HttpOnly 쿠키 처리
+  });
 
-  return null;
+  const data = await response.json();
+  return data; // 항상 200을 반환하므로 에러 처리 불필요
 };

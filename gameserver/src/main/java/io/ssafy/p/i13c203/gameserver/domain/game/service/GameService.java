@@ -4,6 +4,9 @@ import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
 import io.ssafy.p.i13c203.gameserver.domain.ending.service.EndingService;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.*;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CardType;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.AppliedDoc;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.service.GameResultService;
+import io.ssafy.p.i13c203.gameserver.domain.ranking.service.RankingService;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.GameHistory;
@@ -12,11 +15,7 @@ import io.ssafy.p.i13c203.gameserver.domain.game.model.ChoiceWeights;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CountryStats;
 import io.ssafy.p.i13c203.gameserver.domain.game.repository.GameHistoryRepository;
 import io.ssafy.p.i13c203.gameserver.domain.game.repository.GameRepository;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.NpcRefDoc;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.SpawnConditionsDoc;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Npc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
-import io.ssafy.p.i13c203.gameserver.domain.scenario.repository.NpcRepository;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.service.ScenarioService;
 import io.ssafy.p.i13c203.gameserver.global.exception.BusinessException;
 import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
@@ -36,9 +35,10 @@ public class GameService {
 
     private final GameRepository gameRepo;
     private final GameHistoryRepository historyRepo;
-    private final NpcRepository npcRepo;
     private final ScenarioService scenarioService;
     private final EndingService endingService;
+    private final RankingService rankingService;
+    private final GameResultService gameResultService;
 
     @Transactional(readOnly = true)
     public Game findByIdOrThrow(Long gameId) {
@@ -76,12 +76,10 @@ public class GameService {
         ChoiceWeights weights = ChoiceWeights.builder().build(); // 기본 0
 
         // 1) 첫 시나리오 선택은 ScenarioService가 담당
-        // TODO: 임시 테스트 데이터 수거
-        Scenario sc = makeTestScenario();
-//        Scenario sc = scenarioService.firstScenario();
+        Scenario sc = scenarioService.firstScenario();
 
         // 2) CardDoc 생성은 GameService가 담당
-        CardDoc first = toCardDoc(sc, CardType.ORIGIN);
+        CardDoc first = CardDoc.of(sc, CardType.ORIGIN);
 
         Game game = Game.builder()
                 .memberId(memberId)
@@ -91,13 +89,32 @@ public class GameService {
                 .currentCard(first)
                 .currentChoices(first.choices())
                 .active(true)
+                .turn(1)
                 .build();
 
-        return gameRepo.saveAndFlush(game);
+        Game savedGame = gameRepo.saveAndFlush(game);
+
+        // --------  히스토리 저장  ----------
+        HistoryEntryDoc entry = new HistoryEntryDoc(
+                0,
+                null,
+                CountryStatsDoc.from(stats),
+                ChoiceWeightsDoc.from(game.getChoiceWeights()),
+                null,
+                Instant.now(),
+                null,
+                null
+        );
+
+        historyRepo.save(GameHistory.builder()
+                .gameId(savedGame.getId())
+                .entry(entry)
+                .build());
+
+        return savedGame;
     }
 
     // ========== 9.3 선택 반영 (AOP 멱등성) ==========
-    // io.ssafy.p.i13c203.gameserver.domain.game.service.GameService#submitChoice
 
     @IdempotentOperation(
             hashArgs = {"gameId","cardId","choiceCode"},
@@ -113,12 +130,7 @@ public class GameService {
         if (chosen == null) throw new BusinessException(ErrorCode.INVALID_CHOICE_CODE);
 
         // -------- (0) 적용 "이전" 스냅샷 ----------
-        CountryStatsDoc beforeStats = new CountryStatsDoc(
-                game.getCountryStats().getEconomy(),
-                game.getCountryStats().getDefense(),
-                game.getCountryStats().getPublicSentiment(),
-                game.getCountryStats().getEnvironment()
-        );
+        CountryStatsDoc beforeStats = CountryStatsDoc.from(game.getCountryStats());
         int finishedTurn = game.getTurn();
 
         // -------- (1) effect 반영 ----------
@@ -132,21 +144,18 @@ public class GameService {
         game.getCountryStats().addDelta(dEco, dDef, dOpi, dEnv);
 
         // 적용 "이후" 스냅샷
-        CountryStatsDoc afterStats = new CountryStatsDoc(
-                game.getCountryStats().getEconomy(),
-                game.getCountryStats().getDefense(),
-                game.getCountryStats().getPublicSentiment(),
-                game.getCountryStats().getEnvironment()
-        );
+        CountryStatsDoc afterStats = CountryStatsDoc.from(game.getCountryStats());
 
         // -------- (2) 히스토리 저장 (after 기준 스냅샷) ----------
         HistoryEntryDoc entry = new HistoryEntryDoc(
                 finishedTurn,
                 choiceCode,
                 afterStats,
-                toWeightsDoc(game.getChoiceWeights()),
+                ChoiceWeightsDoc.from(game.getChoiceWeights()),
                 game.getCurrentCard(),
-                Instant.now()
+                Instant.now(),
+                AppliedDoc.of(beforeStats, afterStats),
+                game.getCurrentCard().choices().get(choiceCode).label()
         );
         historyRepo.save(GameHistory.builder()
                 .gameId(gameId)
@@ -161,21 +170,27 @@ public class GameService {
         if (ending != null) {
             game.markEnded(ending); // endingCode, endedAt, active=false
 
-            try { gameRepo.saveAndFlush(game); }
-            catch (OptimisticLockingFailureException e) { throw new BusinessException(ErrorCode.CONCURRENCY_CONFLICT); }
+            try {
+                gameRepo.saveAndFlush(game);
+            } catch (OptimisticLockingFailureException e) {
+                throw new BusinessException(ErrorCode.CONCURRENCY_CONFLICT);
+            }
+
+            gameResultService.createOnEnding(memberId, game);
+
+            // TODO: Check Ranking Service 입력
+            rankingService.registerRanking(game);
 
             // 엔딩 응답: nextCard=null, 다음 턴 증가 없음
             return SubmitChoiceResult.ended(
                     finishedTurn, choiceCode, beforeStats, afterStats, ending
-                                           );
+            );
         }
 
         // -------- (4) 다음 카드 선정 ----------
         int nextTurn = finishedTurn + 1;
-
-        // TODO: 실제 로직 연결 전 임시 시나리오
-        Scenario nextScenario = makeTestScenario();
-        CardDoc next = toCardDoc(nextScenario, CardType.CONSEQUENCE);
+        Scenario nextScenario = scenarioService.nextScenario(game, nextTurn);
+        CardDoc next = CardDoc.of(nextScenario, CardType.ORIGIN);
 
         game.setTurn(nextTurn);
         game.setCurrentCard(next);
@@ -191,7 +206,6 @@ public class GameService {
         );
     }
 
-
     private ChoiceWeights addWeights(ChoiceWeights base, EffectWeightsDoc d) {
         ChoiceWeights delta = ChoiceWeights.builder()
                 .macroeconomy(d.macroeconomy()).fiscalPolicy(d.fiscalPolicy()).financialMarkets(d.financialMarkets()).industryBusiness(d.industryBusiness())
@@ -203,114 +217,6 @@ public class GameService {
         return base;
     }
 
-
-    private static ChoiceWeightsDoc toWeightsDoc(ChoiceWeights w) {
-        return new ChoiceWeightsDoc(
-                w.getMacroeconomy(), w.getFiscalPolicy(), w.getFinancialMarkets(), w.getIndustryBusiness(),
-                w.getMilitarySecurity(), w.getAlliances(), w.getCyberSpace(), w.getPublicSafety(),
-                w.getPublicOpinion(), w.getSocialIssues(), w.getProtestsStrikes(), w.getHealthWelfare(),
-                w.getClimateChangeEnergy(), w.getPollutionDisaster(), w.getBiodiversity(), w.getResourceManagement()
-        );
-    }
-
-    private CardDoc toCardDoc(Scenario sc, CardType type) {
-        Npc npc = sc.getNpc();
-        if (npc == null) throw new BusinessException(ErrorCode.NPC_NOT_FOUND);
-
-        NpcRefDoc npcRef = new NpcRefDoc(
-                npc.getId(),           // Long (PK)
-                npc.getName(),
-                npc.getImageS3Key()
-        );
-
-        return new CardDoc(
-                java.util.UUID.randomUUID(), // cardId: 런타임 UUID
-                sc.getId(),                  // scenarioId: Long
-                type,
-                sc.getTitle(),
-                sc.getContent(),
-                npcRef,
-                sc.getSpawn(),
-                sc.getChoices(),
-                sc.getRelatedArticle()
-        );
-    }
-
-    /**
-     * 임시 테스트 시나리오 반환
-     */
-    private Scenario makeTestScenario() {
-        // 1) 첫 시나리오 선택은 ScenarioService가 담당
-        Scenario sc = new Scenario();
-
-        // ----- 기본 메타 -----
-        sc.setId(1L);
-        sc.setTitle("새 정부의 경제 어젠다");
-        sc.setContent("새로운 내각이 경제정책 우선순위를 논의합니다.");
-
-        // ----- NPC (참조만 설정: id, name, imageS3Key) -----
-        Npc npc = new Npc();
-        npc.setId(101L);
-        npc.setName("대변인");
-        npc.setImageS3Key("npc/spokesperson.png");
-        sc.setNpc(npc);
-
-        // ----- 스폰 조건 (첫 카드: 조건 없음) -----
-        sc.setSpawn(new SpawnConditionsDoc(
-                        java.util.List.of() // 빈 조건 목록
-                )
-        );
-
-        // ----- 선택지(effect: scores + weights) -----
-        final String[] MINORS = {
-                "macroeconomy","fiscalPolicy","financialMarkets","industryBusiness",
-                "militarySecurity","alliances","cyberSpace","publicSafety",
-                "publicOpinion","socialIssues","protestsStrikes","healthWelfare",
-                "climateChangeEnergy","pollutionDisaster","biodiversity","resourceManagement"
-        };
-
-        // 16개 중분류 가중치
-        EffectWeightsDoc fullWeights = new  EffectWeightsDoc(
-                0.1, 0.2, 0.1, 0.1,
-                0.1, 0.2, 0.1, 0.1,
-                0.1, 0.2, 0.1, 0.1,
-                0.1, 0.2, 0.1, 0.1
-                );
-
-        // scores 도메인 객체(대분류 4개)
-        EffectScoresDoc scoresA =
-                new EffectScoresDoc(10, 0, 5, -3); // economy, defense, publicSentiment, environment
-        EffectScoresDoc scoresB =
-                new EffectScoresDoc(1, -5, 10, 0);
-
-        // effect
-        EffectDoc effectA =
-                new EffectDoc(scoresA, fullWeights);
-        EffectDoc effectB =
-                new EffectDoc(scoresB, fullWeights);
-
-        // choice A/B
-        ChoiceDoc choiceA =
-                new ChoiceDoc("A", "일자리 창출 계획 가속", effectA);
-        ChoiceDoc choiceB =
-                new ChoiceDoc("B", "재정 건전성 최우선", effectB);
-
-        // 선택지 맵(순서 고정용 LinkedHashMap)
-        java.util.Map<String, io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc> choices =
-                new java.util.LinkedHashMap<>();
-        choices.put("A", choiceA);
-        choices.put("B", choiceB);
-        sc.setChoices(choices);
-
-        // ----- 관련 기사 -----
-        sc.setRelatedArticle(
-                new io.ssafy.p.i13c203.gameserver.domain.scenario.doc.RelatedArticleDoc(
-                        "경제 컨퍼런스 개최",
-                        "https://news.example/econ-1"
-                )
-        );
-        return sc;
-    }
 }
 
 

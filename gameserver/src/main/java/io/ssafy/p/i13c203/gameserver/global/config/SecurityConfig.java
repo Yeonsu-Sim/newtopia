@@ -1,8 +1,9 @@
-package io.ssafy.p.i13c203.gameserver.config;
+package io.ssafy.p.i13c203.gameserver.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ssafy.p.i13c203.gameserver.auth.filter.JsonAuthenticationFilter;
 import io.ssafy.p.i13c203.gameserver.auth.filter.JwtCookieAuthenticationFilter;
+import io.ssafy.p.i13c203.gameserver.auth.handler.CustomAccessDeniedHandler;
 import io.ssafy.p.i13c203.gameserver.auth.handler.CustomAuthenticationFailureHandler;
 import io.ssafy.p.i13c203.gameserver.auth.handler.CustomAuthenticationSuccessHandler;
 import io.ssafy.p.i13c203.gameserver.auth.handler.CustomLogoutHandler;
@@ -39,6 +40,7 @@ public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler successHandler;
     private final CustomAuthenticationFailureHandler failureHandler;
     private final CustomLogoutHandler logoutHandler;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
     private final ObjectMapper objectMapper;
     private final Environment environment;
 
@@ -66,13 +68,15 @@ public class SecurityConfig {
         http
             // CSRF 비활성화 (JWT + 쿠키 방식에서는 불필요)
             .csrf(AbstractHttpConfigurer::disable)
-            .cors(AbstractHttpConfigurer::disable)
+            .cors(AbstractHttpConfigurer::disable)  // CORS 비활성화
+//            .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // CORS 활성화
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             // 권한 설정
             .authorizeHttpRequests(auth -> auth
                 // 인증 없이 접근 가능한 경로
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/v1/files/public").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
@@ -97,7 +101,12 @@ public class SecurityConfig {
             .addFilterBefore(jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
             // JSON 로그인 필터 설정
-            .addFilterAt(jsonAuthenticationFilter(authenticationManager(null)), UsernamePasswordAuthenticationFilter.class);
+            .addFilterAt(jsonAuthenticationFilter(authenticationManager(null)), UsernamePasswordAuthenticationFilter.class)
+
+            // 커스텀 AccessDeniedHandler 설정
+            .exceptionHandling(exceptions -> exceptions
+                .accessDeniedHandler(accessDeniedHandler)
+            );
 
         return http.build();
     }

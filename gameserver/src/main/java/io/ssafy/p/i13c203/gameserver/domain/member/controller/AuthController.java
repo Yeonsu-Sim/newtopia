@@ -1,5 +1,6 @@
 package io.ssafy.p.i13c203.gameserver.domain.member.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,11 +26,19 @@ public interface AuthController {
         @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
         @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일 또는 닉네임")
     })
-    @PostMapping("/signup")
     ResponseEntity<APIResponse<SignupResponseDto, Void>> signup(
             @Parameter(description = "회원가입 요청 정보")
             @RequestBody @Valid SignupRequestDto request
     );
+
+    @Operation(
+      summary = "로그인 확인",
+      description = "로그인 여부와 상관없이 언제나 200을 보냅니다. 단, 로그인이 안될 경우 내부 요소가 null로 표현됩니다."
+    )
+    @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "로그인 여부 조회 성공(로그인 여부와 상관없이 출력)"),
+    })
+    ResponseEntity<APIResponse<LoginResponseDto, Void>> me();
 
     @Operation(
         summary = "로그인",
@@ -39,7 +48,7 @@ public interface AuthController {
         @ApiResponse(responseCode = "200", description = "로그인 성공 - JWT 토큰이 쿠키로 설정됩니다"),
         @ApiResponse(responseCode = "401", description = "인증 실패 - 이메일 또는 비밀번호 불일치")
     })
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     default ResponseEntity<APIResponse<LoginResponseDto, Void>> login(
             @Parameter(description = "로그인 요청 정보")
             @RequestBody @Valid LoginRequestDto request
@@ -54,7 +63,7 @@ public interface AuthController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "로그아웃 성공 - 모든 인증 쿠키가 삭제됩니다")
     })
-    @PostMapping("/logout")
+    @PostMapping("/auth/logout")
     default ResponseEntity<APIResponse<Void, Void>> logout(){
         throw new UnsupportedOperationException("This method is for documentation only. Actual logout is handled by Spring Security.");
     }

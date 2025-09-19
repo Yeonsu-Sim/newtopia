@@ -8,3 +8,12 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
       retries: 3
+
+  r2dbc:
+    url: r2dbc:postgresql://postgres:5432/newtopia
+    username: newtopia
+    password: newtopia
+    pool:
+      enabled: true
+      initial-size: 5
+      max-size: 20

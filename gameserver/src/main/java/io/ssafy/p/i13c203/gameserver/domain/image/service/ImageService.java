@@ -41,7 +41,6 @@ public class ImageService {
         String ext = StorageKeyBuilder.extOf(file.getOriginalFilename(), file.getContentType());
         String key = StorageKeyBuilder.build(memberId, domain, fileId, ext);
 
-
         // 2 저장소에 업로드 (키를 지정)
 
         storage.store(key, file);
@@ -71,7 +70,6 @@ public class ImageService {
 
         return new ImageUploadResponse(
                 save.getId(),
-
                 image.getPublicId(), url, image.getStorageKey(),
                 image.getContentType(), image.getSizeBytes(), image.getOriginalName(), image.getStatus().name()
         );    }

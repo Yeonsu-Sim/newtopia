@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuthForm } from '@/hooks/useAuthForm';
 import {
   ModalOverlay,
@@ -22,7 +23,7 @@ import {
   ModalFrame,
   ModalBorder,
   CloseButton
-} from './AuthModal.styles';
+} from '@/components/AuthModal/AuthModal.styles';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -30,11 +31,12 @@ interface AuthModalProps {
   initialMode?: 'login' | 'signup';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  initialMode = 'login' 
+export const AuthModal: React.FC<AuthModalProps> = ({
+  isOpen,
+  onClose,
+  initialMode = 'login'
 }) => {
+  const navigate = useNavigate();
   const {
     mode,
     formData,
@@ -42,14 +44,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     isLoading,
     handleInputChange,
     handleSubmit,
-    switchMode
+    switchMode,
+    switchToLogin
   } = useAuthForm(initialMode);
 
   if (!isOpen) return null;
 
+  const handleLoginSuccess = () => {
+    onClose(); // 모달 닫기
+    navigate({ to: '/main' }); // 메인 페이지로 이동
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await handleSubmit(onClose);
+    await handleSubmit(
+      handleLoginSuccess, // 로그인 성공 시 메인 페이지로 이동
+      (email: string, password: string) => {
+        // 회원가입 성공 시 로그인 모드로 전환하고 정보 자동 입력
+        switchToLogin(email, password);
+      }
+    );
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
