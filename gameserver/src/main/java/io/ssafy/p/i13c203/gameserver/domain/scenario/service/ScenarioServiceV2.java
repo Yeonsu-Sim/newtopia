@@ -310,7 +310,7 @@ public class ScenarioServiceV2 implements ScenarioService{
     }
 
 
-    static final double WEIGHT_VALUE = 0.5;
+    static final double WEIGHT_VALUE = 0.2;
     /**
      * effect 파싱
      *

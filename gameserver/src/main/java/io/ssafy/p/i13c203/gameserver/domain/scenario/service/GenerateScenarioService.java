@@ -231,32 +231,50 @@ public class GenerateScenarioService {
         return List.of(
                 new Message("developer", "당신은 정치 시뮬레이션 게임의 시나리오작가입니다. 반드시 유효한 JSON 형식으로만 응답해주세요."),
                 new Message("user", String.format("""
-                당신은 정치 시뮬레이션 게임의 시나리오 작가입니다.
-                주어진 뉴스를 바탕으로 아래 시나리오 객체 형식에 맞게 JSON을 생성해주세요.
-
-                【뉴스 정보】
-                제목: %s
-                내용: %s
-                카테고리: %s
-                감정: %s
-
-                【시나리오 객체 구조】
-                - title: 시나리오 제목 (20자 이내)
-                - content: 상황 설명 (50자 이내, 게임다운 톤앤매너)
-                - conditions: 등장 조건 (배열, 각 조건은 다음을 포함)
-                  - operator: "LESS_THAN" | "MORE_THAN"
-                  - threshold: 정수
-                - choices: { "A": Choice, "B": Choice }
-                  - code: "A" 또는 "B"
-                  - content: 선택지 설명
-                  - effect:
-                    - scores: { economy, defense, environment, publicSentiment } (정수 -100~100)
-                  - comments: 국민 반응 문자열 배열
-
-                【요구사항】
-                1. 반드시 유효한 JSON만 응답할 것
-                2. scores와 weights는 각각 의미 있는 수치를 설정할 것
-                3. comments는 최소 2개만 , 실제 시민 반응처럼 작성할 것
+                                당신은 정치 시뮬레이션 게임의 시나리오 작가입니다.
+                                주어진 뉴스를 바탕으로 아래 시나리오 객체 형식에 맞게 JSON을 생성해주세요.
+                                                
+                                【뉴스 정보】
+                                제목: %s
+                                내용: %s
+                                카테고리: %s
+                                감정: %s
+                                                
+                                【시나리오 객체 구조】
+                                - title: 시나리오 제목 (20자 이내)
+                                - content: 상황 설명 (50자 이내, 게임다운 톤앤매너)
+                                - conditions: 등장 조건 (배열, 각 조건은 다음을 포함)
+                                  - operator: "LESS_THAN" | "MORE_THAN"
+                                  - threshold: 정수
+                                - choices: { "A": Choice, "B": Choice }
+                                  - code: "A" 또는 "B"
+                                  - content: 선택지 설명
+                                  - effect:
+                                    - scores: { economy, defense, environment, publicSentiment } (정수)
+                                  - comments: 국민 반응 문자열 배열
+                                                
+                                【점수(밸런스) 규칙】
+                                1) 각 score는 -20 이상 20 이하의 정수여야 한다.
+                                2) “선택지 내용 ↔ scores”가 논리적으로 일치해야 한다.
+                                   - 예: 환경 보호 정책 → environment는 +(소폭~중간폭), 규제 강화로 경제 부담 → economy는 -(소폭)
+                                3) 과도한 급등락 방지(지표는 0~100에서 끝남):
+                                   - 일반 뉴스(보통 강도): 주효과 ±8~±18, 부수 효과 ±3~±10, 상쇄 효과(트레이드오프) ±2~±8
+                                   - 큰 이슈(강한 강도): 주효과 최대 ±25까지 허용하되, 반드시 1개 이상 상쇄 효과 포함
+                                   - 아주 경미한 이슈(약한 강도): 모든 효과 절대값을 3~10 사이로 제한
+                                   (강도는 기사 내용/감정에서 추론하되, 과도한 값 사용 금지)
+                                4) 네 지표가 모두 같은 방향(전부 + 또는 전부 -)이 되지 않도록 최소 1개 이상의 트레이드오프를 포함한다.
+                                5) 의미 없는 0 남발 금지: 최소 2개 이상의 지표에 |score| ≥ 3을 부여한다.
+                                6) A/B는 서로 다른 전략과 결과를 보여야 하며, 동일/유사한 분포를 피한다.
+                                                
+                                【comments 규칙】
+                                - 최소 2개 이상, 실제 시민 반응처럼 구체적으로 작성(이해관계·우려·지지 등 혼합 가능)
+                                - 과도한 비속어 금지, 짧고 명확하게
+                                                
+                                【출력 형식 요구사항】
+                                - 반드시 유효한 JSON만 출력
+                                - 설명 문구나 여는/닫는 텍스트 없이 JSON만 반환
+                                                
+                
                 """,
                         newsData.path("title").asText(),
                         newsData.path("content").asText(),
