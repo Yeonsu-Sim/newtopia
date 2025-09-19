@@ -19,6 +19,8 @@ spec:
       labels:
         app: gitlab-runner
     spec:
+      nodeSelector:
+        location: aws
       serviceAccountName: gitlab-runner
       containers:
       - name: gitlab-runner

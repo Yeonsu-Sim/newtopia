@@ -18,6 +18,8 @@ spec:
         app: newtopia-db # has to match .spec.selector.matchLabels
         component: redis
     spec:
+      nodeSelector:
+        location: aws
       containers:
       - name: redis
         image: redis:7-alpine

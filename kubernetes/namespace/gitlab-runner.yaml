@@ -39,7 +39,7 @@ metadata:
   name: gitlab-runner-role-binding
 subjects:
 - kind: ServiceAccount
-  name: default
+  name: gitlab-runner
   namespace: gitlab-runner
 roleRef:
   kind: ClusterRole

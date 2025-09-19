@@ -16,6 +16,8 @@ spec:
       labels:
         app: gameserver
     spec:
+      nodeSelector:
+        location: aws
       containers:
       - name: gameserver
         image: dudgh614/gameserver-app:CI_COMMIT_SHA
