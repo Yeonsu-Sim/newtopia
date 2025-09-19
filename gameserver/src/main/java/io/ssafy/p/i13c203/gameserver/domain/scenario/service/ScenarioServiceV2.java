@@ -203,16 +203,18 @@ public class ScenarioServiceV2 implements ScenarioService{
         // choices 파싱
         Map<String, ChoiceDoc> choices = parseChoices(scenarioJson.path("choices"));
 
-        // related article 생성 (뉴스 기반)
-//        RelatedArticleDoc relatedArticle = new RelatedArticleDoc(
-//            newsData.path("title").asText(),
-//            newsData.path("source_url").asText()
-//        );
-        // 보도자료 패스
+//         related article 생성 (뉴스 기반)
         RelatedArticleDoc relatedArticle = new RelatedArticleDoc(
-                "",
-                ""
+            newsData.path("title").asText(),
+            newsData.path("source_url").asText(),
+                newsData.path("content").asText()
+
         );
+//        // 보도자료 패스
+//        RelatedArticleDoc relatedArticle = new RelatedArticleDoc(
+//                "",
+//                ""
+//        );
 
         // 임시 NPC (실제로는 DB에서 조회하거나 별도 로직 필요)
         Npc defaultNpc = createDefaultNpc();
@@ -222,14 +224,18 @@ public class ScenarioServiceV2 implements ScenarioService{
 
         log.info("here");
 
-        return Scenario.builder()
-            .title(title)
-            .content(content)
-            .npc(npc)
-            .spawn(spawn)
-            .choices(choices)
-            .relatedArticle(relatedArticle)
-            .build();
+        Scenario sc = Scenario.builder()
+                .title(title)
+                .content(content)
+                .npc(npc)
+                .spawn(spawn)
+                .choices(choices)
+                .relatedArticle(relatedArticle)
+                .build();
+
+        log.info("scenario : {}", sc);
+
+        return sc;
     }
 
 
