@@ -14,17 +14,25 @@ export const DialogOverlay = styled.div`
 export const DialogBox = styled.div`
   display: flex;
   padding: 2rem;
-  width: 600px;
+  width: 850px;
   border-radius: 12px;
   text-align: center;
   flex-direction: column;
-  gap: 50px;
+  gap: 30px;
+`;
+
+export const DialogText = styled.h2`
+  width: 800px;
+  margin: 0 auto;
+  font-size: 30px;
+  
 `;
 
 export const ChoiceCards = styled.div`
   display: flex;
   gap: 1rem;
-  margin: 1rem 0;
+  margin: 1rem auto;
+  width: 550px;
 `;
 
 export const ChoiceCardA = styled.button`
@@ -36,7 +44,7 @@ export const ChoiceCardA = styled.button`
   transform: rotate(-20deg);
   background-color: #1a95d4;
   color: white;
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
   height:300px;
   padding: 20px 40px;
@@ -47,6 +55,8 @@ export const ChoiceCardA = styled.button`
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
 
   text-shadow: 2px 2px #000080;
+  -webkit-text-stroke-width: 0.3px;
+  -webkit-text-stroke-color: #28287bff;
 
   transition: all 0.2s ease;
 
@@ -70,7 +80,7 @@ export const ChoiceCardB = styled.button`
   transform: rotate(15deg);
   background-color: #E49000;
   color: white;
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
   height:300px;
   padding: 20px 40px;
@@ -81,6 +91,8 @@ export const ChoiceCardB = styled.button`
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
 
   text-shadow: 2px 2px #8E4600;
+  -webkit-text-stroke-width: 0.5px;
+  -webkit-text-stroke-color: #a24706ff;
   transition: all 0.2s ease;
 
   &:hover {

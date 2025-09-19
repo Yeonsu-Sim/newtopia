@@ -136,9 +136,47 @@ export const BackButton = styled.button`
   transition: all 0.2s ease;
   z-index: 20;
   backdrop-filter: blur(4px);
-  
+
   &:hover {
     background: rgba(0, 0, 0, 0.7);
     transform: translateY(-1px);
+  }
+`;
+
+export const IntroTextContainer = styled.div`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    text-align: center;
+  }
+`;
+
+export const IntroTextLine = styled.div<{ $isActive: boolean }>`
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
+  font-weight: normal;
+  color: white;
+  letter-spacing: -0.25px;
+  font-size: clamp(24px, 6vw, 48px);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  text-shadow: ${({ $isActive }) => $isActive ? '0 0 20px rgba(255, 255, 255, 0.8)' : 'none'};
+
+  &:last-child {
+    margin-bottom: 0;
   }
 `;

@@ -17,7 +17,7 @@ import {
 
 import Parameter from "@/components/Parameter";
 import GuestDialog from '@/components/GuestDialog/GuestDialog';
-import ChoiceDialog from '@/components/ChoiceDialog/ChoiceDIalog';
+import ChoiceDialog from '@/components/ChoiceDialog/ChoiceDialog';
 import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
 
 import { useGame } from '@/hooks/useGame';
