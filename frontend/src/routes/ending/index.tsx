@@ -4,7 +4,9 @@ import {
   Container,
   TopRightButton,
   EndingImage,
-  EndingText
+  EndingText,
+  NextButton,
+  ButtonGroup
 } from '@/routes/ending/-Ending.styles';
 
 export const Route = createFileRoute('/ending/')({
@@ -43,15 +45,22 @@ useEffect(() => {
 
   return (
     <Container>
-      <TopRightButton onClick={() => navigate({ to: '/' })}>
-        메인으로
-      </TopRightButton>
+
       <EndingImage 
         src={ending.assets.imageUrl}
         alt={ending.code} />
       <EndingText>
         <h2>{ending.content}</h2>
       </EndingText>
+
+      <ButtonGroup>
+        <NextButton onClick={() => navigate({ to: '/report' })}>
+          리포트 보러가기
+        </NextButton>
+        <TopRightButton onClick={() => navigate({ to: '/' })}>
+          메인으로
+        </TopRightButton>
+      </ButtonGroup>
     </Container>
   );
 }

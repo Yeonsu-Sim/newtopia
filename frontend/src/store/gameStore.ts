@@ -13,13 +13,13 @@ export type RelatedArticle = {
 };
 
 type GameState = {
-  gameId: string | null;
+  gameId: number;
   currentTurn: number;
   currentStats: CountryStats;
   countryName: string;
   playerName: string;
   setGameStart: (
-    gameId: string, 
+    gameId: number, 
     stats: CountryStats,
     countryName: string,
     playerName: string,
@@ -31,7 +31,7 @@ type GameState = {
 };
 
 export const useGameStore = create<GameState>((set) => ({
-  gameId: null,
+  gameId: 0,
   currentTurn: 1,
   currentStats: { eco: 50, mil: 50, opi: 50, env: 50 },
   countryName: "",
@@ -48,7 +48,7 @@ export const useGameStore = create<GameState>((set) => ({
   setTurn: (turn) => set({currentTurn: turn}),
   resetGame: () =>
     set({
-      gameId: null,
+      gameId: 0,
       currentTurn: 1,
       currentStats: { eco: 50, mil: 50, opi: 50, env: 50 },
       countryName: "",

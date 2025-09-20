@@ -136,7 +136,7 @@ export const SearchInput = styled.input<SearchInputProps>`
   border: 3px solid #6E3400;
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.9);
-  font-family: 'PFStardustExtraBold', 'Noto Sans KR', sans-serif;
+  font-family: "PFStardustExtraBold", 'Noto Sans KR', sans-serif;
   font-size: 24px;
   font-weight: 400;
   color: #333;
@@ -260,7 +260,7 @@ export const TableCell = styled.div`
   -webkit-text-stroke-width: 0px;
   -webkit-text-stroke-color: #6E3400;
   // 이거 쉐도우가 왜 피그마랑 반대로 적용되는지 확인필요
-  font-family: 'PFStardust', 'Noto Sans KR', sans-serif;
+  font-family: "PFStardust", 'Noto Sans KR', sans-serif;
   font-size: 32px;
   font-style: normal;
   font-weight: 800;

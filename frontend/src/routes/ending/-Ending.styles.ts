@@ -10,6 +10,7 @@ export const Container = styled.div`
   position: relative;
   flex-direction: column;
   color: white;
+  gap: 10px;
 `;
 
 export const EndingImage = styled.img`
@@ -25,11 +26,26 @@ export const EndingText = styled.div`
   font-family: 'Galmuri14', 'Noto Sans KR', sans-serif;
 `;
 
-export const TopRightButton = styled.button`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+export const NextButton = styled.button`
   padding: 0.5rem 1rem;
   cursor: pointer;
-  font-family: 'Galmuri14', 'Noto Sans KR', sans-serif;
+  font-family: "PFStardust", 'Noto Sans KR', sans-serif;
+  background: #fc7575ff;
+  border-radius: 12px;
+`;
+
+export const TopRightButton = styled.button`
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-family: "PFStardust", 'Noto Sans KR', sans-serif;
+  background: #338fffff;
+  border-radius: 12px;
+  
+`;
+
+export const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  width: 40%;
 `;
