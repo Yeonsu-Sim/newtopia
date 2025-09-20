@@ -38,5 +38,8 @@ public record CardBriefDto(
                 )
         );
     }
+
+    public record NpcDto(String name, String imageUrl) {}
+    public record RelatedArticleDto(String title, String url, String content) {}
 }
 

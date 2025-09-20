@@ -1,6 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.gameresult.adapter;
 
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CardType;
+import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.PressReleaseDoc;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,8 +45,8 @@ public interface GameResultReader {
                 List<Choice> choices,
                 RelatedArticle related
         ) {
-            public record Choice(String code, String label) {}
-            public record RelatedArticle(String title, String url) {}
+            public record Choice(String code, String label, PressReleaseDoc pressRelease, List<String> comments) {}
+            public record RelatedArticle(String title, String url, String content) {}
         }
     }
 }
