@@ -111,12 +111,12 @@ public class GameResultReaderImpl implements GameResultReader {
             var choices = new ArrayList<TurnFrame.Card.Choice>();
             if (cardDoc.choices() != null) {
                 for (var ch : cardDoc.choices().values()) {
-                    choices.add(new TurnFrame.Card.Choice(ch.code(), ch.label()));
+                    choices.add(new TurnFrame.Card.Choice(ch.code(), ch.label(), ch.pressRelease(), ch.comments()));
                 }
             }
             TurnFrame.Card.RelatedArticle related = null;
             if (cardDoc.relatedArticle() != null) {
-                related = new TurnFrame.Card.RelatedArticle(cardDoc.relatedArticle().title(), cardDoc.relatedArticle().url());
+                related = new TurnFrame.Card.RelatedArticle(cardDoc.relatedArticle().title(), cardDoc.relatedArticle().url(), cardDoc.relatedArticle().content());
             }
             card = new TurnFrame.Card(
                     cardDoc.title(),

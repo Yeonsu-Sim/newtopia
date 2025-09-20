@@ -291,9 +291,15 @@ public class GameResultServiceImpl implements GameResultService {
         if (c == null) return null;
         var npc = new GameResultDetailResponse.Npc(c.npcName(), c.npcImageUrl());
         var choices = c.choices() == null ? List.<GameResultDetailResponse.Choice>of() :
-                c.choices().stream().map(ch -> new GameResultDetailResponse.Choice(ch.code(), ch.label())).toList();
+                c.choices().stream().map(
+                        ch -> new GameResultDetailResponse.Choice(ch.code(),
+                                ch.label(),
+                                GameResultDetailResponse.PressRelease.from(ch.pressRelease()),
+                                ch.comments()
+                        ))
+                        .toList();
         var related = c.related() == null ? null :
-                new GameResultDetailResponse.RelatedArticle(c.related().title(), c.related().url());
+                new GameResultDetailResponse.RelatedArticle(c.related().title(), c.related().url(), c.related().content());
         return new GameResultDetailResponse.Card(c.title(), c.content(), c.type(), npc, choices, related);
     }
 
