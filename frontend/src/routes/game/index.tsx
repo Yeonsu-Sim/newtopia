@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { useGameStore } from '@/store/gameStore'
 import {
   MainContainer,
@@ -30,6 +30,11 @@ import { HotTopic } from '@/components/common/HotTopic/HotTopic'
 
 export const Route = createFileRoute('/game/')({
   component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      isFirstGame: search?.isFirstGame === 'true',
+    }
+  },
 })
 
 function RouteComponent() {
@@ -64,6 +69,7 @@ function RouteComponent() {
   const { submitChoice } = useGamePlay()
   const { user } = useAuthStore()
   const navigate = useNavigate()
+  const search = useSearch({ from: '/game/' })
   useAudio({ enableBgm: false })
 
   const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(
@@ -113,20 +119,28 @@ function RouteComponent() {
           setCurrentCard(startTurn.card)
           setCurrentArticle(startTurn.card.relatedArticle)
 
-          // 말풍선 아이콘 애니메이션과 사운드
-          setTimeout(() => {
-            setShowEventIcon(true)
-            setEventIconAnimation(true)
-            // 팝업 사운드 재생
-            const popSound = new Audio('/sounds/game-bonus-02-294436.mp3')
-            popSound.volume = 0.7
-            popSound.play().catch(console.error)
-
-            // 애니메이션 클래스 제거
+          // 처음 게임인 경우 onboarding 표시, 그렇지 않으면 말풍선 아이콘 표시
+          if (search.isFirstGame) {
+            // 처음 게임인 경우 온보딩 다이얼로그 표시
             setTimeout(() => {
-              setEventIconAnimation(false)
-            }, 600)
-          }, 100)
+              setOnboardingOpen(true)
+            }, 500)
+          } else {
+            // 말풍선 아이콘 애니메이션과 사운드
+            setTimeout(() => {
+              setShowEventIcon(true)
+              setEventIconAnimation(true)
+              // 팝업 사운드 재생
+              const popSound = new Audio('/sounds/game-bonus-02-294436.mp3')
+              popSound.volume = 0.7
+              popSound.play().catch(console.error)
+
+              // 애니메이션 클래스 제거
+              setTimeout(() => {
+                setEventIconAnimation(false)
+              }, 600)
+            }, 100)
+          }
         } else {
           const newGame = await createNewGame(countryName.trim())
           const startTurn = newGame.data.game.turn

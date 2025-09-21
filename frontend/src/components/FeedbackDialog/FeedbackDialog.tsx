@@ -51,13 +51,14 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
       <DialogBox>
         {/* <DialogTitle>뉴스 속보</DialogTitle> */}
         <ContentContainer>
-          <NewsTitle>
+
+          {article.content && (
+            <ContentArea>
+                        <NewsTitle>
             <a href={article.url} target="_blank" rel="noopener noreferrer">
               {article.title}
             </a>
           </NewsTitle>
-          {article.content && (
-            <ContentArea>
               <ContentText>{formatContent(article.content)}</ContentText>
             </ContentArea>
           )}

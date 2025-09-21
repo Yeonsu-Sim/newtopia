@@ -50,8 +50,12 @@ const ArticleDialog: React.FC<ArticleDialogProps> = ({
   const { playClickSound } = useAudio({ enableBgm: false })
   const [visibleComments, setVisibleComments] = useState<number>(0)
   const [isScrolledToComments, setIsScrolledToComments] = useState(false)
+
+  // 안정적인 데이터 생성을 위한 유니크 키 생성
+  const stableKey = `${currentTurn}-${selectedChoice.code}-${selectedChoice.label}`
+
   const [selectedImage] = useState(() => {
-    // 컴포넌트 마운트 시 한 번만 이미지 선택
+    // 턴과 선택에 기반한 안정적인 이미지 선택
     const newsImages = [
       '/news/newsimg1.jpg',
       '/news/newsimg2.jpg',
@@ -62,22 +66,28 @@ const ArticleDialog: React.FC<ArticleDialogProps> = ({
       '/news/newsimg7.jpg',
       '/news/newsimg8.jpg',
     ]
-    return newsImages[Math.floor(Math.random() * newsImages.length)]
+    // 턴과 선택 코드를 조합하여 안정적인 인덱스 생성
+    const seed = currentTurn * 7 + selectedChoice.code.charCodeAt(0)
+    return newsImages[seed % newsImages.length]
   })
+
   const containerRef = useRef<HTMLDivElement>(null)
   const commentsRef = useRef<HTMLDivElement>(null)
 
   if (!open) return null
 
-  // 랜덤 프로필 이미지
-  const getRandomProfileImage = (index: number) => {
+  // 안정적인 프로필 이미지 선택
+  const getStableProfileImage = (index: number) => {
     const profileImages = [
       '/icons/1.png',
       '/icons/2.png',
       '/icons/3.png',
       '/icons/4.png',
     ]
-    return profileImages[index % profileImages.length]
+    // 턴, 선택 코드, 인덱스를 조합하여 안정적인 시드 생성
+    const seed =
+      currentTurn * 13 + selectedChoice.code.charCodeAt(0) * 7 + index
+    return profileImages[seed % profileImages.length]
   }
 
   // 현재 날짜 형식
@@ -88,24 +98,30 @@ const ArticleDialog: React.FC<ArticleDialogProps> = ({
     weekday: 'short',
   })
 
-  // 댓글 작성자 더미 이름 생성
-  const generateCommentAuthor = (index: number) => {
+  // 안정적인 댓글 작성자 이름 생성
+  const generateStableCommentAuthor = (index: number) => {
     const authors = ['시민1', '시민2', '시민3', '시민4']
-    return authors[index % authors.length]
+    const seed =
+      currentTurn * 11 + selectedChoice.code.charCodeAt(0) * 3 + index
+    return authors[seed % authors.length]
   }
 
-  // 랜덤 좋아요 수 생성
-  const generateLikeCount = (index: number) => {
-    // 인덱스 기반으로 시드를 만들어 일관된 랜덤값 생성
-    const seed = index * 17 + 42
+  // 안정적인 좋아요 수 생성
+  const generateStableLikeCount = (index: number) => {
+    // 턴, 선택 코드, 인덱스를 조합하여 안정적인 시드 생성
+    const seed =
+      currentTurn * 17 + selectedChoice.code.charCodeAt(0) * 5 + index * 23
     return (seed % 50) + 1 // 1~50 사이의 값
   }
 
-  // 댓글 시간 생성
-  const generateCommentTime = (index: number) => {
-    const now = new Date()
-    const minutesAgo = (index + 1) * 15 + Math.floor(Math.random() * 10)
-    const commentTime = new Date(now.getTime() - minutesAgo * 60000)
+  // 안정적인 댓글 시간 생성
+  const generateStableCommentTime = (index: number) => {
+    // 턴과 선택을 기반으로 기준 시간 생성
+    const baseTime = new Date()
+    const seed =
+      currentTurn * 19 + selectedChoice.code.charCodeAt(0) * 11 + index
+    const minutesAgo = (index + 1) * 15 + (seed % 10) // 고정된 분 차이
+    const commentTime = new Date(baseTime.getTime() - minutesAgo * 60000)
     return commentTime.toLocaleString('ko-KR', {
       month: '2-digit',
       day: '2-digit',
@@ -163,13 +179,13 @@ const ArticleDialog: React.FC<ArticleDialogProps> = ({
     <DialogOverlay>
       <ArticleContainer ref={containerRef}>
         <ArticleHeader>
-          <NewspaperName>[{countryName}] 일보</NewspaperName>
-          <VolumeInfo>{currentTurn}턴 보</VolumeInfo>
+          <NewspaperName>{countryName} 일보</NewspaperName>
+          <VolumeInfo>{currentTurn} 보</VolumeInfo>
           <DateInfo>{currentDate}</DateInfo>
         </ArticleHeader>
 
         <Headline>
-          [{playerName}]시장, [{selectedChoice.label}] 결정!
+          {playerName}시장, {selectedChoice.label} 결정!
         </Headline>
 
         <NewsImage src={selectedImage} alt="뉴스 이미지" />
@@ -181,9 +197,9 @@ const ArticleDialog: React.FC<ArticleDialogProps> = ({
 
           <CommentsList>
             {Array.from({ length: visibleComments }).map((_, index) => (
-              <CommentItem key={index}>
+              <CommentItem key={`${stableKey}-comment-${index}`}>
                 <UserAvatar
-                  src={getRandomProfileImage(index)}
+                  src={getStableProfileImage(index)}
                   alt="프로필 이미지"
                   onError={(e) => {
                     // 이미지 로드 실패 시 기본 이미지로 대체
@@ -191,12 +207,14 @@ const ArticleDialog: React.FC<ArticleDialogProps> = ({
                   }}
                 />
                 <CommentContent>
-                  <CommentAuthor>{generateCommentAuthor(index)}</CommentAuthor>
-                  <CommentTime>{generateCommentTime(index)}</CommentTime>
+                  <CommentAuthor>
+                    {generateStableCommentAuthor(index)}
+                  </CommentAuthor>
+                  <CommentTime>{generateStableCommentTime(index)}</CommentTime>
                   <CommentText>{selectedChoice.comments[index]}</CommentText>
                   <CommentActions>
                     <LikeButton $liked={false}>
-                      👍 {generateLikeCount(index)}
+                      👍 {generateStableLikeCount(index)}
                     </LikeButton>
                   </CommentActions>
                 </CommentContent>

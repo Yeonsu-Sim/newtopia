@@ -43,7 +43,7 @@ export const NewsTitle = styled.div`
   font-size: 1.6rem;
   flex-shrink: 0;
   margin-bottom: 1rem;
-  color: #fdf3d8;
+  color: #ffe8aaff;
   text-shadow: 2px 2px 0 #6e3400;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: #683503;
@@ -130,7 +130,7 @@ export const ContentArea = styled.div`
   line-height: 1.6;
   overflow-y: auto;
   padding: 2rem;
-  background-color: #fff1cbff;
+  background-color: #fcf8ecff;
   border-radius: 8px;
   border: 3px solid #f9bf26;
   scrollbar-width: thin;

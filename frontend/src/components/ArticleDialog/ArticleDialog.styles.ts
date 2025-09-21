@@ -160,10 +160,10 @@ export const CommentTime = styled.div`
 `
 
 export const CommentText = styled.p`
-  font-family: 'PFStardust ExtraBold', 'DNFBitBitv2', sans-serif;
+  font-family: 'DNFBitBitv2', sans-serif;
   color: #333;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 1.4rem;
+  line-height: 1;
   margin: 0 0 0.75rem 0;
   word-break: break-word;
 `

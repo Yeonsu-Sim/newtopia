@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { useAudio } from '@/hooks/useAudio'
 import {
   Container,
@@ -12,13 +12,17 @@ import {
 
 export const Route = createFileRoute('/ending/')({
   component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      endingCode: search?.endingCode as string,
+    }
+  },
 })
 
 function RouteComponent() {
   const navigate = useNavigate()
-  const router = useRouter()
-  const searchParams = new URLSearchParams(router.state.location.search)
-  const endingCode = searchParams.get('endingCode')
+  const search = useSearch({ from: '/ending/' })
+  const endingCode = search.endingCode
 
   const [ending, setEnding] = useState<any>(null)
   const [fadeIn, setFadeIn] = useState(false)
