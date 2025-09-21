@@ -30,7 +30,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 @RequiredArgsConstructor
 @Slf4j
 public class GenerateScenarioService {
-
+    // api 될까
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
