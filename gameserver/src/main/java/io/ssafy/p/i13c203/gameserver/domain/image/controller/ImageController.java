@@ -73,6 +73,26 @@ public class ImageController {
         );
     }
 
+    // 건의사항 이미지 전용 업로드 (인증 불필요)
+    @PostMapping(value = "/suggestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<APIResponse<ImageUploadResponse, Void>> uploadForSuggestion(
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+
+        String contentType = file.getContentType();
+        Set<String> allowed = Set.of("image/png", "image/jpeg", "image/gif", "image/webp");
+
+        if (contentType == null || !allowed.contains(contentType)) {
+            throw new IllegalArgumentException("Unsupported file type");
+        }
+
+        ImageUploadResponse upload = imageService.uploadPublic(file, "suggestion");
+
+        return ResponseEntity.ok(
+                APIResponse.success(upload)
+        );
+    }
+
     // 미구현
     // 가서 지우기 하면 됌
     @DeleteMapping("/{imageId}")

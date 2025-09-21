@@ -10,9 +10,6 @@ import lombok.ToString;
 @ToString
 public class SuggestionCreateRequest {
 
-    @NotNull
-    private Long memberId;
-
     @NotBlank(message = "title이 null 일 수 없습니다.")
     private String title;
 

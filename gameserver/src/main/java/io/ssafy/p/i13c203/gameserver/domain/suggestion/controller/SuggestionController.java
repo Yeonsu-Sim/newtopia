@@ -1,5 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.suggestion.controller;
 
+import io.ssafy.p.i13c203.gameserver.auth.security.CustomUserDetails;
+import io.ssafy.p.i13c203.gameserver.domain.member.entity.Member;
 import io.ssafy.p.i13c203.gameserver.domain.suggestion.dto.request.SuggestionCreateRequest;
 import io.ssafy.p.i13c203.gameserver.domain.suggestion.dto.request.SuggestionRequest;
 import io.ssafy.p.i13c203.gameserver.domain.suggestion.dto.response.SuggestionCreateResponse;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,10 +32,12 @@ public class SuggestionController {
 
     @PostMapping
     public ResponseEntity<APIResponse<SuggestionCreateResponse, Void>> createSuggestion(
-            @Valid @RequestBody SuggestionCreateRequest suggestionCreateRequest
+            @Valid @RequestBody SuggestionCreateRequest suggestionCreateRequest,
+            @AuthenticationPrincipal CustomUserDetails details
             ){
+        Member member = details.getMember();
 
-        SuggestionCreateResponse response = suggestionService.createSuggestion(suggestionCreateRequest);
+        SuggestionCreateResponse response = suggestionService.createSuggestion(suggestionCreateRequest, member);
 
         return ResponseEntity.ok(
                 APIResponse.success(response)

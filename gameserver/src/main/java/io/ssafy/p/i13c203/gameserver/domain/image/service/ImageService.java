@@ -31,8 +31,6 @@ public class ImageService {
 //    로컬 또는 S3에 저장 후 previewUrl 생성
 //    image_file 테이블에 status=TEMP로 insert
 //    deleteIfTempOwnedBy는 status=TEMP인 경우만 삭제(or 삭제 예약)
-
-
     public ImageUploadResponse upload(MultipartFile file, Member member, String domain) throws IOException {
 
         Long memberId = member.getId();

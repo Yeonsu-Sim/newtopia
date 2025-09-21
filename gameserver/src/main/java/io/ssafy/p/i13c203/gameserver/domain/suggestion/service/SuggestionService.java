@@ -1,9 +1,11 @@
 package io.ssafy.p.i13c203.gameserver.domain.suggestion.service;
 
 import io.ssafy.p.i13c203.gameserver.domain.image.entity.Image;
+import io.ssafy.p.i13c203.gameserver.domain.image.entity.ImageStatus;
+import io.ssafy.p.i13c203.gameserver.domain.image.entity.SuggestionImage;
 import io.ssafy.p.i13c203.gameserver.domain.image.repository.ImageRepository;
+import io.ssafy.p.i13c203.gameserver.domain.image.repository.SuggestionImageRepository;
 import io.ssafy.p.i13c203.gameserver.domain.member.entity.Member;
-import io.ssafy.p.i13c203.gameserver.domain.member.entity.Role;
 import io.ssafy.p.i13c203.gameserver.domain.member.repository.MemberRepository;
 import io.ssafy.p.i13c203.gameserver.domain.suggestion.dto.request.SuggestionCreateRequest;
 import io.ssafy.p.i13c203.gameserver.domain.suggestion.dto.request.SuggestionRequest;
@@ -16,9 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -28,20 +28,16 @@ public class SuggestionService {
     private final SuggestionRepository suggestionRepository;
     private final MemberRepository memberRepository;
     private final ImageRepository imageRepository;
+    private final SuggestionImageRepository suggestionImageRepository;
 
 
-    // TODO  image TEMP -> ATTACH 필요
-    // 1. create Suggestion
-    // 2. suggestion <-> image 들 관계 테이블에 추가
-    //  image 올린 사람이랑 suggestion 한사람 같은지 확인
-    //
     @Transactional
-    public SuggestionCreateResponse createSuggestion(SuggestionCreateRequest request) {
+    public SuggestionCreateResponse createSuggestion(SuggestionCreateRequest request, Member member) {
 
         Suggestion suggestion = Suggestion.builder()
                 .text(request.getText())
                 .title(request.getTitle())
-                .member(memberRepository.findById(request.getMemberId()).orElseThrow())
+                .member(member)
                 .category(request.getSuggestionCategory())
                 .build();
 
@@ -50,21 +46,33 @@ public class SuggestionService {
                 .boxed()
                 .toList();
 
-        //1. suggestion 영속화
-        Suggestion save = suggestionRepository.save(suggestion);
+        // 1. suggestion 영속화
+        Suggestion savedSuggestion = suggestionRepository.save(suggestion);
 
-        //2. suggestion, image 관계 추가
-        // imageIds에는 이미지가 0 ~ 몇개가 될지 모름
-        // 이때 imageRepository에서 image들을 꺼내와서 작업해야함
-        List<Image> allById = imageRepository.findAllById(imageIds);
-
-//        for (Image image : allById) {
-//            image.setSuggestion(save);
-//        }
-
+        // 2. suggestion <-> image 관계 추가
+        if (!imageIds.isEmpty()) {
+            List<Image> images = imageRepository.findAllById(imageIds);
+            
+            // TEMP 상태 이미지들을 ATTACHED로 변경하고 SuggestionImage 생성
+            for (int i = 0; i < images.size(); i++) {
+                Image image = images.get(i);
+                
+                // 이미지 상태를 ATTACHED로 변경
+                image.setStatus(ImageStatus.ATTACHED);
+                
+                // SuggestionImage 연관관계 생성
+                SuggestionImage suggestionImage = SuggestionImage.builder()
+                        .suggestion(savedSuggestion)
+                        .image(image)
+                        .sortOrder(i)
+                        .build();
+                
+                suggestionImageRepository.save(suggestionImage);
+            }
+        }
 
         return SuggestionCreateResponse.builder()
-                .suggestionId(save.getId())
+                .suggestionId(savedSuggestion.getId())
                 .build();
     }
 
