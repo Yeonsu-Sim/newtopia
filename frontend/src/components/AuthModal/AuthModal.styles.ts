@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const ModalOverlay = styled.div`
   position: fixed;
@@ -8,14 +8,14 @@ export const ModalOverlay = styled.div`
   align-items: center;
   justify-content: center;
   padding: 1rem;
-`;
+`
 
 export const ModalBackground = styled.div`
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
-`;
+`
 
 export const ModalContent = styled.div`
   background: #e49000;
@@ -26,7 +26,7 @@ export const ModalContent = styled.div`
   max-height: 95vh;
   overflow-y: auto;
   z-index: 10;
-`;
+`
 
 export const ModalInner = styled.div`
   overflow: clip;
@@ -34,7 +34,7 @@ export const ModalInner = styled.div`
   width: 100%;
   height: 100%;
   min-height: 600px;
-`;
+`
 
 export const ModalHeader = styled.div`
   display: flex;
@@ -50,19 +50,18 @@ export const ModalHeader = styled.div`
   width: 100%;
   padding-top: 60px;
   padding-bottom: 20px;
-
-`;
+`
 
 export const HeaderTitle = styled.div`
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-weight: 400;
   position: relative;
   flex-shrink: 0;
-  color: #FFF;
+  color: #fff;
   text-align: center;
-  text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.50);
+  text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
   -webkit-text-stroke-width: 2px;
-  -webkit-text-stroke-color: #A35400;
+  -webkit-text-stroke-color: #a35400;
   font-size: 40px;
   font-style: normal;
   padding-bottom: 10px;
@@ -74,16 +73,16 @@ export const HeaderTitle = styled.div`
     text-wrap: nowrap;
     white-space: pre;
   }
-`;
+`
 
 export const HeaderSubtitle = styled.div`
   font-family: 'PFStardustExtraBold', 'Noto Sans KR', sans-serif;
   font-weight: 800;
   min-width: 100%;
   position: relative;
-    padding-bottom: 20px;
+  padding-bottom: 20px;
   flex-shrink: 0;
-  color: #FFF;
+  color: #fff;
   text-align: center;
   text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.75);
   font-size: 28px;
@@ -94,7 +93,7 @@ export const HeaderSubtitle = styled.div`
   p {
     line-height: 20px;
   }
-`;
+`
 
 export const ModalForm = styled.form`
   display: flex;
@@ -106,7 +105,7 @@ export const ModalForm = styled.form`
   flex-shrink: 0;
   width: 100%;
   padding: 0 40px 40px 40px;
-`;
+`
 
 export const ErrorMessage = styled.div`
   width: 100%;
@@ -117,7 +116,7 @@ export const ErrorMessage = styled.div`
   color: #991b1b;
   border-radius: 8px;
   font-family: 'Noto Sans KR', sans-serif;
-`;
+`
 
 export const FormFields = styled.div`
   display: flex;
@@ -129,7 +128,7 @@ export const FormFields = styled.div`
   flex-shrink: 0;
   width: 100%;
   max-width: 500px;
-`;
+`
 
 export const InputWrapper = styled.div`
   background: white;
@@ -138,7 +137,7 @@ export const InputWrapper = styled.div`
   border-radius: 8px;
   flex-shrink: 0;
   width: 100%;
-`;
+`
 
 export const Input = styled.input`
   width: 100%;
@@ -156,7 +155,7 @@ export const Input = styled.input`
   &:focus {
     border-color: #629eff;
   }
-`;
+`
 
 export const SubmitButtonWrapper = styled.div`
   background: #f9bf26;
@@ -164,7 +163,7 @@ export const SubmitButtonWrapper = styled.div`
   border-radius: 8px;
   flex-shrink: 0;
   width: 100%;
-`;
+`
 
 export const SubmitButton = styled.button`
   display: flex;
@@ -180,16 +179,16 @@ export const SubmitButton = styled.button`
   height: 52px;
   cursor: pointer;
   transition: background-color 0.2s;
-  
+
   &:hover:not(:disabled) {
     background: #fcd34d;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-`;
+`
 
 export const SubmitButtonInner = styled.div`
   box-sizing: border-box;
@@ -199,7 +198,7 @@ export const SubmitButtonInner = styled.div`
   padding: 1rem;
   position: relative;
   width: 100%;
-`;
+`
 
 export const SubmitButtonText = styled.div`
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
@@ -211,16 +210,16 @@ export const SubmitButtonText = styled.div`
   font-size: 18px;
   text-wrap: nowrap;
   color: white;
-  
+
   p {
     line-height: 20px;
     white-space: pre;
   }
-`;
+`
 
 export const ModeSwitch = styled.div`
   text-align: center;
-`;
+`
 
 export const ModeSwitchButton = styled.button`
   color: white;
@@ -231,18 +230,18 @@ export const ModeSwitchButton = styled.button`
   text-decoration: underline;
   cursor: pointer;
   transition: color 0.2s;
-  
+
   &:hover {
     color: #fef3c7;
   }
-`;
+`
 
 export const ModalFrame = styled.div`
   position: absolute;
   inset: 0;
   pointer-events: none;
   box-shadow: 12px 12px 10px 4px inset #a35400;
-`;
+`
 
 export const ModalBorder = styled.div`
   position: absolute;
@@ -251,7 +250,7 @@ export const ModalBorder = styled.div`
   pointer-events: none;
   border-radius: 40px;
   box-shadow: 6px 6px 0px 2px #d57500;
-`;
+`
 
 export const CloseButton = styled.button`
   position: absolute;
@@ -270,9 +269,9 @@ export const CloseButton = styled.button`
   justify-content: center;
   transition: all 0.2s;
   cursor: pointer;
-  
+
   &:hover {
     color: #fca5a5;
     background: #b91c1c;
   }
-`;
+`

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const MainContainer = styled.div`
   position: relative;
@@ -6,8 +6,7 @@ export const MainContainer = styled.div`
   height: 100vh;
   min-height: 100vh;
   overflow: hidden;
-`;
-
+`
 
 export const WelcomeSection = styled.div`
   position: absolute;
@@ -16,7 +15,7 @@ export const WelcomeSection = styled.div`
   transform: translateX(-50%);
   text-align: center;
   z-index: 10;
-`;
+`
 
 export const WelcomeTitle = styled.h1`
   color: white;
@@ -27,7 +26,7 @@ export const WelcomeTitle = styled.h1`
   margin-bottom: 1rem;
   line-height: 1.2;
   white-space: nowrap;
-`;
+`
 
 export const WelcomeSubtitle = styled.p`
   color: #fef3c7;
@@ -36,7 +35,7 @@ export const WelcomeSubtitle = styled.p`
   font-weight: 500;
   text-shadow: #000000 2px 2px 4px;
   line-height: 1.4;
-`;
+`
 
 export const MenuContainer = styled.div`
   position: absolute;
@@ -51,9 +50,7 @@ export const MenuContainer = styled.div`
   justify-content: center;
   width: 100%;
   padding: 0 1rem;
-`;
-
-
+`
 
 export const BgmToggleButton = styled.button`
   position: absolute;
@@ -82,7 +79,7 @@ export const BgmToggleButton = styled.button`
   &:active {
     transform: scale(0.95);
   }
-`;
+`
 
 export const LogoutButton = styled.button`
   position: absolute;
@@ -109,4 +106,4 @@ export const LogoutButton = styled.button`
     opacity: 0.5;
     cursor: not-allowed;
   }
-`;
+`

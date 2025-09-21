@@ -1,12 +1,12 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { useAudio } from '@/hooks/useAudio';
-import { GameBackground } from '@/components/common/GameBackground';
-import { MenuButton } from '@/components/common/MenuButton';
-import { HotTopic } from '@/components/common/HotTopic';
-import { RankingModal } from '@/components/RankingModal';
-import { SuggestionModal } from '@/components/SuggestionModal';
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { useAuthStore } from '@/store/authStore'
+import { useAudio } from '@/hooks/useAudio'
+import { GameBackground } from '@/components/common/GameBackground'
+import { MenuButton } from '@/components/common/MenuButton'
+import { HotTopic } from '@/components/common/HotTopic'
+import { RankingModal } from '@/components/RankingModal'
+import { SuggestionModal } from '@/components/SuggestionModal'
 import {
   MainContainer,
   WelcomeSection,
@@ -14,60 +14,60 @@ import {
   WelcomeSubtitle,
   MenuContainer,
   BgmToggleButton,
-  LogoutButton
-} from '@/routes/main/-Main.styles';
+  LogoutButton,
+} from '@/routes/main/-Main.styles'
 
 export const Route = createFileRoute('/main/')({
   component: MainPage,
-});
+})
 
 function MainPage() {
-  const { user, logout, isLoading } = useAuthStore();
-  const navigate = useNavigate();
+  const { user, logout, isLoading } = useAuthStore()
+  const navigate = useNavigate()
   const { isBgmPlaying, playClickSound, toggleBgm } = useAudio({
     bgmVolume: 0.5,
-    clickSoundVolume: 0.7
-  });
-  const [showRankingModal, setShowRankingModal] = useState(false);
-  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+    clickSoundVolume: 0.7,
+  })
+  const [showRankingModal, setShowRankingModal] = useState(false)
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false)
 
   // 로그인되지 않은 사용자는 랜딩 페이지로 리다이렉트
   useEffect(() => {
     if (!user) {
-      navigate({ to: '/landing' });
+      navigate({ to: '/landing' })
     }
-  }, [user, navigate]);
+  }, [user, navigate])
 
   const handleStartGame = () => {
-    playClickSound();
-    navigate({ to: '/game/setup' });
-  };
+    playClickSound()
+    navigate({ to: '/game/setup' })
+  }
 
   const handleMyInfo = () => {
-    playClickSound();
+    playClickSound()
     // TODO: 내정보 페이지 구현 후 연결
-    alert('내정보 기능은 준비 중입니다.');
-  };
+    alert('내정보 기능은 준비 중입니다.')
+  }
 
   const handleSuggestion = () => {
-    playClickSound();
-    setShowSuggestionModal(true);
-  };
+    playClickSound()
+    setShowSuggestionModal(true)
+  }
 
   const handleRanking = () => {
-    playClickSound();
-    setShowRankingModal(true);
-  };
+    playClickSound()
+    setShowRankingModal(true)
+  }
 
   const handleLogout = async () => {
-    playClickSound();
+    playClickSound()
     try {
-      await logout();
-      navigate({ to: '/landing' });
+      await logout()
+      navigate({ to: '/landing' })
     } catch (error) {
-      console.error('로그아웃 중 오류 발생:', error);
+      console.error('로그아웃 중 오류 발생:', error)
     }
-  };
+  }
 
   // 사용자 정보가 없으면 로딩 상태 표시
   if (!user) {
@@ -78,7 +78,7 @@ function MainPage() {
           <WelcomeTitle>로딩 중...</WelcomeTitle>
         </WelcomeSection>
       </MainContainer>
-    );
+    )
   }
 
   return (
@@ -99,9 +99,11 @@ function MainPage() {
       <WelcomeSection>
         <WelcomeTitle>환영합니다!</WelcomeTitle>
         {/* 추후 웰컴메시지에 사용자명 추가 필요! [환영합니다, {user.nickname}님]  */}
-        <WelcomeSubtitle>뉴토피아에서 당신만의 통치를 시작해보세요</WelcomeSubtitle>
+        <WelcomeSubtitle>
+          뉴토피아에서 당신만의 통치를 시작해보세요
+        </WelcomeSubtitle>
       </WelcomeSection>
-      
+
       {/* 메뉴 버튼들 */}
       <MenuContainer>
         <MenuButton onClick={handleStartGame} variant="main">
@@ -136,5 +138,5 @@ function MainPage() {
         onClose={() => setShowSuggestionModal(false)}
       />
     </MainContainer>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export const LoadingContainer = styled.div`
   position: relative;
@@ -9,7 +9,7 @@ export const LoadingContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
+`
 
 export const LoadingContent = styled.div`
   position: relative;
@@ -20,7 +20,7 @@ export const LoadingContent = styled.div`
   justify-content: center;
   gap: 2rem;
   text-align: center;
-`;
+`
 
 export const LoadingTitle = styled.h1`
   color: white;
@@ -31,14 +31,14 @@ export const LoadingTitle = styled.h1`
   margin: 0;
   line-height: 1.2;
   white-space: nowrap;
-`;
+`
 
 export const LottieContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-`;
+`
 
 export const FallbackBackground = styled.div`
   position: absolute;
@@ -46,4 +46,4 @@ export const FallbackBackground = styled.div`
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-`;
+`

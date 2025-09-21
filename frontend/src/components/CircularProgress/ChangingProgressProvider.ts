@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import type { ReactNode } from "react";
+import { useState, useEffect } from 'react'
+import type { ReactNode } from 'react'
 
 interface Props {
-  interval?: number;
-  values: any[];
-  children: (value: any) => ReactNode;
+  interval?: number
+  values: any[]
+  children: (value: any) => ReactNode
 }
 
 const ChangingProgressProvider: React.FC<Props> = ({
@@ -12,17 +12,17 @@ const ChangingProgressProvider: React.FC<Props> = ({
   values,
   children,
 }) => {
-  const [valuesIndex, setValuesIndex] = useState<number>(0);
+  const [valuesIndex, setValuesIndex] = useState<number>(0)
 
   useEffect(() => {
     const intervalId = setTimeout(() => {
-      setValuesIndex((prevIndex) => (prevIndex + 1) % values.length);
-    }, interval);
+      setValuesIndex((prevIndex) => (prevIndex + 1) % values.length)
+    }, interval)
 
-    return () => clearTimeout(intervalId);
-  }, [interval, values.length]);
+    return () => clearTimeout(intervalId)
+  }, [interval, values.length])
 
-  return children(values[valuesIndex]);
-};
+  return children(values[valuesIndex])
+}
 
-export default ChangingProgressProvider;
+export default ChangingProgressProvider

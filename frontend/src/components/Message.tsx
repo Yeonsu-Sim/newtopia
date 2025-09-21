@@ -1,8 +1,8 @@
-import React from "react";
-import { MessageBox, MessageIcon } from "@/routes/game/-Game.styles";
+import React from 'react'
+import { MessageBox, MessageIcon } from '@/routes/game/-Game.styles'
 
 interface MessageProps {
-  text: string;
+  text: string
 }
 
 const Message: React.FC<MessageProps> = ({ text }) => {
@@ -11,7 +11,7 @@ const Message: React.FC<MessageProps> = ({ text }) => {
       <div>{text}</div>
       <MessageIcon />
     </MessageBox>
-  );
-};
+  )
+}
 
-export default Message;
+export default Message

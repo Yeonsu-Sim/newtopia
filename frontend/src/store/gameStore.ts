@@ -1,41 +1,41 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 
 export type CountryStats = {
-  eco: number;
-  mil: number;
-  opi: number;
-  env: number;
-};
+  eco: number
+  mil: number
+  opi: number
+  env: number
+}
 
 export type RelatedArticle = {
-  title: string;
-  url: string;
-};
+  title: string
+  url: string
+}
 
 type GameState = {
-  gameId: number;
-  currentTurn: number;
-  currentStats: CountryStats;
-  countryName: string;
-  playerName: string;
+  gameId: number
+  currentTurn: number
+  currentStats: CountryStats
+  countryName: string
+  playerName: string
   setGameStart: (
-    gameId: number, 
+    gameId: number,
     stats: CountryStats,
     countryName: string,
     playerName: string,
     turn: number,
-  ) => void;
-  setStats: (stats: CountryStats) => void;
-  setTurn: (turn: number) => void;
-  resetGame: () => void;
-};
+  ) => void
+  setStats: (stats: CountryStats) => void
+  setTurn: (turn: number) => void
+  resetGame: () => void
+}
 
 export const useGameStore = create<GameState>((set) => ({
   gameId: 0,
   currentTurn: 1,
   currentStats: { eco: 50, mil: 50, opi: 50, env: 50 },
-  countryName: "",
-  playerName: "",
+  countryName: '',
+  playerName: '',
   setGameStart: (gameId, stats, countryName, playerName, turn) =>
     set({
       gameId,
@@ -43,15 +43,15 @@ export const useGameStore = create<GameState>((set) => ({
       currentTurn: turn,
       countryName,
       playerName,
-  }),
+    }),
   setStats: (stats) => set({ currentStats: stats }),
-  setTurn: (turn) => set({currentTurn: turn}),
+  setTurn: (turn) => set({ currentTurn: turn }),
   resetGame: () =>
     set({
       gameId: 0,
       currentTurn: 1,
       currentStats: { eco: 50, mil: 50, opi: 50, env: 50 },
-      countryName: "",
-      playerName: "",
+      countryName: '',
+      playerName: '',
     }),
-}));
+}))

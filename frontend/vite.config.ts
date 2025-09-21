@@ -22,15 +22,15 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": {
-        target: "http://localhost:8080", // Spring Boot 서버
+      '/api': {
+        target: 'http://localhost:8080', // Spring Boot 서버
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/api/, ""),
       },
-      "^/(ws|sockjs-node)": {
-        target: "http://localhost:8080",
+      '^/(ws|sockjs-node)': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        ws: true
+        ws: true,
       },
     },
   },

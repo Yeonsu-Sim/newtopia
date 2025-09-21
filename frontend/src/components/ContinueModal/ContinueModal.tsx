@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'
 import {
   Overlay,
   ModalBox,
-  ButtonGroup
-} from '@/components/ContinueModal/ContinueModal.styles';
+  ButtonGroup,
+} from '@/components/ContinueModal/ContinueModal.styles'
 
 interface ContinueModalProps {
-  countryName: string;
-  onContinue: () => void;
-  onNewGame: () => void;
+  countryName: string
+  onContinue: () => void
+  onNewGame: () => void
 }
 
 export const ContinueModal: React.FC<ContinueModalProps> = ({
@@ -27,5 +27,5 @@ export const ContinueModal: React.FC<ContinueModalProps> = ({
         </ButtonGroup>
       </ModalBox>
     </Overlay>
-  );
-};
+  )
+}

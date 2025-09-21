@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const TestContainer = styled.div`
   position: relative;
@@ -6,7 +6,7 @@ export const TestContainer = styled.div`
   background: #1a1a2e;
   color: #fff;
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
-`;
+`
 
 export const TestHeader = styled.div`
   position: fixed;
@@ -18,24 +18,24 @@ export const TestHeader = styled.div`
   backdrop-filter: blur(8px);
   padding: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-`;
+`
 
 export const TestTitle = styled.h1`
   font-size: 1.5rem;
   margin: 0 0 1rem 0;
   text-align: center;
   color: #fff;
-`;
+`
 
 export const TestControls = styled.div`
   display: flex;
   gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
-`;
+`
 
 export const TestButton = styled.button<{ variant?: 'reset' }>`
-  background: ${({ variant }) => variant === 'reset' ? '#dc2626' : '#3b82f6'};
+  background: ${({ variant }) => (variant === 'reset' ? '#dc2626' : '#3b82f6')};
   color: white;
   border: none;
   border-radius: 8px;
@@ -47,14 +47,15 @@ export const TestButton = styled.button<{ variant?: 'reset' }>`
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${({ variant }) => variant === 'reset' ? '#b91c1c' : '#2563eb'};
+    background: ${({ variant }) =>
+      variant === 'reset' ? '#b91c1c' : '#2563eb'};
     transform: translateY(-1px);
   }
 
   &:active {
     transform: translateY(0);
   }
-`;
+`
 
 export const MockGameContainer = styled.div`
   position: relative;
@@ -62,13 +63,13 @@ export const MockGameContainer = styled.div`
   height: 100vh;
   overflow: hidden;
   margin-top: 120px;
-`;
+`
 
 export const MockBackgroundImage = styled.img`
   width: 100%;
   height: auto;
   display: block;
-`;
+`
 
 export const MockEventIcon = styled.img`
   position: absolute;
@@ -86,11 +87,11 @@ export const MockEventIcon = styled.img`
   &:active {
     transform: translate(-50%, -50%) scale(0.95);
   }
-  
+
   &.pop-animation {
     animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
-  
+
   @keyframes popIn {
     0% {
       transform: translate(-50%, -50%) scale(0);
@@ -105,4 +106,4 @@ export const MockEventIcon = styled.img`
       opacity: 1;
     }
   }
-`;
+`

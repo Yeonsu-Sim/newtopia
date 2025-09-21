@@ -1,9 +1,9 @@
-import { 
-    Section, 
-    SectionTitle, 
-    Wrapper,
-    Label
-} from '@/components/AiReport/AiReport.styles';
+import {
+  Section,
+  SectionTitle,
+  Wrapper,
+  Label,
+} from '@/components/AiReport/AiReport.styles'
 
 // interface Props {
 //   summary?: {
@@ -20,5 +20,5 @@ export default function AiReport() {
         <Label>준비중입니다!</Label>
       </Section>
     </Wrapper>
-  );
+  )
 }
