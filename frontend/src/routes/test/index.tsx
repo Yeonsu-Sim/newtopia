@@ -31,7 +31,7 @@ function TestComponent() {
   const [toastMessages, setToastMessages] = useState<string[]>([]);
   const [showEventIcon, setShowEventIcon] = useState(false);
   const [eventIconAnimation, setEventIconAnimation] = useState(false);
-  const { playClickSound } = useAudio({ enableBgm: false });
+  useAudio({ enableBgm: false });
 
   // Mock 게임 데이터
   const mockStats = {

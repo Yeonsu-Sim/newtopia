@@ -5,7 +5,6 @@ import {
   DialogOverlay,
   DialogBox,
   CloseButton,
-  DialogTitle,
   NewsTitle,
   ContentContainer,
   ContentArea,
