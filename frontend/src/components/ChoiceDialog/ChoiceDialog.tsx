@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAudio } from '@/hooks/useAudio';
 
 import {
     ParameterChangeBox
@@ -40,9 +41,20 @@ interface ChoiceDialogProps {
 }
 
 const ChoiceDialog: React.FC<ChoiceDialogProps> = ({ guestText, choices, currentStats, onBack, onSelect, initialMousePos = { x: 0, y: 0 } }) => {
+  const { playClickSound } = useAudio({ enableBgm: false });
   const [mousePos, setMousePos] = useState(
     initialMousePos || { x: 0, y: 0 }
   );
+
+  const handleBack = () => {
+    playClickSound();
+    onBack();
+  };
+
+  const handleSelect = (choiceCode: string) => {
+    playClickSound();
+    onSelect(choiceCode);
+  };
 
   useEffect(() => {
     if (initialMousePos) {
@@ -75,10 +87,10 @@ const ChoiceDialog: React.FC<ChoiceDialogProps> = ({ guestText, choices, current
       <DialogBox>
         <DialogText>{guestText}</DialogText>
         <ChoiceCards>
-          {choices[0] && <ChoiceCardA onClick={() => onSelect(choices[0].code)}>{choices[0].label}</ChoiceCardA>}
-          {choices[1] && <ChoiceCardB onClick={() => onSelect(choices[1].code)}>{choices[1].label}</ChoiceCardB>}
+          {choices[0] && <ChoiceCardA onClick={() => handleSelect(choices[0].code)}>{choices[0].label}</ChoiceCardA>}
+          {choices[1] && <ChoiceCardB onClick={() => handleSelect(choices[1].code)}>{choices[1].label}</ChoiceCardB>}
         </ChoiceCards>
-        <CloseButton onClick={onBack}>뒤로가기</CloseButton>
+        <CloseButton onClick={handleBack}>뒤로가기</CloseButton>
       </DialogBox>
     </DialogOverlay>
   );

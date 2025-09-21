@@ -8,6 +8,7 @@ import{
   DialogContent,
   DialogActions
 } from '@/components/GuestDialog/GuestDialog.styles';
+import { useAudio } from '@/hooks/useAudio';
 
 interface GuestDialogProps {
   guestName: string;
@@ -19,6 +20,17 @@ interface GuestDialogProps {
 }
 
 const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, guestImage, onClose, onSelect }) => {
+  const { playClickSound } = useAudio({ enableBgm: false });
+
+  const handleClose = () => {
+    playClickSound();
+    onClose();
+  };
+
+  const handleSelect = (e: React.MouseEvent<HTMLButtonElement>) => {
+    playClickSound();
+    onSelect(e);
+  };
 
   return (
     <DialogOverlay>
@@ -31,10 +43,10 @@ const GuestDialog: React.FC<GuestDialogProps> = ({guestName, guestText, guestIma
           <DialogContent>{guestText}</DialogContent>
           <DialogActionsBox>
             <DialogActions>
-              <button onClick={onClose}>닫기</button>
+              <button onClick={handleClose}>닫기</button>
             </DialogActions>
             <DialogActions>
-              <button onClick={(e) => onSelect(e)}>선택</button>
+              <button onClick={handleSelect}>선택</button>
             </DialogActions>
           </DialogActionsBox>
 

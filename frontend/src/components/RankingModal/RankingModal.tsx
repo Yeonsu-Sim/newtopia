@@ -125,14 +125,15 @@ export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) =
             >
               통합랭킹
             </HeaderTab>
-            <HeaderTab
+            {/* <HeaderTab
               $isActive={activeTab === 'my'}
               onClick={() => handleTabChange('my')}
             >
               내 랭킹
-            </HeaderTab>
+            </HeaderTab> */}
           </div>
 
+          {/* 
           {activeTab === 'integrated' && (
             <SearchSection>
               <SearchInput
@@ -146,6 +147,7 @@ export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) =
               <SearchButton onClick={handleSearch}>검색</SearchButton>
             </SearchSection>
           )}
+          */}
         </ModalHeader>
 
         {error && !error.includes('게임') && <ErrorMessage>{error}</ErrorMessage>}

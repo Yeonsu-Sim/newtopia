@@ -13,17 +13,21 @@ export const Container = styled.div`
   gap: 10px;
 `;
 
-export const EndingImage = styled.img`
+export const EndingImage = styled.img<{ fadeIn?: boolean }>`
   width: 400px;
   height: auto;
   object-fit: contain;
   margin-bottom: 2rem;
+  opacity: ${({ fadeIn }) => fadeIn ? 1 : 0};
+  transition: opacity 1.5s ease-in-out;
 `;
 
-export const EndingText = styled.div`
+export const EndingText = styled.div<{ fadeIn?: boolean }>`
   text-align: center;
   font-size: 1.5rem;
   font-family: 'Galmuri14', 'Noto Sans KR', sans-serif;
+  opacity: ${({ fadeIn }) => fadeIn ? 1 : 0};
+  transition: opacity 1.5s ease-in-out 0.5s;
 `;
 
 export const NextButton = styled.button`

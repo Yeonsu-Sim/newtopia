@@ -73,7 +73,7 @@ export const ContentWrapper = styled.div`
 
 export const HotTopicTitle = styled.h2`
   color: #FFF;
-  font-family: "Gmarket Sans TTF", 'Noto Sans KR', sans-serif;
+  font-family: "GmarketSansTTF", 'NotoSans KR', sans-serif;
   font-size: 18px;
   font-style: normal;
   font-weight: 400;
