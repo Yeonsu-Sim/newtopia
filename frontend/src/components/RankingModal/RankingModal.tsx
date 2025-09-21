@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { getMyRanking, getTopRanking } from '@/services/rankingApi';
-import type { RankingItem } from '@/services/rankingApi';
+import React, { useEffect, useState } from 'react'
+import { useAuthStore } from '@/store/authStore'
+import { getMyRanking, getTopRanking } from '@/services/rankingApi'
+import type { RankingItem } from '@/services/rankingApi'
 import {
   ModalBackground,
   ModalOverlay,
@@ -15,59 +15,64 @@ import {
   TableRow,
   TableCell,
   LoadingSpinner,
-  ErrorMessage
-} from '@/components/RankingModal/RankingModal.styles';
+  ErrorMessage,
+} from '@/components/RankingModal/RankingModal.styles'
 
 export interface RankingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
-type TabType = 'integrated' | 'my';
+type TabType = 'integrated' | 'my'
 
-export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) => {
-  const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<TabType>('integrated');
-  const [rankingData, setRankingData] = useState<RankingItem[]>([]);
+export const RankingModal: React.FC<RankingModalProps> = ({
+  isOpen,
+  onClose,
+}) => {
+  const { user } = useAuthStore()
+  const [activeTab, setActiveTab] = useState<TabType>('integrated')
+  const [rankingData, setRankingData] = useState<RankingItem[]>([])
   // const [searchGameId, setSearchGameId] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string>('')
 
   // 모달이 열릴 때 초기 데이터 로드
   useEffect(() => {
     if (isOpen) {
-      loadInitialData();
+      loadInitialData()
     }
-  }, [isOpen, activeTab]);
+  }, [isOpen, activeTab])
 
   const loadInitialData = async () => {
-    setIsLoading(true);
-    setError('');
+    setIsLoading(true)
+    setError('')
 
     try {
       if (activeTab === 'integrated') {
-        const data = await getTopRanking(100);
-        setRankingData(data);
+        const data = await getTopRanking(100)
+        setRankingData(data)
       } else if (activeTab === 'my' && user) {
-        const data = await getMyRanking();
-        setRankingData(data);
+        const data = await getMyRanking()
+        setRankingData(data)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '데이터 로드에 실패했습니다.');
+      setError(
+        err instanceof Error ? err.message : '데이터 로드에 실패했습니다.',
+      )
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleTabChange = (tab: TabType) => {
     if (tab === 'my' && !user) {
-      setError('로그인이 필요합니다.');
-      return;
+      setError('로그인이 필요합니다.')
+      return
     }
-    setActiveTab(tab);
+    setActiveTab(tab)
     // setSearchGameId('');
-    setError('');
-  };
+    setError('')
+  }
 
   // const handleSearch = async () => {
   //   if (!searchGameId.trim()) {
@@ -96,16 +101,16 @@ export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) =
   // };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toISOString().split('T')[0];
-  };
+    return new Date(dateString).toISOString().split('T')[0]
+  }
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      onClose()
     }
-  };
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <ModalOverlay>
@@ -147,7 +152,9 @@ export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) =
           */}
         </ModalHeader>
 
-        {error && !error.includes('게임') && <ErrorMessage>{error}</ErrorMessage>}
+        {error && !error.includes('게임') && (
+          <ErrorMessage>{error}</ErrorMessage>
+        )}
 
         <TableContainer>
           {isLoading ? (
@@ -172,7 +179,11 @@ export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) =
 
               {rankingData.length === 0 && !isLoading && (
                 <TableRow style={{ gridColumn: '1 / -1' }}>
-                  <TableCell style={{ gridColumn: '1 / -1', textAlign: 'center' }}>데이터가 없습니다.</TableCell>
+                  <TableCell
+                    style={{ gridColumn: '1 / -1', textAlign: 'center' }}
+                  >
+                    데이터가 없습니다.
+                  </TableCell>
                 </TableRow>
               )}
             </RankingTable>
@@ -180,5 +191,5 @@ export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) =
         </TableContainer>
       </ModalContent>
     </ModalOverlay>
-  );
-};
+  )
+}

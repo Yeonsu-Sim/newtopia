@@ -15,16 +15,16 @@ interface MyRouterContext {
 }
 
 function RootComponent() {
-  const { initializeAuth, isInitialized } = useAuthStore();
+  const { initializeAuth, isInitialized } = useAuthStore()
 
   // 앱 시작시 서버에서 인증 상태 확인
   useEffect(() => {
-    initializeAuth();
-  }, [initializeAuth]);
+    initializeAuth()
+  }, [initializeAuth])
 
   // 초기화가 완료되지 않았으면 로딩 화면 표시
   if (!isInitialized) {
-    return <LoadingScreen />;
+    return <LoadingScreen />
   }
 
   return (
@@ -44,7 +44,7 @@ function RootComponent() {
         ]}
       /> */}
     </>
-  );
+  )
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

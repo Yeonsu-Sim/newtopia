@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const LandingContainer = styled.div`
   position: relative;
@@ -6,8 +6,7 @@ export const LandingContainer = styled.div`
   height: 100vh;
   min-height: 100vh;
   overflow: hidden;
-`;
-
+`
 
 export const GameLogoSection = styled.div`
   position: absolute;
@@ -20,7 +19,7 @@ export const GameLogoSection = styled.div`
   justify-content: center;
   gap: 0rem;
   z-index: 10;
-`;
+`
 
 export const GameLogo = styled.div`
   display: flex;
@@ -33,7 +32,7 @@ export const GameLogo = styled.div`
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-`;
+`
 
 export const PressStartButton = styled.button`
   color: white;
@@ -52,7 +51,7 @@ export const PressStartButton = styled.button`
     color: #fcd34d;
     transform: scale(1.05);
   }
-`;
+`
 
 export const WelcomeSection = styled.div`
   position: absolute;
@@ -61,7 +60,7 @@ export const WelcomeSection = styled.div`
   transform: translateX(-50%);
   text-align: center;
   z-index: 10;
-`;
+`
 
 export const WelcomeTitle = styled.h1`
   color: white;
@@ -72,7 +71,7 @@ export const WelcomeTitle = styled.h1`
   margin-bottom: 1rem;
   line-height: 1.2;
   white-space: nowrap;
-`;
+`
 
 export const WelcomeSubtitle = styled.p`
   color: #fef3c7;
@@ -81,7 +80,7 @@ export const WelcomeSubtitle = styled.p`
   font-weight: 500;
   text-shadow: #000000 2px 2px 4px;
   line-height: 1.4;
-`;
+`
 
 export const MenuContainer = styled.div`
   position: absolute;
@@ -96,9 +95,7 @@ export const MenuContainer = styled.div`
   justify-content: center;
   width: 100%;
   padding: 0 1rem;
-`;
-
-
+`
 
 export const BgmToggleButton = styled.button`
   position: absolute;
@@ -127,4 +124,4 @@ export const BgmToggleButton = styled.button`
   &:active {
     transform: scale(0.95);
   }
-`;
+`

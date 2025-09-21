@@ -1,4 +1,4 @@
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = '/api/v1'
 
 export const gamePlayService = {
   submitChoice: async (gameId: number, cardId: string, choice: 'A' | 'B') => {
@@ -7,9 +7,9 @@ export const gamePlayService = {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({ cardId, choice }),
-    });
+    })
 
-    if (!res.ok) throw new Error('선택 반영 실패');
-    return await res.json();
+    if (!res.ok) throw new Error('선택 반영 실패')
+    return await res.json()
   },
-};
+}

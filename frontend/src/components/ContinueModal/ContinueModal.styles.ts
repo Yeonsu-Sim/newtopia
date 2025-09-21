@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const Overlay = styled.div`
   position: fixed;
@@ -7,7 +7,7 @@ export const Overlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
+`
 
 export const ModalBox = styled.div`
   background: #fff;
@@ -16,7 +16,7 @@ export const ModalBox = styled.div`
   width: 360px;
   text-align: center;
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
-`;
+`
 
 export const ButtonGroup = styled.div`
   margin-top: 16px;
@@ -29,4 +29,4 @@ export const ButtonGroup = styled.div`
     border-radius: 6px;
     cursor: pointer;
   }
-`;
+`

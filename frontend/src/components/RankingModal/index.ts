@@ -1,2 +1,2 @@
-export { RankingModal } from './RankingModal';
-export type { RankingModalProps } from './RankingModal';
+export { RankingModal } from './RankingModal'
+export type { RankingModalProps } from './RankingModal'

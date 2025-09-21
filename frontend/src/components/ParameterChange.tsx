@@ -1,32 +1,32 @@
-import{
+import {
   ParameterChangeWrapper,
   ProgressBar,
   ProgressFill,
   ProgressBox,
   ProgressValue,
-  ParameterEmoji
+  ParameterEmoji,
 } from '@/routes/game/-Game.styles'
 
 interface ParameterProps {
-  type: "eco" | "env" | "opi" | "mil";
-  value: number;
+  type: 'eco' | 'env' | 'opi' | 'mil'
+  value: number
 }
 
 const ParameterChange: React.FC<ParameterProps> = ({ type, value }) => {
-  const getEmoji = (t: ParameterProps["type"]) => {
+  const getEmoji = (t: ParameterProps['type']) => {
     switch (t) {
-      case "eco":
-        return "💰";
-      case "env":
-        return "🌱";
-      case "opi":
-        return "👥";
-      case "mil":
-        return "🛡️";
+      case 'eco':
+        return '💰'
+      case 'env':
+        return '🌱'
+      case 'opi':
+        return '👥'
+      case 'mil':
+        return '🛡️'
       default:
-        return "❓";
+        return '❓'
     }
-  };
+  }
 
   return (
     <ParameterChangeWrapper>
@@ -38,7 +38,7 @@ const ParameterChange: React.FC<ParameterProps> = ({ type, value }) => {
         <ProgressValue>{value}</ProgressValue>
       </ProgressBox>
     </ParameterChangeWrapper>
-  );
-};
+  )
+}
 
-export default ParameterChange;
+export default ParameterChange
