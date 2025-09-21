@@ -100,7 +100,7 @@ function GameSetupPage() {
       user?.nickname || '플레이어',
       turn.number,
     )
-    navigate({ to: '/game' })
+    navigate({ to: '/game', search: { isFirstGame: true } })
   }
 
   const handleContinue = async () => {
