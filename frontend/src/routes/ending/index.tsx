@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router';
+import { useAudio } from '@/hooks/useAudio';
 import {
   Container,
   TopRightButton,
@@ -20,6 +21,8 @@ function RouteComponent() {
   const endingCode = searchParams.get('endingCode');
 
   const [ending, setEnding] = useState<any>(null);
+  const [fadeIn, setFadeIn] = useState(false);
+  const { playClickSound } = useAudio({ enableBgm: false });
 
 useEffect(() => {
   const fetchEnding = async () => {
@@ -31,6 +34,16 @@ useEffect(() => {
       const data = await res.json();
       console.log(data.data);
       setEnding(data.data);
+      
+      // 게임 오버 사운드 재생
+      const gameOverSound = new Audio('/sounds/game-over-arcade-6435.mp3');
+      gameOverSound.volume = 0.7;
+      gameOverSound.play().catch(console.error);
+      
+      // 페이드인 애니메이션 시작
+      setTimeout(() => {
+        setFadeIn(true);
+      }, 300);
     } catch (err) {
       console.error(err);
     }
@@ -48,8 +61,10 @@ useEffect(() => {
 
       <EndingImage 
         src={ending.assets.imageUrl}
-        alt={ending.code} />
-      <EndingText>
+        alt={ending.code}
+        fadeIn={fadeIn}
+      />
+      <EndingText fadeIn={fadeIn}>
         <h2>{ending.content}</h2>
       </EndingText>
 

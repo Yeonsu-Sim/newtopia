@@ -216,6 +216,25 @@ export const EventIcon = styled.img<{ x: number; y: number }>`
   cursor: pointer;
 
   width: 10%; 
+  
+  &.pop-animation {
+    animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  @keyframes popIn {
+    0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.2);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+  }
 `;
 
 export const LodingIcon = styled.img<{ x: number; y: number }>`

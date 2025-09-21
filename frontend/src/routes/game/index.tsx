@@ -23,6 +23,7 @@ import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
 import { useGame } from '@/hooks/useGame';
 import { useGamePlay } from '@/hooks/useGamePlay';
 import { useAuthStore } from '@/store/authStore';
+import { useAudio } from '@/hooks/useAudio';
 import FeedbackToastContainer from '@/components/FeedbackToast/FeedbackToastContainer';
 import { HotTopic } from '@/components/common/HotTopic/HotTopic';
 
@@ -40,11 +41,15 @@ function RouteComponent() {
   const [currentArticle, setCurrentArticle] = useState<any>(null);
   const [currentCard, setCurrentCard] = useState<any>(null);
   const [gameId, setGameId] = useState<number | null>(null);
+  const [selectedChoiceCode, setSelectedChoiceCode] = useState<"A" | "B" | null>(null);
+  const [showEventIcon, setShowEventIcon] = useState(false);
+  const [eventIconAnimation, setEventIconAnimation] = useState(false);
 
   const { fetchOngoingGame, fetchGameById, createNewGame } = useGame();
   const { submitChoice } = useGamePlay();
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { playClickSound } = useAudio({ enableBgm: false });
 
   const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null);
 
@@ -77,6 +82,21 @@ function RouteComponent() {
 
           setCurrentCard(startTurn.card);
           setCurrentArticle(startTurn.card.relatedArticle);
+          
+          // 말풍선 아이콘 애니메이션과 사운드
+          setTimeout(() => {
+            setShowEventIcon(true);
+            setEventIconAnimation(true);
+            // 팝업 사운드 재생
+            const popSound = new Audio('/sounds/game-bonus-02-294436.mp3');
+            popSound.volume = 0.7;
+            popSound.play().catch(console.error);
+            
+            // 애니메이션 클래스 제거
+            setTimeout(() => {
+              setEventIconAnimation(false);
+            }, 600);
+          }, 100);
         } else {
           const newGame = await createNewGame(countryName.trim());
           const startTurn = newGame.data.game.turn;
@@ -92,6 +112,21 @@ function RouteComponent() {
 
           setCurrentCard(startTurn.card);
           setCurrentArticle(startTurn.card.relatedArticle);
+          
+          // 말풍선 아이콘 애니메이션과 사운드
+          setTimeout(() => {
+            setShowEventIcon(true);
+            setEventIconAnimation(true);
+            // 팝업 사운드 재생
+            const popSound = new Audio('/sounds/game-bonus-02-294436.mp3');
+            popSound.volume = 0.7;
+            popSound.play().catch(console.error);
+            
+            // 애니메이션 클래스 제거
+            setTimeout(() => {
+              setEventIconAnimation(false);
+            }, 600);
+          }, 100);
         }
       } catch (err) {
         console.error(err);
@@ -104,6 +139,7 @@ function RouteComponent() {
   const handleChoice = async (choiceCode: "A" | "B") => {
     if (!gameId || !currentCard) return;
 
+    setSelectedChoiceCode(choiceCode);
     setCurrentArticle(currentCard.relatedArticle);
     setGuestOpen(false);
     setChoiceOpen(false);
@@ -125,6 +161,22 @@ function RouteComponent() {
         setCurrentCard(nextTurn.card);
         setStats(nextTurn.countryStats);
         setTurn(nextTurn.number);
+        
+        // 새로운 턴에서 말풍선 아이콘 다시 표시
+        setShowEventIcon(false);
+        setTimeout(() => {
+          setShowEventIcon(true);
+          setEventIconAnimation(true);
+          // 팝업 사운드 재생
+          const popSound = new Audio('/sounds/game-bonus-02-294436.mp3');
+          popSound.volume = 0.7;
+          popSound.play().catch(console.error);
+          
+          // 애니메이션 클래스 제거
+          setTimeout(() => {
+            setEventIconAnimation(false);
+          }, 600);
+        }, 500);
       }
     } catch (err) {
       console.error(err);
@@ -139,7 +191,13 @@ function RouteComponent() {
 
   const handleFeedbackClose = () => {
     setFeedbackOpen(false);
-    const messages = currentCard?.comments || dummyComments;
+    
+    let messages = dummyComments;
+    if (currentCard && selectedChoiceCode) {
+      const selectedChoice = currentCard.choices?.find((choice: any) => choice.code === selectedChoiceCode);
+      messages = selectedChoice?.comments || dummyComments;
+    }
+    
     setToastMessages(messages);
   };
 
@@ -162,7 +220,15 @@ function RouteComponent() {
           {loading ? (
             <LodingIcon src="/icons/로딩중.png" x={50} y={20} />
           ) : (
-            <EventIcon src="/icons/말풍선.png" x={50} y={20} onClick={() => setGuestOpen(true)} />
+            showEventIcon && (
+              <EventIcon 
+                src="/icons/말풍선.png" 
+                x={50} 
+                y={20} 
+                className={eventIconAnimation ? 'pop-animation' : ''}
+                onClick={() => setGuestOpen(true)} 
+              />
+            )
           )}
           {currentStats && (
             <>
