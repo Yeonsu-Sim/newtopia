@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { getMyRanking, getTopRanking, getGameRanking } from '@/services/rankingApi';
+import { getMyRanking, getTopRanking } from '@/services/rankingApi';
 import type { RankingItem } from '@/services/rankingApi';
 import {
   ModalBackground,
@@ -9,9 +9,6 @@ import {
   ModalHeader,
   HeaderTab,
   CloseButton,
-  SearchSection,
-  SearchInput,
-  SearchButton,
   TableContainer,
   RankingTable,
   TableHeader,
@@ -32,7 +29,7 @@ export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) =
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState<TabType>('integrated');
   const [rankingData, setRankingData] = useState<RankingItem[]>([]);
-  const [searchGameId, setSearchGameId] = useState<string>('');
+  // const [searchGameId, setSearchGameId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
@@ -68,35 +65,35 @@ export const RankingModal: React.FC<RankingModalProps> = ({ isOpen, onClose }) =
       return;
     }
     setActiveTab(tab);
-    setSearchGameId('');
+    // setSearchGameId('');
     setError('');
   };
 
-  const handleSearch = async () => {
-    if (!searchGameId.trim()) {
-      setError('게임 ID를 입력해주세요.');
-      return;
-    }
+  // const handleSearch = async () => {
+  //   if (!searchGameId.trim()) {
+  //     setError('게임 ID를 입력해주세요.');
+  //     return;
+  //   }
 
-    const gameId = parseInt(searchGameId.trim());
-    if (isNaN(gameId)) {
-      setError('올바른 게임 ID를 입력해주세요.');
-      return;
-    }
+  //   const gameId = parseInt(searchGameId.trim());
+  //   if (isNaN(gameId)) {
+  //     setError('올바른 게임 ID를 입력해주세요.');
+  //     return;
+  //   }
 
-    setIsLoading(true);
-    setError('');
+  //   setIsLoading(true);
+  //   setError('');
 
-    try {
-      const data = await getGameRanking(gameId);
-      setRankingData([data]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '게임 검색에 실패했습니다.');
-      setRankingData([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   try {
+  //     const data = await getGameRanking(gameId);
+  //     setRankingData([data]);
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : '게임 검색에 실패했습니다.');
+  //     setRankingData([]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toISOString().split('T')[0];

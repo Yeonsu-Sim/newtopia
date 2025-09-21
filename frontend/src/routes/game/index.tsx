@@ -49,7 +49,7 @@ function RouteComponent() {
   const { submitChoice } = useGamePlay();
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const { playClickSound } = useAudio({ enableBgm: false });
+  useAudio({ enableBgm: false });
 
   const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null);
 

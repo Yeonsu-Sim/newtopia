@@ -58,7 +58,6 @@ useEffect(() => {
 
   return (
     <Container>
-
       <EndingImage 
         src={ending.assets.imageUrl}
         alt={ending.code}
@@ -69,10 +68,16 @@ useEffect(() => {
       </EndingText>
 
       <ButtonGroup>
-        <NextButton onClick={() => navigate({ to: '/report' })}>
+        <NextButton onClick={() => {
+          playClickSound();
+          navigate({ to: '/report' });
+        }}>
           리포트 보러가기
         </NextButton>
-        <TopRightButton onClick={() => navigate({ to: '/' })}>
+        <TopRightButton onClick={() => {
+          playClickSound();
+          navigate({ to: '/' });
+        }}>
           메인으로
         </TopRightButton>
       </ButtonGroup>
