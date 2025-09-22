@@ -214,26 +214,30 @@ function RouteComponent() {
 
     // 지연된 다음 턴 데이터 적용
     if (pendingTurnData) {
+      // 1. 먼저 말풍선 완전히 숨김
+      setShowEventIcon(false)
+
+      // 2. 상태 업데이트를 동기적으로 처리
       setCurrentCard(pendingTurnData.card)
       setStats(pendingTurnData.countryStats)
       setTurn(pendingTurnData.number)
       setPendingTurnData(null)
 
-      // 새로운 턴에서 말풍선 아이콘 다시 표시
-      setShowEventIcon(false)
-      setTimeout(() => {
+      // 3. 다음 프레임에서 새로운 말풍선 즉시 표시 (타이밍 이슈 방지)
+      requestAnimationFrame(() => {
         setShowEventIcon(true)
         setEventIconAnimation(true)
+
         // 팝업 사운드 재생
         const popSound = new Audio('/sounds/game-bonus-02-294436.mp3')
         popSound.volume = 0.7
         popSound.play().catch(console.error)
 
-        // 애니메이션 클래스 제거
+        // 애니메이션만 짧게 처리
         setTimeout(() => {
           setEventIconAnimation(false)
         }, 600)
-      }, 500)
+      })
     }
   }
 
