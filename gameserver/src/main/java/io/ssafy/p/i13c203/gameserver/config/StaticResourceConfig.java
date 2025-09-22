@@ -1,4 +1,4 @@
-package io.ssafy.p.i13c203.gameserver.global.config;
+package io.ssafy.p.i13c203.gameserver.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

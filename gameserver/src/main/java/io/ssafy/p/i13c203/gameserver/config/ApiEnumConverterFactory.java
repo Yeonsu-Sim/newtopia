@@ -1,4 +1,4 @@
-package io.ssafy.p.i13c203.gameserver.global.config;
+package io.ssafy.p.i13c203.gameserver.config;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;

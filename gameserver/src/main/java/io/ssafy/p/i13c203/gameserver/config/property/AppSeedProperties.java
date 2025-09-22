@@ -1,4 +1,4 @@
-package io.ssafy.p.i13c203.gameserver.global.config.property;
+package io.ssafy.p.i13c203.gameserver.config.property;
 
 import lombok.Getter;
 import lombok.Setter;

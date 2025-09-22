@@ -1,6 +1,6 @@
 package io.ssafy.p.i13c203.gameserver.seed;
 
-import io.ssafy.p.i13c203.gameserver.global.config.property.AppSeedProperties;
+import io.ssafy.p.i13c203.gameserver.config.property.AppSeedProperties;
 import io.ssafy.p.i13c203.gameserver.domain.image.entity.Image;
 import io.ssafy.p.i13c203.gameserver.domain.image.entity.ImageStatus;
 import io.ssafy.p.i13c203.gameserver.domain.image.repository.ImageRepository;

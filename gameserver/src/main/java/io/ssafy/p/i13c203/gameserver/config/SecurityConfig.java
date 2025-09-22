@@ -1,4 +1,4 @@
-package io.ssafy.p.i13c203.gameserver.global.config;
+package io.ssafy.p.i13c203.gameserver.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ssafy.p.i13c203.gameserver.auth.filter.JsonAuthenticationFilter;
