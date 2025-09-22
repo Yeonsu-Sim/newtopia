@@ -165,12 +165,14 @@ const ArticleDialog: React.FC<ArticleDialogProps> = ({
       setVisibleComments((prev) =>
         Math.min(prev + 1, selectedChoice.comments.length),
       )
-    }, 700) // 0.7초 간격으로 댓글 로딩
+    }, 800) // 0.8초 간격으로 댓글 로딩
 
     return () => clearTimeout(timer)
   }, [isScrolledToComments, visibleComments, selectedChoice.comments.length])
 
   const handleRelatedArticleClick = () => {
+    // 모든 댓글이 로딩되지 않았으면 클릭 방지
+    if (visibleComments < selectedChoice.comments.length) return
     playClickSound()
     onViewRelatedArticle()
   }
@@ -238,10 +240,13 @@ const ArticleDialog: React.FC<ArticleDialogProps> = ({
 
         <NavigationButtons>
           <RelatedArticleButton
-            $disabled={false}
+            $disabled={visibleComments < selectedChoice.comments.length}
             onClick={handleRelatedArticleClick}
           >
-            관련기사 보기
+            {visibleComments < selectedChoice.comments.length
+              ? `댓글 로딩 중... (${visibleComments}/${selectedChoice.comments.length})`
+              : '관련기사 보기'
+            }
           </RelatedArticleButton>
         </NavigationButtons>
       </ArticleContainer>

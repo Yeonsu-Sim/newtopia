@@ -21,15 +21,18 @@ interface FeedbackDialogProps {
   open: boolean
   article: Article
   onClose: () => void
+  loading?: boolean
 }
 
 const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
   article,
   onClose,
+  loading = false,
 }) => {
   const { playClickSound } = useAudio({ enableBgm: false })
 
   const handleClose = () => {
+    if (loading) return
     playClickSound()
     onClose()
   }
@@ -63,7 +66,9 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
             </ContentArea>
           )}
         </ContentContainer>
-        <CloseButton onClick={handleClose}>확인</CloseButton>
+        <CloseButton onClick={handleClose} disabled={loading}>
+          {loading ? '처리 중...' : '확인'}
+        </CloseButton>
       </DialogBox>
     </DialogOverlay>
   )

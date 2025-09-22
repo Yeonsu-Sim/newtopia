@@ -385,6 +385,7 @@ function RouteComponent() {
           open
           article={currentArticle}
           onClose={handleFeedbackClose}
+          loading={loading}
         />
       )}
 
