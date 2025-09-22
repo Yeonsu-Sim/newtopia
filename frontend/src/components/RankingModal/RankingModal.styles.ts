@@ -1,7 +1,7 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 interface HeaderTabProps {
-  $isActive: boolean;
+  $isActive: boolean
 }
 
 export const ModalOverlay = styled.div`
@@ -11,14 +11,14 @@ export const ModalOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
+`
 
 export const ModalBackground = styled.div`
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
-`;
+`
 
 export const ModalContent = styled.div`
   position: relative;
@@ -30,9 +30,11 @@ export const ModalContent = styled.div`
   min-height: 90vh;
   max-height: 95vh;
   border-radius: 40px;
-  border: 10px solid #F9BF26;
-  background: #E49000;
-  box-shadow: 4px 4px 8px 4px #A35400 inset, 0px 0px 0 0px #D57500;
+  border: 10px solid #f9bf26;
+  background: #e49000;
+  box-shadow:
+    4px 4px 8px 4px #a35400 inset,
+    0px 0px 0 0px #d57500;
   z-index: 1001;
 
   @media (max-width: 768px) {
@@ -40,7 +42,7 @@ export const ModalContent = styled.div`
     min-width: 95vw;
     max-height: 90vh;
   }
-`;
+`
 
 export const CloseButton = styled.button`
   position: absolute;
@@ -64,7 +66,7 @@ export const CloseButton = styled.button`
     background: rgba(0, 0, 0, 0.5);
     transform: scale(1.1);
   }
-`;
+`
 
 export const ModalHeader = styled.div`
   display: flex;
@@ -78,7 +80,7 @@ export const ModalHeader = styled.div`
     margin-bottom: 20px;
     flex-direction: column;
   }
-`;
+`
 
 export const HeaderTab = styled.button<HeaderTabProps>`
   background: none;
@@ -88,11 +90,11 @@ export const HeaderTab = styled.button<HeaderTabProps>`
   border-radius: 10px;
   transition: all 0.2s ease;
 
-  color: #FFF;
+  color: #fff;
   text-align: center;
-  text-shadow: 3px 3px 0 #6E3400;
+  text-shadow: 3px 3px 0 #6e3400;
   -webkit-text-stroke-width: 2px;
-  -webkit-text-stroke-color: #8E4600;
+  -webkit-text-stroke-color: #8e4600;
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-size: 42px;
   font-style: normal;
@@ -100,7 +102,9 @@ export const HeaderTab = styled.button<HeaderTabProps>`
   line-height: 50px;
   letter-spacing: 2px;
 
-  ${({ $isActive }) => $isActive && `
+  ${({ $isActive }) =>
+    $isActive &&
+    `
     background: rgba(255, 255, 255, 0.2);
   `}
 
@@ -114,7 +118,7 @@ export const HeaderTab = styled.button<HeaderTabProps>`
     letter-spacing: 3px;
     padding: 5px 15px;
   }
-`;
+`
 
 export const SearchSection = styled.div`
   display: flex;
@@ -125,15 +129,15 @@ export const SearchSection = styled.div`
     flex-direction: column;
     gap: 10px;
   }
-`;
+`
 
 interface SearchInputProps {
-  $hasError?: boolean;
+  $hasError?: boolean
 }
 
 export const SearchInput = styled.input<SearchInputProps>`
   padding: 12px 20px;
-  border: 3px solid #6E3400;
+  border: 3px solid #6e3400;
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.9);
   font-family: 'PFStardustExtraBold', 'Noto Sans KR', sans-serif;
@@ -144,26 +148,26 @@ export const SearchInput = styled.input<SearchInputProps>`
 
   &:focus {
     outline: none;
-    border-color: #F9BF26;
+    border-color: #f9bf26;
     background: white;
   }
 
   &::placeholder {
-    color: ${({ $hasError }) => $hasError ? '#dc2626' : '#666'};
+    color: ${({ $hasError }) => ($hasError ? '#dc2626' : '#666')};
   }
 
   @media (max-width: 768px) {
     font-size: 18px;
     min-width: 150px;
   }
-`;
+`
 
 export const SearchButton = styled.button`
   padding: 12px 24px;
-  border: 3px solid #6E3400;
+  border: 3px solid #6e3400;
   border-radius: 15px;
-  background: #F9BF26;
-  color: #6E3400;
+  background: #f9bf26;
+  color: #6e3400;
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-size: 24px;
   font-weight: 400;
@@ -171,7 +175,7 @@ export const SearchButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #FFD700;
+    background: #ffd700;
     transform: translateY(-2px);
   }
 
@@ -183,14 +187,14 @@ export const SearchButton = styled.button`
     font-size: 18px;
     padding: 10px 20px;
   }
-`;
+`
 
 export const TableContainer = styled.div`
   flex: 1;
   overflow-y: auto;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.1);
-  padding: 20px ;
+  padding: 20px;
 
   /* 스크롤바 스타일링 */
   &::-webkit-scrollbar {
@@ -203,21 +207,21 @@ export const TableContainer = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #F9BF26;
+    background: #f9bf26;
     border-radius: 6px;
     border: 2px solid rgba(0, 0, 0, 0.2);
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #FFD700;
+    background: #ffd700;
   }
-`;
+`
 
 export const RankingTable = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`;
+`
 
 export const TableHeader = styled.div`
   display: grid;
@@ -232,7 +236,7 @@ export const TableHeader = styled.div`
     gap: 10px;
     padding: 10px 15px;
   }
-`;
+`
 
 export const TableRow = styled.div`
   display: grid;
@@ -251,14 +255,18 @@ export const TableRow = styled.div`
     gap: 10px;
     padding: 10px 15px;
   }
-`;
+`
 
 export const TableCell = styled.div`
-  color: #FFFFFF;
+  color: #ffffff;
   text-align: center;
-  text-shadow: 2px 2px 4px #6E3400, -1px -1px 2px #6E3400, 1px -1px 2px #6E3400, -1px 1px 2px #6E3400;
+  text-shadow:
+    2px 2px 4px #6e3400,
+    -1px -1px 2px #6e3400,
+    1px -1px 2px #6e3400,
+    -1px 1px 2px #6e3400;
   -webkit-text-stroke-width: 0px;
-  -webkit-text-stroke-color: #6E3400;
+  -webkit-text-stroke-color: #6e3400;
   // 이거 쉐도우가 왜 피그마랑 반대로 적용되는지 확인필요
   font-family: 'PFStardust', 'Noto Sans KR', sans-serif;
   font-size: 32px;
@@ -285,18 +293,18 @@ export const TableCell = styled.div`
     letter-spacing: 1px;
     -webkit-text-stroke-width: 0.5px;
   }
-`;
+`
 
 export const LoadingSpinner = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: #FFF;
+  color: #fff;
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
   font-size: 32px;
-  text-shadow: 4px 4px 0 #6E3400;
-`;
+  text-shadow: 4px 4px 0 #6e3400;
+`
 
 export const ErrorMessage = styled.div`
   background: rgba(220, 38, 38, 0.8);
@@ -313,4 +321,4 @@ export const ErrorMessage = styled.div`
     font-size: 18px;
     padding: 10px 15px;
   }
-`;
+`

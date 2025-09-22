@@ -1,1 +1,1 @@
-export { SuggestionModal } from '@/components/SuggestionModal/SuggestionModal';
+export { SuggestionModal } from '@/components/SuggestionModal/SuggestionModal'

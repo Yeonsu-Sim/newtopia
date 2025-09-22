@@ -1,10 +1,10 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components'
 
 interface NewsItemProps {
-  $isVisible: boolean;
-  $index: number;
-  $currentIndex: number;
-  $totalItems: number;
+  $isVisible: boolean
+  $index: number
+  $currentIndex: number
+  $totalItems: number
 }
 
 // 위에서 아래로 슬라이드되는 애니메이션
@@ -17,7 +17,7 @@ const slideInFromTop = keyframes`
     transform: translateY(0);
     opacity: 1;
   }
-`;
+`
 
 // 아래로 슬라이드되어 나가는 애니메이션
 const slideOutToBottom = keyframes`
@@ -29,7 +29,7 @@ const slideOutToBottom = keyframes`
     transform: translateY(100%);
     opacity: 0;
   }
-`;
+`
 
 export const HotTopicContainer = styled.div`
   display: flex;
@@ -38,7 +38,7 @@ export const HotTopicContainer = styled.div`
   padding: 0px 40px;
   justify-content: center;
   align-items: center;
-  background: rgba(34, 41, 59, 0.70);
+  background: rgba(34, 41, 59, 0.7);
   position: fixed;
   bottom: 0;
   left: 50%;
@@ -53,7 +53,7 @@ export const HotTopicContainer = styled.div`
   @media (max-width: 768px) {
     padding: 8px 16px;
   }
-`;
+`
 
 export const ContentWrapper = styled.div`
   display: flex;
@@ -69,11 +69,11 @@ export const ContentWrapper = styled.div`
   @media (max-width: 480px) {
     gap: 6px;
   }
-`;
+`
 
 export const HotTopicTitle = styled.h2`
-  color: #FFF;
-  font-family: "Gmarket Sans TTF", 'Noto Sans KR', sans-serif;
+  color: #fff;
+  font-family: 'GmarketSansTTF', 'NotoSans KR', sans-serif;
   font-size: 18px;
   font-style: normal;
   font-weight: 400;
@@ -91,7 +91,7 @@ export const HotTopicTitle = styled.h2`
     font-size: 16px;
     letter-spacing: 1.6px;
   }
-`;
+`
 
 export const NewsScrollContainer = styled.div`
   position: relative;
@@ -106,7 +106,7 @@ export const NewsScrollContainer = styled.div`
     height: 28px;
     justify-content: center;
   }
-`;
+`
 
 export const NewsItem = styled.div<NewsItemProps>`
   position: absolute;
@@ -116,33 +116,30 @@ export const NewsItem = styled.div<NewsItemProps>`
   justify-content: flex-start;
 
   /* 애니메이션 적용 */
-  animation: ${props =>
-    props.$isVisible
-      ? slideInFromTop
-      : slideOutToBottom
-  } 0.5s ease-in-out;
+  animation: ${(props) =>
+      props.$isVisible ? slideInFromTop : slideOutToBottom}
+    0.5s ease-in-out;
 
   /* 현재 보이는 아이템만 표시 */
-  opacity: ${props => props.$isVisible ? 1 : 0};
-  transform: ${props =>
+  opacity: ${(props) => (props.$isVisible ? 1 : 0)};
+  transform: ${(props) =>
     props.$isVisible
       ? 'translateY(0)'
       : props.$index < props.$currentIndex
         ? 'translateY(100%)'
-        : 'translateY(-100%)'
-  };
+        : 'translateY(-100%)'};
 
   transition: all 0.5s ease-in-out;
 
   @media (max-width: 768px) {
     justify-content: center;
   }
-`;
+`
 
 export const NewsLink = styled.button`
   background: none;
   border: none;
-  color: #FFF;
+  color: #fff;
   font-family: Galmuri14, 'Noto Sans KR', sans-serif;
   font-size: 18px;
   font-style: normal;
@@ -172,7 +169,7 @@ export const NewsLink = styled.button`
     font-size: 14px;
     letter-spacing: 1.4px;
   }
-`;
+`
 
 export const NewsIcon = styled.span`
   margin-right: 8px;
@@ -181,4 +178,4 @@ export const NewsIcon = styled.span`
   @media (max-width: 480px) {
     margin-right: 4px;
   }
-`;
+`

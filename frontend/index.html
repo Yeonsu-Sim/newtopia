@@ -1,13 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X68ZWN63SG"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-X68ZWN63SG"
+    ></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-X68ZWN63SG');
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+      gtag('config', 'G-X68ZWN63SG')
     </script>
 
     <meta charset="UTF-8" />
@@ -23,41 +28,59 @@
     <title>NEWTOPIA</title>
 
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-NTX9XN2G');</script>
+    <script>
+      ;(function (w, d, s, l, i) {
+        w[l] = w[l] || []
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : ''
+        j.async = true
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+        f.parentNode.insertBefore(j, f)
+      })(window, document, 'script', 'dataLayer', 'GTM-NTX9XN2G')
+    </script>
     <!-- End Google Tag Manager -->
 
     <!-- Maze User Testing Tracking -->
     <script>
-    (function (m, a, z, e) {
-      var s, t;
-      try {
-        t = m.sessionStorage.getItem('maze-us');
-      } catch (err) {}
-
-      if (!t) {
-        t = new Date().getTime();
+      ;(function (m, a, z, e) {
+        var s, t
         try {
-          m.sessionStorage.setItem('maze-us', t);
+          t = m.sessionStorage.getItem('maze-us')
         } catch (err) {}
-      }
 
-      s = a.createElement('script');
-      s.src = z + '?apiKey=' + e;
-      s.async = true;
-      a.getElementsByTagName('head')[0].appendChild(s);
-      m.mazeUniversalSnippetApiKey = e;
-    })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', 'dc1c0473-307d-4acb-b46d-fe922251521f');
+        if (!t) {
+          t = new Date().getTime()
+          try {
+            m.sessionStorage.setItem('maze-us', t)
+          } catch (err) {}
+        }
+
+        s = a.createElement('script')
+        s.src = z + '?apiKey=' + e
+        s.async = true
+        a.getElementsByTagName('head')[0].appendChild(s)
+        m.mazeUniversalSnippetApiKey = e
+      })(
+        window,
+        document,
+        'https://snippet.maze.co/maze-universal-loader.js',
+        'dc1c0473-307d-4acb-b46d-fe922251521f',
+      )
     </script>
     <!-- End Maze User Testing Tracking -->
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NTX9XN2G"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-NTX9XN2G"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
     <div id="app"></div>

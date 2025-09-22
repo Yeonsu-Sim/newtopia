@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   ModalOverlay,
   ModalBackground,
@@ -29,92 +29,92 @@ import {
   SubmitButtonText,
   ModalFrame,
   ModalBorder,
-  CloseButton
-} from '@/components/SuggestionModal/SuggestionModal.styles';
+  CloseButton,
+} from '@/components/SuggestionModal/SuggestionModal.styles'
 
 interface SuggestionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
 interface SuggestionForm {
-  type: string;
-  title: string;
-  content: string;
-  files: File[];
+  type: string
+  title: string
+  content: string
+  files: File[]
 }
 
 export const SuggestionModal: React.FC<SuggestionModalProps> = ({
   isOpen,
-  onClose
+  onClose,
 }) => {
   const [formData, setFormData] = useState<SuggestionForm>({
     type: '버그신고',
     title: '',
     content: '',
-    files: []
-  });
-  const [isLoading, setIsLoading] = useState(false);
+    files: [],
+  })
+  const [isLoading, setIsLoading] = useState(false)
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const handleInputChange = (field: keyof SuggestionForm, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setFormData(prev => ({
+    const files = Array.from(e.target.files || [])
+    setFormData((prev) => ({
       ...prev,
-      files: [...prev.files, ...files]
-    }));
-  };
+      files: [...prev.files, ...files],
+    }))
+  }
 
   const removeFile = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      files: prev.files.filter((_, i) => i !== index)
-    }));
-  };
+      files: prev.files.filter((_, i) => i !== index),
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!formData.title.trim() || !formData.content.trim()) {
-      alert('제목과 내용을 모두 입력해주세요.');
-      return;
+      alert('제목과 내용을 모두 입력해주세요.')
+      return
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     try {
       // TODO: API 호출 구현
-      await new Promise(resolve => setTimeout(resolve, 1000)); // 임시 지연
+      await new Promise((resolve) => setTimeout(resolve, 1000)) // 임시 지연
 
-      alert('건의사항이 성공적으로 제출되었습니다.');
+      alert('건의사항이 성공적으로 제출되었습니다.')
 
       // 폼 초기화
       setFormData({
         type: '버그신고',
         title: '',
         content: '',
-        files: []
-      });
+        files: [],
+      })
 
-      onClose();
+      onClose()
     } catch (error) {
-      console.error('건의사항 제출 중 오류 발생:', error);
-      alert('건의사항 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error('건의사항 제출 중 오류 발생:', error)
+      alert('건의사항 제출 중 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      onClose()
     }
-  };
+  }
 
   return (
     <ModalOverlay>
@@ -180,7 +180,7 @@ export const SuggestionModal: React.FC<SuggestionModalProps> = ({
                     onChange={handleFileSelect}
                   />
                   <FileUploadText>
-                    📎 이미지를 첨부해주세요  (선택사항)
+                    📎 이미지를 첨부해주세요 (선택사항)
                   </FileUploadText>
                 </FileUploadButton>
 
@@ -217,5 +217,5 @@ export const SuggestionModal: React.FC<SuggestionModalProps> = ({
         <CloseButton onClick={onClose}>✕</CloseButton>
       </ModalContent>
     </ModalOverlay>
-  );
-};
+  )
+}

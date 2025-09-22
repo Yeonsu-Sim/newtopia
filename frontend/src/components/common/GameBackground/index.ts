@@ -1,1 +1,1 @@
-export { GameBackground } from './GameBackground';
+export { GameBackground } from './GameBackground'

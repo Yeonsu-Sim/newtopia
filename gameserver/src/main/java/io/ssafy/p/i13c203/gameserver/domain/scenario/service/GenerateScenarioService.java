@@ -30,7 +30,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 @RequiredArgsConstructor
 @Slf4j
 public class GenerateScenarioService {
-
+    // api 될까
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -61,7 +61,11 @@ public class GenerateScenarioService {
             String jsonBody = objectMapper.writeValueAsString(chatRequest);
 
             // GPT API 호출 (문자열 직접 전송)
-            String apiUrl = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions";
+//            String apiUrl = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions";
+
+            String apiUrl = "https://api.openai.com/v1/chat/completions";
+
+
 
             String response = callGptApiWithString(jsonBody, apiUrl);
 
@@ -290,7 +294,7 @@ public class GenerateScenarioService {
     private HttpHeaders createApiHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-        headers.setBearerAuth("S13P22C203-45155ad1-760a-4e91-bebf-8a7db540fc92");
+        headers.setBearerAuth("${ssafy.gms.bearer-token}");
         headers.set("User-Agent", "Gameserver/1.0");
         headers.set("Accept", "application/json");
         return headers;

@@ -80,6 +80,8 @@ dependencies {
 	// Minio - Object Storage
 	implementation 'io.minio:minio:8.5.14'
 
+	// WebFlux - SSE 및 GMS 호출
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 }
 

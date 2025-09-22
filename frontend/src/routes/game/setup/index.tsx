@@ -1,11 +1,11 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { useGameStore } from '@/store/gameStore';
-import { useAuthStore } from '@/store/authStore';
-import { useAudio } from '@/hooks/useAudio';
-import { useGame } from '@/hooks/useGame';
-import { GameBackground } from '@/components/common/GameBackground';
-import { ContinueModal } from '@/components/ContinueModal/ContinueModal';
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { useGameStore } from '@/store/gameStore'
+import { useAuthStore } from '@/store/authStore'
+import { useAudio } from '@/hooks/useAudio'
+import { useGame } from '@/hooks/useGame'
+import { GameBackground } from '@/components/common/GameBackground'
+import { ContinueModal } from '@/components/ContinueModal/ContinueModal'
 import {
   SetupContainer,
   TitleSection,
@@ -17,42 +17,77 @@ import {
   CountryNameInput,
   InstructionText,
   BackButton,
-} from '@/routes/game/setup/-GameSetup.styles';
+  IntroTextContainer,
+  IntroTextLine,
+} from '@/routes/game/setup/-GameSetup.styles'
 
 export const Route = createFileRoute('/game/setup/')({
   component: GameSetupPage,
-});
+})
 
 function GameSetupPage() {
-  const navigate = useNavigate();
-  const { setGameStart } = useGameStore();
-  const { user } = useAuthStore();
-  const { playClickSound } = useAudio();
-  const { fetchOngoingGame, fetchGameById, createNewGame } = useGame();
+  const navigate = useNavigate()
+  const { setGameStart } = useGameStore()
+  const { user } = useAuthStore()
+  const { playClickSound } = useAudio()
+  const { fetchOngoingGame, fetchGameById, createNewGame } = useGame()
 
-  const [countryName, setCountryName] = useState('');
-  const [showNameInput, setShowNameInput] = useState(false);
-  const [ongoingGame, setOngoingGame] = useState<any>(null);
+  const [countryName, setCountryName] = useState('')
+  const [showNameInput, setShowNameInput] = useState(false)
+  const [ongoingGame, setOngoingGame] = useState<any>(null)
+  const [showIntroAnimation, setShowIntroAnimation] = useState(false)
+  const [currentTextIndex, setCurrentTextIndex] = useState(0)
+  const [animationComplete, setAnimationComplete] = useState(false)
+  const [gameData, setGameData] = useState<any>(null)
+  const [isApiLoading, setIsApiLoading] = useState(false)
 
   useEffect(() => {
     const checkGame = async () => {
       try {
-        const data = await fetchOngoingGame();
+        const data = await fetchOngoingGame()
         if (data?.data?.game) {
-          setOngoingGame(data.data.game);
+          setOngoingGame(data.data.game)
         } else {
-          setShowNameInput(true);
+          setShowNameInput(true)
         }
       } catch (err) {
-        console.error(err);
-        setShowNameInput(true);
+        console.error(err)
+        setShowNameInput(true)
       }
-    };
-    checkGame();
-  }, []);
+    }
+    checkGame()
+  }, [])
+
+  const introTexts = [
+    '당신은 이 세계의 지도자가 되었습니다...',
+    '이제는 국가를 운영하며',
+    '국가운영지표를 균형 있게 유지하면서',
+    '임기를 마쳐야합니다...',
+  ]
+
+  useEffect(() => {
+    if (showIntroAnimation && currentTextIndex < introTexts.length) {
+      const timer = setTimeout(() => {
+        setCurrentTextIndex(currentTextIndex + 1)
+      }, 2000)
+      return () => clearTimeout(timer)
+    } else if (showIntroAnimation && currentTextIndex >= introTexts.length) {
+      const timer = setTimeout(() => {
+        setAnimationComplete(true)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [showIntroAnimation, currentTextIndex, introTexts.length])
+
+  // 애니메이션과 API 둘 다 완료되면 자동으로 게임 시작
+  useEffect(() => {
+    if (animationComplete && gameData && !isApiLoading) {
+      startGame(gameData)
+    }
+  }, [animationComplete, gameData, isApiLoading])
 
   const startGame = (game: any) => {
-    const turn = game.turn;
+    const turn = game.turn
     setGameStart(
       game.gameId,
       {
@@ -63,53 +98,63 @@ function GameSetupPage() {
       },
       game.countryName,
       user?.nickname || '플레이어',
-      turn.number
-    );
-    navigate({ to: '/game' });
-  };
+      turn.number,
+    )
+    navigate({ to: '/game', search: { isFirstGame: true } })
+  }
 
   const handleContinue = async () => {
-    playClickSound();
-    if (!ongoingGame) return;
-    const data = await fetchGameById(ongoingGame.gameId);
+    playClickSound()
+    if (!ongoingGame) return
+    const data = await fetchGameById(ongoingGame.gameId)
     if (data?.data?.game) {
-      startGame(data.data.game);
+      startGame(data.data.game)
     }
-  };
+  }
 
   const handleNewGame = () => {
-    playClickSound();
-    setOngoingGame(null);
-    setShowNameInput(true);
-  };
+    playClickSound()
+    setOngoingGame(null)
+    setShowNameInput(true)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    playClickSound();
+    e.preventDefault()
+    playClickSound()
 
     if (!countryName.trim()) {
-      alert('나라 이름을 입력해주세요.');
-      return;
+      alert('나라 이름을 입력해주세요.')
+      return
     }
 
+    // 인트로 애니메이션과 API 호출을 동시에 시작
+    setShowNameInput(false)
+    setShowIntroAnimation(true)
+    setCurrentTextIndex(0)
+    setAnimationComplete(false)
+    setIsApiLoading(true)
+
+    // 백그라운드에서 API 호출 시작
     try {
-      const data = await createNewGame(countryName.trim());
+      const data = await createNewGame(countryName.trim())
       if (data?.data?.game) {
-        startGame(data.data.game);
+        setGameData(data.data.game)
       }
     } catch (err) {
-      console.error(err);
+      console.error(err)
+    } finally {
+      setIsApiLoading(false)
     }
-  };
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCountryName(e.target.value);
-  };
+    setCountryName(e.target.value)
+  }
 
   const handleBack = () => {
-    playClickSound();
-    navigate({ to: '/main' });
-  };
+    playClickSound()
+    navigate({ to: '/main' })
+  }
 
   return (
     <SetupContainer>
@@ -157,6 +202,36 @@ function GameSetupPage() {
           </InstructionText>
         </>
       )}
+
+      {showIntroAnimation && (
+        <IntroTextContainer>
+          <div>
+            {introTexts.slice(0, currentTextIndex + 1).map((text, index) => (
+              <IntroTextLine
+                key={index}
+                $isActive={index === currentTextIndex}
+                style={{
+                  opacity: index <= currentTextIndex ? 1 : 0,
+                  transform:
+                    index <= currentTextIndex
+                      ? 'translateY(0)'
+                      : 'translateY(20px)',
+                  transition: 'all 1s ease',
+                  transitionDelay: '0.2s',
+                }}
+              >
+                {text}
+              </IntroTextLine>
+            ))}
+          </div>
+
+          {animationComplete && (isApiLoading || !gameData) && (
+            <InstructionText>
+              <p>시나리오 준비 중...</p>
+            </InstructionText>
+          )}
+        </IntroTextContainer>
+      )}
     </SetupContainer>
-  );
+  )
 }

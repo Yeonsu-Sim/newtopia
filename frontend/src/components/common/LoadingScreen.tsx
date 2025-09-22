@@ -1,17 +1,19 @@
-import React from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { GameBackground } from '@/components/common/GameBackground';
-import { useImageCache } from '@/hooks/useImageCache';
+import React from 'react'
+import { DotLottieReact } from '@lottiefiles/dotlottie-react'
+import { GameBackground } from '@/components/common/GameBackground'
+import { useImageCache } from '@/hooks/useImageCache'
 import {
   LoadingContainer,
   LoadingContent,
   LoadingTitle,
   LottieContainer,
-  FallbackBackground
-} from './LoadingScreen.styles';
+  FallbackBackground,
+} from './LoadingScreen.styles'
 
 export const LoadingScreen: React.FC = () => {
-  const { isImageCached, isChecking } = useImageCache('/backgrounds/background.jpg');
+  const { isImageCached, isChecking } = useImageCache(
+    '/backgrounds/background.jpg',
+  )
 
   return (
     <LoadingContainer>
@@ -34,5 +36,5 @@ export const LoadingScreen: React.FC = () => {
         </LottieContainer>
       </LoadingContent>
     </LoadingContainer>
-  );
-};
+  )
+}

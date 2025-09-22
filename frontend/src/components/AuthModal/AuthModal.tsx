@@ -1,6 +1,6 @@
-import React from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { useAuthForm } from '@/hooks/useAuthForm';
+import React from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { useAuthForm } from '@/hooks/useAuthForm'
 import {
   ModalOverlay,
   ModalBackground,
@@ -22,21 +22,21 @@ import {
   ModeSwitchButton,
   ModalFrame,
   ModalBorder,
-  CloseButton
-} from '@/components/AuthModal/AuthModal.styles';
+  CloseButton,
+} from '@/components/AuthModal/AuthModal.styles'
 
 interface AuthModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  initialMode?: 'login' | 'signup';
+  isOpen: boolean
+  onClose: () => void
+  initialMode?: 'login' | 'signup'
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
-  initialMode = 'login'
+  initialMode = 'login',
 }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const {
     mode,
     formData,
@@ -45,46 +45,54 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     handleInputChange,
     handleSubmit,
     switchMode,
-    switchToLogin
-  } = useAuthForm(initialMode);
+    switchToLogin,
+  } = useAuthForm(initialMode)
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const handleLoginSuccess = () => {
-    onClose(); // 모달 닫기
-    navigate({ to: '/main' }); // 메인 페이지로 이동
-  };
+    onClose() // 모달 닫기
+    navigate({ to: '/main' }) // 메인 페이지로 이동
+  }
 
   const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     await handleSubmit(
       handleLoginSuccess, // 로그인 성공 시 메인 페이지로 이동
       (email: string, password: string) => {
         // 회원가입 성공 시 로그인 모드로 전환하고 정보 자동 입력
-        switchToLogin(email, password);
-      }
-    );
-  };
+        switchToLogin(email, password)
+      },
+    )
+  }
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      onClose()
     }
-  };
+  }
 
   return (
     <ModalOverlay>
       <ModalBackground onClick={handleOverlayClick} />
-      
+
       <ModalContent>
         <ModalInner>
           {/* 헤더 */}
           <ModalHeader>
             <HeaderTitle>
-              <p>{mode === 'login' ? 'Newtopia에 오신 것을 환영합니다' : 'Newtopia 회원가입'}</p>
+              <p>
+                {mode === 'login'
+                  ? 'Newtopia에 오신 것을 환영합니다'
+                  : 'Newtopia 회원가입'}
+              </p>
             </HeaderTitle>
             <HeaderSubtitle>
-              <p>{mode === 'login' ? '계정으로 로그인하세요.' : '새 계정을 만들어 통치의 여정을 시작하세요.'}</p>
+              <p>
+                {mode === 'login'
+                  ? '계정으로 로그인하세요.'
+                  : '새 계정을 만들어 통치의 여정을 시작하세요.'}
+              </p>
             </HeaderSubtitle>
           </ModalHeader>
 
@@ -99,7 +107,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <Input
                     type="text"
                     value={formData.nickname}
-                    onChange={(e) => handleInputChange('nickname', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange('nickname', e.target.value)
+                    }
                     placeholder="닉네임을 입력해주세요"
                     required
                   />
@@ -122,7 +132,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <Input
                   type="password"
                   value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange('password', e.target.value)
+                  }
                   placeholder="비밀번호를 입력해주세요"
                   required
                   minLength={6}
@@ -135,7 +147,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <Input
                     type="password"
                     value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange('confirmPassword', e.target.value)
+                    }
                     placeholder="비밀번호를 다시 입력해주세요"
                     required
                     minLength={6}
@@ -148,7 +162,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <SubmitButton type="submit" disabled={isLoading}>
                   <SubmitButtonInner>
                     <SubmitButtonText>
-                      <p>{isLoading ? '처리 중...' : (mode === 'login' ? '로그인' : '회원가입')}</p>
+                      <p>
+                        {isLoading
+                          ? '처리 중...'
+                          : mode === 'login'
+                            ? '로그인'
+                            : '회원가입'}
+                      </p>
                     </SubmitButtonText>
                   </SubmitButtonInner>
                 </SubmitButton>
@@ -158,7 +178,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* 모드 전환 */}
             <ModeSwitch>
               <ModeSwitchButton type="button" onClick={switchMode}>
-                {mode === 'login' ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인'}
+                {mode === 'login'
+                  ? '계정이 없으신가요? 회원가입'
+                  : '이미 계정이 있으신가요? 로그인'}
               </ModeSwitchButton>
             </ModeSwitch>
           </ModalForm>
@@ -169,5 +191,5 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <CloseButton onClick={onClose}>✕</CloseButton>
       </ModalContent>
     </ModalOverlay>
-  );
-};
+  )
+}

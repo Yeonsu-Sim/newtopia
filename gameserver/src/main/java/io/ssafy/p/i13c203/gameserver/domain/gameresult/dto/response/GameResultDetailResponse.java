@@ -1,6 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.response;
 
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CardType;
+import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.PressReleaseDoc;
 import java.util.List;
 
 public record GameResultDetailResponse(
@@ -50,11 +51,24 @@ public record GameResultDetailResponse(
 
     public record Choice(
             String code,
-            String label
+            String label,
+            PressRelease pressRelease,
+            List<String> comments
     ) {}
+
+    public record PressRelease(
+        String title,
+        String url,
+        String content
+    ) {
+        public static PressRelease from(PressReleaseDoc p) {
+            return new PressRelease(p.title(), p.imaUrl(), p.content());
+        }
+    }
 
     public record RelatedArticle(
             String title,
-            String url
+            String url,
+            String content
     ) {}
 }

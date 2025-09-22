@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { fetchHotNews } from '@/services/hotNewsService';
+import React, { useState, useEffect } from 'react'
+import { fetchHotNews } from '@/services/hotNewsService'
 import {
   HotTopicContainer,
   HotTopicTitle,
@@ -7,57 +7,55 @@ import {
   NewsItem,
   NewsIcon,
   NewsLink,
-  ContentWrapper
-} from './HotTopic.styles';
+  ContentWrapper,
+} from './HotTopic.styles'
 
 interface NewsData {
-  title: string;
-  url: string;
+  title: string
+  url: string
 }
 
 export interface HotTopicProps {
-  scrollInterval?: number;
+  scrollInterval?: number
 }
 
 export const HotTopic: React.FC<HotTopicProps> = ({
-  scrollInterval = 5000
+  scrollInterval = 5000,
 }) => {
-  const [newsData, setNewsData] = useState<NewsData[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [newsData, setNewsData] = useState<NewsData[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const loadHotNews = async () => {
       try {
-        setIsLoading(true);
-        const hotNewsData = await fetchHotNews(20);
+        setIsLoading(true)
+        const hotNewsData = await fetchHotNews(20)
         const formattedNews: NewsData[] = hotNewsData.map((item) => ({
           title: item.title,
-          url: item.sourceUrl
-        }));
-        setNewsData(formattedNews);
+          url: item.sourceUrl,
+        }))
+        setNewsData(formattedNews)
       } catch (error) {
-        console.error('Failed to load hot news:', error);
-        setNewsData([]);
+        console.error('Failed to load hot news:', error)
+        setNewsData([])
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    loadHotNews();
-  }, []);
+    loadHotNews()
+  }, [])
 
   useEffect(() => {
-    if (newsData.length === 0) return;
+    if (newsData.length === 0) return
 
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        (prevIndex + 1) % newsData.length
-      );
-    }, scrollInterval);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % newsData.length)
+    }, scrollInterval)
 
-    return () => clearInterval(interval);
-  }, [newsData.length, scrollInterval]);
+    return () => clearInterval(interval)
+  }, [newsData.length, scrollInterval])
 
   if (isLoading) {
     return (
@@ -79,7 +77,7 @@ export const HotTopic: React.FC<HotTopicProps> = ({
           </NewsScrollContainer>
         </ContentWrapper>
       </HotTopicContainer>
-    );
+    )
   }
 
   if (newsData.length === 0) {
@@ -102,12 +100,12 @@ export const HotTopic: React.FC<HotTopicProps> = ({
           </NewsScrollContainer>
         </ContentWrapper>
       </HotTopicContainer>
-    );
+    )
   }
 
   const handleNewsClick = (url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <HotTopicContainer>
@@ -132,5 +130,5 @@ export const HotTopic: React.FC<HotTopicProps> = ({
         </NewsScrollContainer>
       </ContentWrapper>
     </HotTopicContainer>
-  );
-};
+  )
+}

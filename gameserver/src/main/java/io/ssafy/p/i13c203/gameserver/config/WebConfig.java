@@ -1,5 +1,6 @@
 package io.ssafy.p.i13c203.gameserver.config;
 
+import io.ssafy.p.i13c203.gameserver.config.converter.ApiEnumConverterFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
