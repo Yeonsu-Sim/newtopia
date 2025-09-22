@@ -1,4 +1,4 @@
-package io.ssafy.p.i13c203.gameserver.domain.gameresult.adapter;
+package io.ssafy.p.i13c203.gameserver.domain.gameresult.reader;
 
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.CardDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.CountryStatsDoc;

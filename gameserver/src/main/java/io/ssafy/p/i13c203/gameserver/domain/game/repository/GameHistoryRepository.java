@@ -17,4 +17,7 @@ public interface GameHistoryRepository extends JpaRepository<GameHistory, Long> 
             Long gameId, int startTurn, int endTurn
     );
 
+    // 전체 턴 기록 조회 (오름차순)
+    List<GameHistory> findByGameIdOrderByTurnAsc(Long gameId);
+
 }
