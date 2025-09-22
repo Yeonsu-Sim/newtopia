@@ -28,7 +28,7 @@ public class Ranking {
   private Long rankingId;
 
   @OneToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "id", nullable = false, unique = true)
+  @JoinColumn(name = "game_id", nullable = false, unique = true)
   private Game game;
 
   @Column(nullable = false)
