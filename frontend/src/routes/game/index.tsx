@@ -210,6 +210,7 @@ function RouteComponent() {
 
   const handleFeedbackClose = () => {
     setFeedbackOpen(false)
+    setSelectedChoiceCode(null) // 이전 턴 선택 초기화
 
     // 지연된 다음 턴 데이터 적용
     if (pendingTurnData) {
