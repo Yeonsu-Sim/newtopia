@@ -1,5 +1,8 @@
 package io.ssafy.p.i13c203.gameserver.domain.image.controller;
 
+import io.ssafy.p.i13c203.gameserver.domain.image.dto.response.ImageUploadResponse;
+import io.ssafy.p.i13c203.gameserver.domain.image.entity.ImageStatus;
+import io.ssafy.p.i13c203.gameserver.domain.image.service.ImageService;
 import io.ssafy.p.i13c203.gameserver.auth.security.CustomUserDetails;
 import io.ssafy.p.i13c203.gameserver.domain.image.dto.response.ImageUploadResponse;
 import io.ssafy.p.i13c203.gameserver.domain.image.entity.ImageStatus;
@@ -9,6 +12,7 @@ import io.ssafy.p.i13c203.gameserver.global.APIResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +39,7 @@ public class ImageController {
 
         // contentType 이 null 이면 거부
 
+
         Member member = details.getMember();
 
         ImageUploadResponse upload = imageService.upload(file, member, domain);
@@ -45,6 +50,7 @@ public class ImageController {
         );
 
     }
+
 
     // api/v1/files/public
     @PostMapping(value = "/public", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -61,6 +67,26 @@ public class ImageController {
         }
 
         ImageUploadResponse upload = imageService.uploadPublic(file, domain);
+
+        return ResponseEntity.ok(
+                APIResponse.success(upload)
+        );
+    }
+
+    // 건의사항 이미지 전용 업로드 (인증 불필요)
+    @PostMapping(value = "/suggestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<APIResponse<ImageUploadResponse, Void>> uploadForSuggestion(
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+
+        String contentType = file.getContentType();
+        Set<String> allowed = Set.of("image/png", "image/jpeg", "image/gif", "image/webp");
+
+        if (contentType == null || !allowed.contains(contentType)) {
+            throw new IllegalArgumentException("Unsupported file type");
+        }
+
+        ImageUploadResponse upload = imageService.uploadPublic(file, "suggestion");
 
         return ResponseEntity.ok(
                 APIResponse.success(upload)

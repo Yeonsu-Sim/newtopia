@@ -71,6 +71,7 @@ cookie:
   same-site: "Lax"
   access-token-name: "ACCESS_TOKEN"
   refresh-token-name: "REFRESH_TOKEN"
+
 app:
   storage:
     minio:

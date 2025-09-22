@@ -18,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class Image {
 
     @Id
@@ -31,6 +32,7 @@ public class Image {
 
     @Column(nullable = false, unique = true)
     private String storageKey;
+
 
 //   제안쪽
 //    @Setter
