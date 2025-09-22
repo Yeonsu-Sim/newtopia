@@ -1,7 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.gameresult.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.ReportContextDoc;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.ContextDoc;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,7 +24,7 @@ public class GameResult {
 
     @Type(JsonType.class)
     @Column(name = "context", columnDefinition = "jsonb", nullable = false)
-    private ReportContextDoc context;   // countryName, finalTurnNumber, generatedAt, final stats
+    private ContextDoc context;   // countryName, finalTurnNumber, generatedAt, final stats
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

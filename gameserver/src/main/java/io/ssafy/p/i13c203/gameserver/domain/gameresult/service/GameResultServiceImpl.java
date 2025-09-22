@@ -3,17 +3,17 @@ package io.ssafy.p.i13c203.gameserver.domain.gameresult.service;
 import io.ssafy.p.i13c203.gameserver.common.dto.request.SortDirection;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.CountryStatsDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.ReportContextDoc;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.ReportSummaryDoc;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.ContextDoc;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.mapper.GameResultContextDtoMapper;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.mapper.GameResultSummaryDtoMapper;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.request.DetailQuery;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.request.Metric;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.request.Part;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.request.ReportQuery;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.response.GameResultDetailResponse;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.response.GameResultReportResponse;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.response.*;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.entity.GameResult;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.entity.GameResultSummary;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.adapter.GameResultReader;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.reader.GameResultReader;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.model.SummaryStatus;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.repository.GameResultRepository;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.repository.GameResultSummaryRepository;
 import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
@@ -28,11 +28,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
  * 컨텍스트/요약은 저장 테이블에서 읽고, 그래프는 히스토리 기반으로 즉시 생성한다.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(Transactional.TxType.SUPPORTS)
@@ -46,9 +48,14 @@ public class GameResultServiceImpl implements GameResultService {
     private final GameResultReader reader;                       // 권한/히스토리/턴 조회 포트
     private final GameResultRepository gameResultRepository;     // context
     private final GameResultSummaryRepository summaryRepository; // summary
+    private final GameResultSummaryOrchestrator orchestrator;
+
+    private final GameResultContextDtoMapper contextMapper;
+    private final GameResultSummaryDtoMapper summaryDtoMapper;
 
 
     @Override
+    @Transactional
     public void createOnEnding(Long memberId, Game game) {
         Long gameId = game.getId();
         ensureOwned(gameId, memberId);
@@ -64,7 +71,7 @@ public class GameResultServiceImpl implements GameResultService {
                 latest.economy(), latest.defense(), latest.publicSentiment(), latest.environment()
         );
 
-        var context = new ReportContextDoc(
+        var context = new ContextDoc(
                 game.getCountryName(),
                 finalTurnNumber,
                 Instant.now().toString(),
@@ -75,21 +82,6 @@ public class GameResultServiceImpl implements GameResultService {
                 .context(context)
                 .build());
 
-        // 요약은 임시 하드코딩(또는 pending으로 생성)
-        var summaryDoc = new ReportSummaryDoc(
-                "ready", "ph_abc123",
-                new ReportSummaryDoc.Sections(
-                        new ReportSummaryDoc.Section(java.util.List.of("GDP 성장률 +1.4%", "산업 투자 지표 호조")),
-                        new ReportSummaryDoc.Section(java.util.List.of("국방 지출 확대", "신형 전력 도입 계획")),
-                        new ReportSummaryDoc.Section(java.util.List.of("지지율 변동: 물가/고용 영향")),
-                        new ReportSummaryDoc.Section(java.util.List.of("자원 재활용 정책 미흡 개선 필요"))
-                ),
-                null
-        );
-        summaryRepository.save(GameResultSummary.builder()
-                .gameResultId(gr.getId())
-                .summary(summaryDoc)
-                .build());
     }
 
     @Override
@@ -100,7 +92,7 @@ public class GameResultServiceImpl implements GameResultService {
         var metrics = resolveMetrics(query.metrics());
 
         // --- context: game_result.context (불변) ---
-        GameResultReportResponse.Context contextDto = null;
+        ContextDto contextDto = null;
         GameResult gr = null;
         if (parts.contains(Part.CONTEXT) || parts.contains(Part.GRAPH) || parts.contains(Part.SUMMARY)) {
             gr = gameResultRepository.findByGameId(gameId)
@@ -108,41 +100,28 @@ public class GameResultServiceImpl implements GameResultService {
         }
         if (parts.contains(Part.CONTEXT)) {
             var ctx = Objects.requireNonNull(gr).getContext();
-            contextDto = new GameResultReportResponse.Context(
-                    ctx.countryName(), ctx.finalTurnNumber(), ctx.generatedAt(),
-                    new GameResultReportResponse.CountryStats(
-                            ctx.countryStats().economy(),
-                            ctx.countryStats().defense(),
-                            ctx.countryStats().publicSentiment(),
-                            ctx.countryStats().environment()
-                    )
-            );
+            contextDto = contextMapper.toContext(gr);
         }
 
-        // --- summary: game_result_summary.summary (변동) ---
-        GameResultReportResponse.Summary summaryDto = null;
+
+        // --- summary: game_result_summary.summary ---
+        SummaryDto summaryDto = null;
         if (parts.contains(Part.SUMMARY)) {
-            GameResultSummary gsr = summaryRepository.findByGameResultId(
-                    Objects.requireNonNull(gr).getId()).orElse(null);
-            if (gsr != null && gsr.getSummary() != null) {
-                var s = gsr.getSummary();
-                var sections = (s.sections() == null) ? null :
-                        new GameResultReportResponse.Sections(
-                                toSection(s.sections().economy()),
-                                toSection(s.sections().defense()),
-                                toSection(s.sections().publicSentiment()),
-                                toSection(s.sections().environment())
-                        );
-                summaryDto = new GameResultReportResponse.Summary(
-                        s.status(), s.promptHash(), sections, s.subscribeUrl()
-                );
+            var grId = Objects.requireNonNull(gr).getId();
+            var s = summaryRepository.findByGameResultId(grId).orElse(null);
+
+            if (s != null && s.getSummary() != null && s.getSummary().status() == SummaryStatus.READY) {
+                // READY 그대로 반환
+                summaryDto = summaryDtoMapper.toReadySummary(s.getSummary());
             } else {
-                summaryDto = new GameResultReportResponse.Summary("pending", "ph_queued", null, null);
+                // 없거나 PENDING/ERROR
+                summaryDto = summaryDtoMapper.toSummary(orchestrator.ensureJob(gameId, null));
             }
         }
 
+
         // --- graph: game_history on-the-fly ---
-        GameResultReportResponse.Graph graphDto = null;
+        GraphDto graphDto = null;
         if (parts.contains(Part.GRAPH)) {
             graphDto = buildGraph(
                     gameId,
@@ -210,7 +189,7 @@ public class GameResultServiceImpl implements GameResultService {
         return metrics.stream().distinct().collect(Collectors.toList());
     }
 
-    private GameResultReportResponse.Graph buildGraph(
+    private GraphDto buildGraph(
             Long gameId, int totalCount,             // finalTurnNumber + 1 이 들어옴
             Integer page, Integer size, SortDirection sort,
             List<Metric> metrics
@@ -235,15 +214,15 @@ public class GameResultServiceImpl implements GameResultService {
                 (sort == SortDirection.ASC) ? rowsAsc : new ArrayList<>(rowsAsc);
         if (sort == SortDirection.DESC) Collections.reverse(rowsOrdered);
 
-        var series = new ArrayList<GameResultReportResponse.Series>();
+        var series = new ArrayList<GraphDto.Series>();
         for (Metric m : metrics) {
             var points = rowsOrdered.stream()
-                    .map(tv -> new GameResultReportResponse.Point(tv.turnNumber(), valueOf(tv, m)))
+                    .map(tv -> new GraphDto.Point(tv.turnNumber(), valueOf(tv, m)))
                     .toList();
-            series.add(new GameResultReportResponse.Series(metricKey(m), points));
+            series.add(new GraphDto.Series(metricKey(m), points));
         }
 
-        var pageDto = new GameResultReportResponse.Page(
+        var pageDto = new GraphDto.Page(
                 n, perPage, sort.name().toLowerCase(),
                 totalCount, pages,
                 n < pages, n > 1,
@@ -251,7 +230,7 @@ public class GameResultServiceImpl implements GameResultService {
                 n > 1 ? n - 1 : null
         );
 
-        return new GameResultReportResponse.Graph(
+        return new GraphDto(
                 metrics.stream().map(this::metricKey).toList(),
                 pageDto,
                 series
@@ -280,11 +259,6 @@ public class GameResultServiceImpl implements GameResultService {
             case PUBLIC_SENTIMENT -> tv.publicSentiment();
             case ENVIRONMENT -> tv.environment();
         };
-    }
-
-    private GameResultReportResponse.Section toSection(
-            io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.ReportSummaryDoc.Section sec) {
-        return (sec == null) ? null : new GameResultReportResponse.Section(sec.bullets());
     }
 
     private GameResultDetailResponse.Card toCard(GameResultReader.TurnFrame.Card c) {

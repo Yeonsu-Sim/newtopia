@@ -19,10 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(
-        name = "게임 결과 리포트 API",
-        description = "게임 결과 리포트 조회 및 드릴다운 상세 조회 API"
-)
+@Tag(name = "게임 결과 리포트 API", description = "게임 결과 리포트 조회 및 드릴다운 상세 조회 API")
 @RequestMapping("/api/v1/game-results")
 public interface GameResultController {
 
@@ -43,7 +40,7 @@ public interface GameResultController {
     })
     @GetMapping("/{gameId}/report")
     ResponseEntity<APIResponse<GameResultReportResponse, Void>> getReport(
-            @Parameter(description = "게임 ID", example = "123")
+            @Parameter(description = "게임 ID", example = "1")
             @PathVariable Long gameId,
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -66,7 +63,7 @@ public interface GameResultController {
     })
     @GetMapping("/{gameId}/turns/{turnNumber}")
     ResponseEntity<APIResponse<GameResultDetailResponse, Void>> getTurnDetail(
-            @Parameter(description = "게임 ID", example = "123")
+            @Parameter(description = "게임 ID", example = "1")
             @PathVariable Long gameId,
             @Parameter(
                     name = "turnNumber",

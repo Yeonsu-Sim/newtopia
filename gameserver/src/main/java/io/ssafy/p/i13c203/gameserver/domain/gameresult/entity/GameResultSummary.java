@@ -1,7 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.gameresult.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.ReportSummaryDoc;
+import io.ssafy.p.i13c203.gameserver.domain.gameresult.doc.SummaryDoc;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,7 +24,7 @@ public class GameResultSummary {
 
     @Type(JsonType.class)
     @Column(name = "summary", columnDefinition = "jsonb", nullable = false)
-    private ReportSummaryDoc summary;   // status/promptHash/sections/subscribeUrl
+    private SummaryDoc summary;   // status/promptHash/sections/subscribeUrl
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
