@@ -64,6 +64,7 @@ function RouteComponent() {
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [, setIsFirstGame] = useState(false)
   const [onboardingStep, setOnboardingStep] = useState(0)
+  const [pendingTurnData, setPendingTurnData] = useState<any>(null)
 
   const { fetchOngoingGame, fetchGameById, createNewGame } = useGame()
   const { submitChoice } = useGamePlay()
@@ -193,25 +194,8 @@ function RouteComponent() {
 
       const nextTurn = result.nextTurn
       if (nextTurn) {
-        setCurrentCard(nextTurn.card)
-        setStats(nextTurn.countryStats)
-        setTurn(nextTurn.number)
-
-        // 새로운 턴에서 말풍선 아이콘 다시 표시
-        setShowEventIcon(false)
-        setTimeout(() => {
-          setShowEventIcon(true)
-          setEventIconAnimation(true)
-          // 팝업 사운드 재생
-          const popSound = new Audio('/sounds/game-bonus-02-294436.mp3')
-          popSound.volume = 0.7
-          popSound.play().catch(console.error)
-
-          // 애니메이션 클래스 제거
-          setTimeout(() => {
-            setEventIconAnimation(false)
-          }, 600)
-        }, 500)
+        // 다음 턴 데이터를 임시 저장만 하고, FeedbackDialog 닫힌 후 적용
+        setPendingTurnData(nextTurn)
       }
     } catch (err) {
       console.error(err)
@@ -226,15 +210,30 @@ function RouteComponent() {
 
   const handleFeedbackClose = () => {
     setFeedbackOpen(false)
-    // 토스트 메시지 기능 비활성화 (ArticleDialog에서 댓글로 대체)
-    // let messages = dummyComments
-    // if (currentCard && selectedChoiceCode) {
-    //   const selectedChoice = currentCard.choices?.find(
-    //     (choice: any) => choice.code === selectedChoiceCode,
-    //   )
-    //   messages = selectedChoice?.comments || dummyComments
-    // }
-    // setToastMessages(messages)
+
+    // 지연된 다음 턴 데이터 적용
+    if (pendingTurnData) {
+      setCurrentCard(pendingTurnData.card)
+      setStats(pendingTurnData.countryStats)
+      setTurn(pendingTurnData.number)
+      setPendingTurnData(null)
+
+      // 새로운 턴에서 말풍선 아이콘 다시 표시
+      setShowEventIcon(false)
+      setTimeout(() => {
+        setShowEventIcon(true)
+        setEventIconAnimation(true)
+        // 팝업 사운드 재생
+        const popSound = new Audio('/sounds/game-bonus-02-294436.mp3')
+        popSound.volume = 0.7
+        popSound.play().catch(console.error)
+
+        // 애니메이션 클래스 제거
+        setTimeout(() => {
+          setEventIconAnimation(false)
+        }, 600)
+      }, 500)
+    }
   }
 
   // 온보딩 다이얼로그 핸들러
