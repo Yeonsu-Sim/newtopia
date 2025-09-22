@@ -353,7 +353,8 @@ function RouteComponent() {
       )}
 
       {/* ArticleDialog */}
-      {articleOpen && currentCard && selectedChoiceCode && (
+      {articleOpen && currentCard && selectedChoiceCode &&
+       !feedbackOpen && !guestOpen && !choiceOpen && (
         <ArticleDialog
           open={articleOpen}
           playerName={playerName}
