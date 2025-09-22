@@ -240,3 +240,39 @@ export const exampleTurnDetail = {
   message: '드릴다운 상세를 불러왔습니다.',
   error: null,
 }
+
+export const exampleNotices = {
+  status: 'success',
+  data: [
+    {
+      id: 1,
+      title: '서버 점검 안내',
+      content: '10월 1일 오전 2시~4시 서버 점검이 예정되어 있습니다. 이용에 참고 바랍니다.',
+      imgUrl: '/icons/notice.png',
+      type: 'notice'
+    },
+    {
+      id: 2,
+      title: '신규 업데이트 안내',
+      content: '새로운 기능이 추가되었습니다! 이제 공지사항 모달에서 이미지를 확인할 수 있습니다.',
+      imgUrl: '/icons/hotfix.png',
+      type: 'hotfix'
+    },
+    {
+      id: 3,
+      title: '이벤트 안내',
+      content: '이번 주말까지 로그인 시 특별 보상을 드립니다!',
+      imgUrl: '/icons/update.png',
+      type: 'update'
+    }
+  ],
+  message: '공지사항을 불러왔습니다.',
+  error: null
+}
+
+export const exampleNoticesEmpty = {
+  status: 'success',
+  data: [],
+  message: '공지사항을 불러왔습니다.',
+  error: null
+}

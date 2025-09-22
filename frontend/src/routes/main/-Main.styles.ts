@@ -107,3 +107,13 @@ export const LogoutButton = styled.button`
     cursor: not-allowed;
   }
 `
+export const NoticeIcon = styled.img`
+  position: absolute;
+  bottom: 10%;
+  left: 3%;  
+  width: 70px;
+  height: auto;
+  cursor: pointer;
+  display: block;
+  z-index: 100;
+`;

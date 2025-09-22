@@ -7,6 +7,8 @@ import { MenuButton } from '@/components/common/MenuButton'
 import { HotTopic } from '@/components/common/HotTopic'
 import { RankingModal } from '@/components/RankingModal'
 import { SuggestionModal } from '@/components/SuggestionModal'
+import { NoticeModal } from '@/components/NoticeModal/NoticeModal'
+
 import {
   MainContainer,
   WelcomeSection,
@@ -15,6 +17,7 @@ import {
   MenuContainer,
   BgmToggleButton,
   LogoutButton,
+  NoticeIcon
 } from '@/routes/main/-Main.styles'
 
 export const Route = createFileRoute('/main/')({
@@ -30,6 +33,7 @@ function MainPage() {
   })
   const [showRankingModal, setShowRankingModal] = useState(false)
   const [showSuggestionModal, setShowSuggestionModal] = useState(false)
+  const [showNoticeModal, setShowNoticeModal] = useState(false)
 
   // 로그인되지 않은 사용자는 랜딩 페이지로 리다이렉트
   useEffect(() => {
@@ -57,6 +61,11 @@ function MainPage() {
   const handleRanking = () => {
     playClickSound()
     setShowRankingModal(true)
+  }
+
+  const handleNotice = () => {
+    playClickSound()
+    setShowNoticeModal(true)
   }
 
   const handleLogout = async () => {
@@ -123,6 +132,11 @@ function MainPage() {
         </MenuButton>
       </MenuContainer>
 
+      <NoticeIcon 
+        src="/icons/확성기.png"
+        onClick={handleNotice}
+      ></NoticeIcon>
+
       {/* 이달의 핫토픽 뉴스 */}
       <HotTopic />
 
@@ -136,6 +150,11 @@ function MainPage() {
       <SuggestionModal
         isOpen={showSuggestionModal}
         onClose={() => setShowSuggestionModal(false)}
+      />
+
+      <NoticeModal
+        isOpen={showNoticeModal}
+        onClose={() => setShowNoticeModal(false)}
       />
     </MainContainer>
   )
