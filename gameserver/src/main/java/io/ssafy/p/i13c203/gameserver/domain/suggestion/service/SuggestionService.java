@@ -32,6 +32,7 @@ public class SuggestionService {
 
 
     @Transactional
+
     public SuggestionCreateResponse createSuggestion(SuggestionCreateRequest request, Member member) {
 
         Suggestion suggestion = Suggestion.builder()
@@ -80,6 +81,7 @@ public class SuggestionService {
     // 이미 본 것은 안보여지게 하기.
 
 
+    @Transactional
     public List<SuggestionResponse> getSuggestion(SuggestionRequest request) {
         return getSuggestionV1(request.getMemberId());
     }

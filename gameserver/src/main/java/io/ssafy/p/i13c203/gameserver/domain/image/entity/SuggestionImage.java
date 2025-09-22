@@ -27,6 +27,4 @@ public class SuggestionImage {
     @Column(name="sort_order", nullable=false)
     private int sortOrder; // 0..N
 
-    @Column(length=300)
-    private String caption;
 }
