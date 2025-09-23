@@ -14,5 +14,4 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     List<Notice> findAllByOrderByCreatedAtDesc();
 
-    Page<Notice> findByTypeOrderByCreatedAtDesc(NoticeType type, Pageable pageable);
 }
