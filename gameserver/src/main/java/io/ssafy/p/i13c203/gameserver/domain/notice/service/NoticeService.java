@@ -7,8 +7,6 @@ import io.ssafy.p.i13c203.gameserver.domain.notice.entity.NoticeType;
 import io.ssafy.p.i13c203.gameserver.domain.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +22,8 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository;
 
-    public Notice createNotice(Long memberId, String title, String content, NoticeType type) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+    public Notice createNotice(Member member, String title, String content, NoticeType type) {
+
 
         Notice notice = Notice.builder()
                 .member(member)
@@ -47,8 +44,8 @@ public class NoticeService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Notice> getAllNotices(Pageable pageable) {
-        return noticeRepository.findAllByOrderByCreatedAtDesc(pageable);
+    public List<Notice> getAllNotices() {
+        return noticeRepository.findAllByOrderByCreatedAtDesc();
     }
 
     @Transactional(readOnly = true)
@@ -56,10 +53,6 @@ public class NoticeService {
         return noticeRepository.findByTypeOrderByCreatedAtDesc(type);
     }
 
-    @Transactional(readOnly = true)
-    public Page<Notice> getNoticesByType(NoticeType type, Pageable pageable) {
-        return noticeRepository.findByTypeOrderByCreatedAtDesc(type, pageable);
-    }
 
     public void deleteNotice(Long id) {
         if (!noticeRepository.existsById(id)) {

@@ -1,15 +1,16 @@
 package io.ssafy.p.i13c203.gameserver.domain.notice.controller;
 
+import io.ssafy.p.i13c203.gameserver.auth.security.CustomUserDetails;
 import io.ssafy.p.i13c203.gameserver.domain.notice.dto.request.CreateNoticeRequest;
 import io.ssafy.p.i13c203.gameserver.domain.notice.dto.response.NoticeResponse;
 import io.ssafy.p.i13c203.gameserver.domain.notice.entity.Notice;
 import io.ssafy.p.i13c203.gameserver.domain.notice.entity.NoticeType;
 import io.ssafy.p.i13c203.gameserver.domain.notice.service.NoticeService;
+import io.ssafy.p.i13c203.gameserver.global.APIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,56 +26,58 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     @PostMapping
-    public ResponseEntity<NoticeResponse> createNotice(
-            @RequestParam Long memberId,
+    public ResponseEntity<APIResponse<NoticeResponse, Void>> createNotice(
+            @AuthenticationPrincipal CustomUserDetails details,
             @RequestBody CreateNoticeRequest request) {
 
         Notice notice = noticeService.createNotice(
-                memberId,
+                details.getMember(),
                 request.getTitle(),
                 request.getContent(),
                 request.getType()
         );
 
-        return ResponseEntity.ok(NoticeResponse.from(notice));
+        return ResponseEntity.ok(APIResponse.success(NoticeResponse.from(notice)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NoticeResponse> getNotice(@PathVariable Long id) {
+    public ResponseEntity<APIResponse<NoticeResponse, Void>> getNotice(@PathVariable Long id) {
         Optional<Notice> notice = noticeService.getNoticeById(id);
 
         if (notice.isPresent()) {
-            return ResponseEntity.ok(NoticeResponse.from(notice.get()));
+            return ResponseEntity.ok(APIResponse.success(NoticeResponse.from(notice.get())));
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(APIResponse.fail("NOT_FOUND", "공지사항을 찾을 수 없습니다."));
         }
     }
 
     @GetMapping
-    public ResponseEntity<Page<NoticeResponse>> getAllNotices(Pageable pageable) {
-        Page<Notice> notices = noticeService.getAllNotices(pageable);
-        Page<NoticeResponse> response = notices.map(NoticeResponse::from);
+    public ResponseEntity<APIResponse<List<NoticeResponse>, Void>> getAllNotices() {
+        List<Notice> notices = noticeService.getAllNotices();
+        List<NoticeResponse> response = notices.stream()
+                .map(NoticeResponse::from)
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.success(response));
     }
 
     @GetMapping("/type/{type}")
-    public ResponseEntity<List<NoticeResponse>> getNoticesByType(@PathVariable NoticeType type) {
+    public ResponseEntity<APIResponse<List<NoticeResponse>, Void>> getNoticesByType(@PathVariable NoticeType type) {
         List<Notice> notices = noticeService.getNoticesByType(type);
         List<NoticeResponse> response = notices.stream()
                 .map(NoticeResponse::from)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.success(response));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNotice(@PathVariable Long id) {
+    public ResponseEntity<APIResponse<Void, Void>> deleteNotice(@PathVariable Long id) {
         try {
             noticeService.deleteNotice(id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(APIResponse.success("공지사항이 삭제되었습니다.", null));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(APIResponse.fail("NOT_FOUND", "삭제할 공지사항을 찾을 수 없습니다."));
         }
     }
 }
