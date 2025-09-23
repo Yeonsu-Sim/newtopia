@@ -33,7 +33,7 @@ function RouteComponent() {
 
         {context && <FinalScore stats={context.data.context.countryStats} />}
 
-        <AiReport></AiReport>
+        <AiReport gameId={gameId}></AiReport>
 
         {graph && context && (
           <PlayStatistics

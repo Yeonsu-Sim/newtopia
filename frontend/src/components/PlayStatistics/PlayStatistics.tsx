@@ -7,6 +7,8 @@ import {
   ChartWrapper,
   Label,
   SectionHeader,
+  SectionFooter,
+  Message,
   ButtonGroup,
   MetricButton,
   TurnNumber,
@@ -144,6 +146,9 @@ export default function PlayStatistics({
           </div>
         </ChartWrapper>
       </Section>
+      <SectionFooter>
+        <Message>점을 클릭하면 턴에 대한 상세정보를 확인할 수 있어요!</Message>
+      </SectionFooter>
       {turnDetail && (
         <DetailSection>
           <DetailHeader>

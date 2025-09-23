@@ -6,6 +6,9 @@ export const Wrapper = styled.div`
 `
 
 export const Section = styled.section`
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
   background: #fff;
   border-radius: 12px;
   padding: 1.5rem;
@@ -22,7 +25,13 @@ export const SectionTitle = styled.h2`
 `
 
 export const Label = styled.div`
-  font-size: 14px;
+  font-size: 17px;
   color: #333;
   font-family: 'PFStardustExtraBold', 'Noto Sans KR', sans-serif;
+`
+
+export const Content = styled.div`
+  font-size: 14px;
+  color: #333;
+  font-family: 'PFStardustBold', 'Noto Sans KR', sans-serif;
 `
