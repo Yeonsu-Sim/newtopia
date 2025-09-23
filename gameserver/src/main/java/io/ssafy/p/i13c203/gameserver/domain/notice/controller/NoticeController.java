@@ -160,33 +160,36 @@ public class NoticeController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "공지사항 목록 조회 성공",
+            description = "모든 공지사항 조회 성공",
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = APIResponse.class),
                 examples = @ExampleObject(
                     value = """
                     {
-                        "success": true,
-                        "message": "success",
+                        "status": "success",
                         "data": [
                             {
-                                "id": 1,
-                                "title": "일반 공지사항",
-                                "content": "서버 점검 안내",
+                                "id": 2,
+                                "title": "중요 업데이트 공지",
+                                "content": "새로운 기능이 추가되었습니다.",
                                 "type": "NOTICE",
-                                "createdAt": "2023-12-01T10:00:00",
-                                "updatedAt": "2023-12-01T10:00:00"
+                                "imgUrl": "https://j13c203.p.ssafy.io/newtopia-img/public/public/2025/09/23/69df6829-9414-4c7e-bdc5-7da5f07533e5.png",
+                                "createdAt": "2025-09-23T21:53:54.11759",
+                                "updatedAt": "2025-09-23T21:53:54.117603"
                             },
                             {
-                                "id": 2,
-                                "title": "겨울 이벤트",
-                                "content": "12월 특별 이벤트를 진행합니다.",
-                                "type": "EVENT",
-                                "createdAt": "2023-12-01T11:00:00",
-                                "updatedAt": "2023-12-01T11:00:00"
+                                "id": 1,
+                                "title": "서버 점검 안내",
+                                "content": "정기 점검이 진행됩니다.",
+                                "type": "HOTFIX",
+                                "imgUrl": "https://j13c203.p.ssafy.io/newtopia-img/public/public/2025/09/23/69df6829-9414-4c7e-bdc5-7da5f07533e5.png",
+                                "createdAt": "2025-09-23T21:53:50.103599",
+                                "updatedAt": "2025-09-23T21:53:50.103605"
                             }
-                        ]
+                        ],
+                        "message": "요청에 성공했습니다.",
+                        "error": null
                     }
                     """
                 )

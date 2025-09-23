@@ -27,21 +27,19 @@ public class Notice {
     @JoinColumn(name = "member_id", nullable = true)
     private Member member;
 
-    @Column(nullable = false, length = 200)
+    @Column( length = 200)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column( columnDefinition = "TEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private NoticeType type;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column( updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
     private LocalDateTime updatedAt;
 }
