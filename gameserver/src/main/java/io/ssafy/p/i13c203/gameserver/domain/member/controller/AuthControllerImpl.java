@@ -59,4 +59,11 @@ public class AuthControllerImpl implements AuthController {
             APIResponse.success(memberId== null ? "로그인 정보 없음" :"로그인 조회 완료", res)
         );
     }
+
+    // TODO 배포환경엔 지워야함
+    @GetMapping("/admin")
+    public void signUpAdmin(){
+        memberService.singupAdmin();
+
+    }
 }
