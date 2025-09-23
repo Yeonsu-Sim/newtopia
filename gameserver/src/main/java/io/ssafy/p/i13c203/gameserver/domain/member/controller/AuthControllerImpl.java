@@ -61,9 +61,9 @@ public class AuthControllerImpl implements AuthController {
     }
 
     // TODO 배포환경엔 지워야함
-    @GetMapping("/admin")
-    public void signUpAdmin(){
-        memberService.singupAdmin();
-
-    }
+//    @GetMapping("/admin")
+//    public void signUpAdmin(){
+//        memberService.singupAdmin();
+//
+//    }
 }
