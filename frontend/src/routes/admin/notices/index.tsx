@@ -1,29 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
+import { verifyAdminApi, getAllNoticesApi, createNoticeApi, deleteNoticeApi } from '../../../services/adminApi'
+import type { Notice } from '../../../services/adminApi'
 
-const mockNotices = [
-  {
-    id: 1,
-    title: '서버 점검 안내',
-    content: '매주 화요일 새벽 2시부터 4시까지 정기 점검을 진행합니다.',
-    type: 'NOTICE',
-    createdAt: '2023-12-01T10:00:00',
-  },
-  {
-    id: 2,
-    title: '긴급 버그 수정',
-    content: '로그인 관련 버그가 발견되어 긴급 수정을 진행합니다.',
-    type: 'HOTFIX',
-    createdAt: '2023-12-01T14:30:00',
-  },
-  {
-    id: 3,
-    title: '겨울 특별 이벤트',
-    content: '12월 한 달간 특별 이벤트를 진행합니다.',
-    type: 'EVENT',
-    createdAt: '2023-12-01T09:00:00',
-  },
-]
+// Mock 데이터 제거 - 백엔드 API 사용
 
 export const Route = createFileRoute('/admin/notices/')({
   component: AdminNoticesPage,
@@ -33,7 +13,7 @@ function AdminNoticesPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [adminUser, setAdminUser] = useState('')
-  const [notices, setNotices] = useState(mockNotices)
+  const [notices, setNotices] = useState<Notice[]>([])
   const [newNotice, setNewNotice] = useState({
     title: '',
     content: '',
@@ -41,51 +21,91 @@ function AdminNoticesPage() {
   })
   const [showAddForm, setShowAddForm] = useState(false)
 
-  useEffect(() => {
-    const authStatus = localStorage.getItem('adminAuth')
-    const user = localStorage.getItem('adminUser')
-
-    if (authStatus === 'true' && user) {
-      setIsAuthenticated(true)
-      setAdminUser(user)
-    } else {
-      window.location.href = '/admin/login'
-      return
+  const loadNotices = async () => {
+    try {
+      const result = await getAllNoticesApi()
+      if (result.status === 'success' && result.data) {
+        setNotices(result.data)
+      }
+    } catch (error) {
+      console.error('공지사항 로드 실패:', error)
     }
-    setLoading(false)
+  }
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      // 백엔드 관리자 권한 확인만 사용
+      try {
+        const backendResult = await verifyAdminApi()
+        if (backendResult.status === 'success' && backendResult.data) {
+          setIsAuthenticated(true)
+          setAdminUser(backendResult.data.nickname || backendResult.data.email)
+          console.log('백엔드 관리자 인증 성공:', backendResult.data)
+
+          // 인증 성공 후 공지사항 데이터 로드
+          await loadNotices()
+        } else {
+          window.location.href = '/admin/login'
+          return
+        }
+      } catch (error) {
+        console.log('백엔드 관리자 인증 실패:', error)
+        window.location.href = '/admin/login'
+        return
+      }
+      setLoading(false)
+    }
+
+    checkAuth()
   }, [])
 
   const handleLogout = () => {
     if (confirm('로그아웃 하시겠습니까?')) {
-      localStorage.removeItem('adminAuth')
-      localStorage.removeItem('adminUser')
-      window.location.href = '/admin/login'
+      // 백엔드 로그아웃 처리 (쿠키 삭제)
+      fetch('/api/v1/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      }).finally(() => {
+        window.location.href = '/admin/login'
+      })
     }
   }
 
-  const handleAddNotice = (e: React.FormEvent) => {
+  const handleAddNotice = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newNotice.title || !newNotice.content) {
       alert('제목과 내용을 입력해주세요.')
       return
     }
 
-    const notice = {
-      id: notices.length + 1,
-      ...newNotice,
-      createdAt: new Date().toISOString(),
+    try {
+      const result = await createNoticeApi(newNotice)
+      if (result.status === 'success') {
+        // 공지사항 목록 새로고침
+        await loadNotices()
+        setNewNotice({ title: '', content: '', type: 'NOTICE' })
+        setShowAddForm(false)
+        alert('공지사항이 추가되었습니다.')
+      }
+    } catch (error) {
+      console.error('공지사항 추가 실패:', error)
+      alert('공지사항 추가에 실패했습니다.')
     }
-
-    setNotices([notice, ...notices])
-    setNewNotice({ title: '', content: '', type: 'NOTICE' })
-    setShowAddForm(false)
-    alert('공지사항이 추가되었습니다.')
   }
 
-  const handleDeleteNotice = (id: number) => {
+  const handleDeleteNotice = async (id: number) => {
     if (confirm('정말로 삭제하시겠습니까?')) {
-      setNotices(notices.filter(notice => notice.id !== id))
-      alert('공지사항이 삭제되었습니다.')
+      try {
+        const result = await deleteNoticeApi(id)
+        if (result.status === 'success') {
+          // 공지사항 목록 새로고침
+          await loadNotices()
+          alert('공지사항이 삭제되었습니다.')
+        }
+      } catch (error) {
+        console.error('공지사항 삭제 실패:', error)
+        alert('공지사항 삭제에 실패했습니다.')
+      }
     }
   }
 

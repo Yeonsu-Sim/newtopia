@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { verifyAdminApi } from '../../services/adminApi'
+import { verifyAdminApi, getNoticeStatsApi, getSuggestionStatsApi } from '../../services/adminApi'
 
 export const Route = createFileRoute('/admin/')({
   component: AdminPage,
@@ -10,6 +10,8 @@ function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [adminUser, setAdminUser] = useState('')
+  const [noticeStats, setNoticeStats] = useState({ totalCount: 0, recentCount: 0 })
+  const [suggestionStats, setSuggestionStats] = useState({ totalCount: 0, recentCount: 0 })
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -20,6 +22,9 @@ function AdminPage() {
           setIsAuthenticated(true)
           setAdminUser(backendResult.data.nickname || backendResult.data.email)
           console.log('백엔드 관리자 인증 성공:', backendResult.data)
+
+          // 인증 성공 후 통계 데이터 로드
+          await loadStats()
         } else {
           window.location.href = '/admin/login'
           return
@@ -30,6 +35,31 @@ function AdminPage() {
         return
       }
       setLoading(false)
+    }
+
+    const loadStats = async () => {
+      try {
+        const [noticeData, suggestionData] = await Promise.all([
+          getNoticeStatsApi(),
+          getSuggestionStatsApi()
+        ])
+
+        if (noticeData.status === 'success' && noticeData.data) {
+          setNoticeStats({
+            totalCount: noticeData.data.totalCount,
+            recentCount: noticeData.data.recentCount
+          })
+        }
+
+        if (suggestionData.status === 'success' && suggestionData.data) {
+          setSuggestionStats({
+            totalCount: suggestionData.data.totalCount,
+            recentCount: suggestionData.data.recentCount
+          })
+        }
+      } catch (error) {
+        console.error('통계 데이터 로드 실패:', error)
+      }
     }
 
     checkAuth()
@@ -138,8 +168,10 @@ function AdminPage() {
           }}>
             <h3 style={{ color: '#444', marginBottom: '15px' }}>📊 시스템 현황</h3>
             <ul style={{ color: '#666', lineHeight: '1.6' }}>
-              <li>총 공지사항: 24개</li>
-              <li>활성 사용자: 156명</li>
+              <li>총 공지사항: {noticeStats.totalCount}개</li>
+              <li>최근 7일 공지사항: {noticeStats.recentCount}개</li>
+              <li>총 건의사항: {suggestionStats.totalCount}개</li>
+              <li>최근 7일 건의사항: {suggestionStats.recentCount}개</li>
               <li>서버 상태: 정상</li>
             </ul>
           </div>
