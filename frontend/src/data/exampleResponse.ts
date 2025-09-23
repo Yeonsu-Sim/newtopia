@@ -276,3 +276,40 @@ export const exampleNoticesEmpty = {
   message: '공지사항을 불러왔습니다.',
   error: null
 }
+
+export const exampleAiReport = {
+  "status": "success",
+  "data": {
+    "status": "READY",
+    "promptHash": null,
+    "sections": {
+      "blocks": {
+        "highlights": {
+          "type": "BULLETS",
+          "title": "하이라이트 턴",
+          "bullets": [
+            "1턴(금양 투자 미달 사태): 국방↑ 경제↓, 초기 균형 붕괴 신호",
+            "2턴(외인 매도): 경제 추가 하락과 민심 급랭",
+            "3턴(시장 안정 대책): 경제/민심 반등으로 급반전"
+          ]
+        },
+        "ending": {
+          "type": "BULLETS",
+          "title": "결말",
+          "bullets": [
+            "초반 불균형 누적이 위기의 불씨가 됨",
+            "균형 회복 시도에도 후유증이 남음"
+          ]
+        },
+        "brief": {
+          "type": "TEXT",
+          "title": "한줄평",
+          "text": "초반 올인의 대가, 뒤늦은 균형 회복으로 아슬아슬한 마무리"
+        }
+      }
+    },
+    "subscribeUrl": null
+  },
+  "message": "게임 결과 요약 생성이 완료되었습니다.",
+  "error": null
+}

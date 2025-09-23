@@ -23,7 +23,6 @@ export const Section = styled.section`
   background: #fff;
   border-radius: 12px;
   padding: 1.5rem;
-  margin-bottom: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `
 
@@ -53,6 +52,18 @@ export const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
 `
+
+export const SectionFooter = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+`
+
+export const Message = styled.div`
+  color: #a2caffff;
+  font-size: 15px;
+  font-family: 'PFStardustBold', 'Noto Sans KR', sans-serif;
+`;
 
 export const ButtonGroup = styled.div`
   display: flex;
