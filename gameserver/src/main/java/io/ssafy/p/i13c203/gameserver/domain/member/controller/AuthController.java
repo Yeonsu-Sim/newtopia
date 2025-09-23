@@ -67,4 +67,6 @@ public interface AuthController {
     default ResponseEntity<APIResponse<Void, Void>> logout(){
         throw new UnsupportedOperationException("This method is for documentation only. Actual logout is handled by Spring Security.");
     }
+
+
 }

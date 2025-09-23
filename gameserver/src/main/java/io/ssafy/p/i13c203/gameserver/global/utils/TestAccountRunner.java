@@ -68,6 +68,7 @@ public class TestAccountRunner implements CommandLineRunner {
         signupRequestDto6.setNickname("집가고싶다왕");
         memberService.signup(signupRequestDto6);
 
+        memberService.singupAdmin();
 
     }
 }

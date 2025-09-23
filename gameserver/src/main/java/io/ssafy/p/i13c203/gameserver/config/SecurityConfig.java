@@ -74,6 +74,9 @@ public class SecurityConfig {
 
             // 권한 설정
                 .authorizeHttpRequests(auth -> auth
+                        // 관리자 전용 엔드포인트
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
                         .requestMatchers("/api/v1/games/**").authenticated()
                         .requestMatchers("/api/v1/game-results/**").authenticated()
 

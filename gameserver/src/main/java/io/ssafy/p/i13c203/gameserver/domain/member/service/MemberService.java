@@ -72,4 +72,34 @@ public class MemberService {
             throw new MemberNotFoundException();
         }
     }
+
+    public SignupResponseDto singupAdmin() {
+        // 이메일 중복 체크
+
+        SignupRequestDto request = new SignupRequestDto();
+        request.setEmail("ssafyAdmin@ssafy.com");
+        request.setPassword("newtopia123!");
+        request.setNickname("newtopia_admin");
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        // Member 엔티티 생성
+        Member member = Member.builder()
+                .email(request.getEmail())
+                .password(encodedPassword)
+                .nickname(request.getNickname())
+                .age(null) // 기본값 null
+                .gender(null) // 기본값 null
+                .role(Role.ADMIN) // 기본값 MEMBER
+                .isDeleted(false) // 기본값 false
+                .isNewsletterSubscribed(false) // 기본값 false
+                .build();
+
+        // 저장
+        Member savedMember = memberRepository.save(member);
+
+        log.info("회원가입 완료: email={}, nickname={}", savedMember.getEmail(), savedMember.getNickname());
+
+        return SignupResponseDto.from(savedMember);
+    }
 }
