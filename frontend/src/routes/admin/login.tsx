@@ -5,33 +5,11 @@ export const Route = createFileRoute('/admin/login')({
   component: AdminLoginPage,
 })
 
-const ADMIN_CREDENTIALS = {
-  username: 'admin',
-  password: 'admin123'
-}
+// 기존 하드코딩된 관리자 계정 제거
+// 이제 백엔드 인증을 사용합니다
 
 function AdminLoginPage() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    setTimeout(() => {
-      if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-        localStorage.setItem('adminAuth', 'true')
-        localStorage.setItem('adminUser', username)
-        window.location.href = '/admin'
-      } else {
-        setError('잘못된 사용자명 또는 비밀번호입니다.')
-      }
-      setLoading(false)
-    }, 800)
-  }
+  // 입력 폼 관련 state 제거 - 이제 백엔드 인증만 사용
 
   return (
     <div style={{
@@ -50,107 +28,60 @@ function AdminLoginPage() {
         width: '100%',
         maxWidth: '400px'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{ color: '#333', margin: '0 0 10px 0' }}>🔐 관리자 로그인</h1>
-          <p style={{ color: '#666', margin: '0' }}>관리자 인증이 필요합니다</p>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1 style={{ color: '#333', margin: '0 0 15px 0' }}>🔐 관리자 페이지 접근</h1>
+          <p style={{ color: '#666', margin: '0', fontSize: '18px' }}>
+            관리자 인증이 필요합니다
+          </p>
         </div>
 
-        {error && (
-          <div style={{
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            padding: '12px',
-            borderRadius: '4px',
-            marginBottom: '20px',
-            border: '1px solid #f5c6cb'
-          }}>
-            {error}
-          </div>
-        )}
+        <div style={{
+          backgroundColor: '#e7f3ff',
+          border: '1px solid #b8daff',
+          borderRadius: '8px',
+          padding: '25px',
+          marginBottom: '30px'
+        }}>
+          <h3 style={{ color: '#004085', margin: '0 0 15px 0', fontSize: '18px' }}>
+            📌 관리자 인증 방법
+          </h3>
+          <ol style={{ color: '#004085', margin: '0', paddingLeft: '20px', lineHeight: '1.8' }}>
+            <li>메인 페이지에서 관리자 계정으로 로그인</li>
+            <li>로그인 완료 후 관리자 페이지로 접근</li>
+            <li>백엔드에서 관리자 권한을 자동으로 확인합니다</li>
+          </ol>
+        </div>
 
-        <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '5px',
-              fontWeight: 'bold',
-              color: '#333'
-            }}>
-              사용자명
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ced4da',
-                borderRadius: '4px',
-                fontSize: '16px'
-              }}
-              placeholder="관리자 사용자명"
-              disabled={loading}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '30px' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '5px',
-              fontWeight: 'bold',
-              color: '#333'
-            }}>
-              비밀번호
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ced4da',
-                borderRadius: '4px',
-                fontSize: '16px'
-              }}
-              placeholder="비밀번호"
-              disabled={loading}
-              required
-            />
-          </div>
-
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <button
-            type="submit"
-            disabled={loading}
+            onClick={() => window.location.href = '/'}
             style={{
-              width: '100%',
-              padding: '14px',
-              backgroundColor: loading ? '#6c757d' : '#007bff',
+              padding: '14px 28px',
+              backgroundColor: '#007bff',
               color: 'white',
               border: 'none',
-              borderRadius: '4px',
+              borderRadius: '6px',
               fontSize: '16px',
               fontWeight: 'bold',
-              cursor: loading ? 'not-allowed' : 'pointer'
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,123,255,0.2)'
             }}
           >
-            {loading ? '로그인 중...' : '로그인'}
+            메인 페이지로 이동 (로그인)
           </button>
-        </form>
+        </div>
 
         <div style={{
-          marginTop: '30px',
+          marginTop: '20px',
           padding: '15px',
-          backgroundColor: '#d1ecf1',
-          borderRadius: '4px',
-          border: '1px solid #bee5eb'
+          backgroundColor: '#fff3cd',
+          borderRadius: '6px',
+          border: '1px solid #ffeaa7'
         }}>
-          <strong style={{ color: '#0c5460' }}>개발용 계정:</strong>
-          <div style={{ color: '#0c5460', fontSize: '14px', marginTop: '5px' }}>
-            사용자명: admin<br />
-            비밀번호: admin123
+          <strong style={{ color: '#856404' }}>💡 참고:</strong>
+          <div style={{ color: '#856404', fontSize: '14px', marginTop: '8px' }}>
+            관리자 계정으로 로그인하면 자동으로 백엔드에서<br />
+            관리자 권한을 확인하여 접근을 허용합니다.
           </div>
         </div>
 
@@ -168,7 +99,7 @@ function AdminLoginPage() {
             }}
             onClick={() => window.location.href = '/'}
           >
-            일반 사용자 페이지로 돌아가기
+            메인 페이지로 돌아가기
           </button>
         </div>
       </div>

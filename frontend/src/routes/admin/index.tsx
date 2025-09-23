@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { verifyAdminApi } from '../../services/adminApi'
 
 export const Route = createFileRoute('/admin/')({
   component: AdminPage,
@@ -11,24 +12,38 @@ function AdminPage() {
   const [adminUser, setAdminUser] = useState('')
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('adminAuth')
-    const user = localStorage.getItem('adminUser')
-
-    if (authStatus === 'true' && user) {
-      setIsAuthenticated(true)
-      setAdminUser(user)
-    } else {
-      window.location.href = '/admin/login'
-      return
+    const checkAuth = async () => {
+      // 백엔드 관리자 권한 확인만 사용
+      try {
+        const backendResult = await verifyAdminApi()
+        if (backendResult.status === 'success' && backendResult.data) {
+          setIsAuthenticated(true)
+          setAdminUser(backendResult.data.nickname || backendResult.data.email)
+          console.log('백엔드 관리자 인증 성공:', backendResult.data)
+        } else {
+          window.location.href = '/admin/login'
+          return
+        }
+      } catch (error) {
+        console.log('백엔드 관리자 인증 실패:', error)
+        window.location.href = '/admin/login'
+        return
+      }
+      setLoading(false)
     }
-    setLoading(false)
+
+    checkAuth()
   }, [])
 
   const handleLogout = () => {
     if (confirm('로그아웃 하시겠습니까?')) {
-      localStorage.removeItem('adminAuth')
-      localStorage.removeItem('adminUser')
-      window.location.href = '/admin/login'
+      // 백엔드 로그아웃 처리 (쿠키 삭제)
+      fetch('/api/v1/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      }).finally(() => {
+        window.location.href = '/admin/login'
+      })
     }
   }
 
@@ -77,6 +92,15 @@ function AdminPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             <span style={{ color: '#666' }}>
               👤 {adminUser}님 환영합니다
+            </span>
+            <span style={{
+              color: '#28a745',
+              fontSize: '14px',
+              padding: '4px 8px',
+              backgroundColor: '#d4edda',
+              borderRadius: '4px'
+            }}>
+              🔒 관리자 인증됨
             </span>
             <button
               onClick={handleLogout}
