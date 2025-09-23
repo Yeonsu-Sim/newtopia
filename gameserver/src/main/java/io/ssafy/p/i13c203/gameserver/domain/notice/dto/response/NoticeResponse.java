@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class NoticeResponse {
     private Long id;
-    private String memberNickname;
     private String title;
     private String content;
     private NoticeType type;
@@ -25,7 +24,6 @@ public class NoticeResponse {
     public static NoticeResponse from(Notice notice) {
         return NoticeResponse.builder()
                 .id(notice.getId())
-                .memberNickname(notice.getMember().getNickname())
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .type(notice.getType())
