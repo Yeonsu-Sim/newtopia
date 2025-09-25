@@ -13,6 +13,7 @@ import io.ssafy.p.i13c203.gameserver.global.exception.NotFoundException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,14 +35,118 @@ public class EndingService {
         var cs = game.getCountryStats();
         List<String> hitCodes = new ArrayList<>();
 
-        if (cs.getEconomy()        <= 0)   hitCodes.add("ECO_MIN");
-        if (cs.getEconomy()        >= 100) hitCodes.add("ECO_MAX");
-        if (cs.getDefense()        <= 0)   hitCodes.add("DEF_MIN");
-        if (cs.getDefense()        >= 100) hitCodes.add("DEF_MAX");
-        if (cs.getPublicSentiment()<= 0)   hitCodes.add("PUB_MIN");
-        if (cs.getPublicSentiment()>= 100) hitCodes.add("PUB_MAX");
-        if (cs.getEnvironment()    <= 0)   hitCodes.add("ENV_MIN");
-        if (cs.getEnvironment()    >= 100) hitCodes.add("ENV_MAX");
+        // Economy
+        if (cs.getEconomy() <= 0) {
+            hitCodes.add("ECO_MIN");
+        }
+        if (cs.getEconomy() >= 100) {
+            String selected = null;
+            int minValue = Integer.MAX_VALUE;
+
+            if (cs.getPublicSentiment() <= 30 && cs.getPublicSentiment() < minValue) {
+                selected = "ECO_100_PUB_LE30";
+                minValue = cs.getPublicSentiment();
+            }
+            if (cs.getEnvironment() <= 30 && cs.getEnvironment() < minValue) {
+                selected = "ECO_100_ENV_LE30";
+                minValue = cs.getEnvironment();
+            }
+            if (cs.getDefense() <= 30 && cs.getDefense() < minValue) {
+                selected = "ECO_100_DEF_LE30";
+                minValue = cs.getDefense();
+            }
+
+            if (selected != null) {
+                hitCodes.add(selected);
+            } else {
+                hitCodes.add("ECO_MAX");
+            }
+        }
+
+        // Defense
+        if (cs.getDefense() <= 0) {
+            hitCodes.add("DEF_MIN");
+        }
+        if (cs.getDefense() >= 100) {
+            String selected = null;
+            int minValue = Integer.MAX_VALUE;
+
+            if (cs.getPublicSentiment() <= 30 && cs.getPublicSentiment() < minValue) {
+                selected = "DEF_100_PUB_LE30";
+                minValue = cs.getPublicSentiment();
+            }
+            if (cs.getEconomy() <= 30 && cs.getEconomy() < minValue) {
+                selected = "DEF_100_ECO_LE30";
+                minValue = cs.getEconomy();
+            }
+            if (cs.getEnvironment() <= 30 && cs.getEnvironment() < minValue) {
+                selected = "DEF_100_ENV_LE30";
+                minValue = cs.getEnvironment();
+            }
+
+            if (selected != null) {
+                hitCodes.add(selected);
+            } else {
+                hitCodes.add("DEF_MAX");
+            }
+        }
+
+        // Public Sentiment
+        if (cs.getPublicSentiment() <= 0) {
+            hitCodes.add("PUB_MIN");
+        }
+        if (cs.getPublicSentiment() >= 100) {
+            String selected = null;
+            int minValue = Integer.MAX_VALUE;
+
+            if (cs.getEconomy() <= 30 && cs.getEconomy() < minValue) {
+                selected = "PUB_100_ECO_LE30";
+                minValue = cs.getEconomy();
+            }
+            if (cs.getDefense() <= 30 && cs.getDefense() < minValue) {
+                selected = "PUB_100_DEF_LE30";
+                minValue = cs.getDefense();
+            }
+            if (cs.getEnvironment() <= 30 && cs.getEnvironment() < minValue) {
+                selected = "PUB_100_ENV_LE30";
+                minValue = cs.getEnvironment();
+            }
+
+            if (selected != null) {
+                hitCodes.add(selected);
+            } else {
+                hitCodes.add("PUB_MAX");
+            }
+        }
+
+        // Environment
+        if (cs.getEnvironment() <= 0) {
+            hitCodes.add("ENV_MIN");
+        }
+        if (cs.getEnvironment() >= 100) {
+            String selected = null;
+            int minValue = Integer.MAX_VALUE;
+
+            if (cs.getEconomy() <= 30 && cs.getEconomy() < minValue) {
+                selected = "ENV_100_ECO_LE30";
+                minValue = cs.getEconomy();
+            }
+            if (cs.getPublicSentiment() <= 30 && cs.getPublicSentiment() < minValue) {
+                selected = "ENV_100_PUB_LE30";
+                minValue = cs.getPublicSentiment();
+            }
+            if (cs.getDefense() <= 30 && cs.getDefense() < minValue) {
+                selected = "ENV_100_DEF_LE30";
+                minValue = cs.getDefense();
+            }
+
+            if (selected != null) {
+                hitCodes.add(selected);
+            } else {
+                hitCodes.add("ENV_MAX");
+            }
+        }
+
 
         int n = hitCodes.size();
         if (n == 0) return null;
