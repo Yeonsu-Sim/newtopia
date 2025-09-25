@@ -12,7 +12,7 @@ export const DialogOverlay = styled.div`
 
 export const ArticleContainer = styled.div`
   background: #e49000;
-  width: 90%;
+  width: 100%;
   max-width: 800px;
   height: 90%;
   border-radius: 12px;
@@ -160,10 +160,10 @@ export const CommentTime = styled.div`
 `
 
 export const CommentText = styled.p`
-  font-family: 'DNFBitBitv2', sans-serif;
+  font-family: 'PFStardustExtraBold', 'DNFBitBitv2', sans-serif;
   color: #333;
   font-size: 1.4rem;
-  line-height: 1;
+  line-height: 1.4;
   margin: 0 0 0.75rem 0;
   word-break: break-word;
 `

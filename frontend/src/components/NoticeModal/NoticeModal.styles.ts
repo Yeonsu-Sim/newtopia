@@ -94,7 +94,7 @@ export const NoticeItem = styled.div`
   align-items: center;
   flex-direction: column;
   cursor: pointer;
-  padding: 5px 10px;
+  padding: 10px 10px;
   margin: 10px;
   border-radius: 8px;
   border: 1px solid #f9bf26;
@@ -123,6 +123,7 @@ export const NoticeTitle = styled.span`
 
 export const NoticeContent = styled.div`
   color: #000;
+  white-space: pre-line;
   font-family: 'PFStardustBold', 'Noto Sans KR', sans-serif;
 `;
 
@@ -141,6 +142,25 @@ export const NoticeContentWrapper = styled.div`
   border-radius: 8px;
   text-align: left;
   background: #fdf3d8;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #f9bf26;
+    border-radius: 6px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #ffd700;
+  }
 `
 
 export const NoticeEmptyWrapper = styled.div`

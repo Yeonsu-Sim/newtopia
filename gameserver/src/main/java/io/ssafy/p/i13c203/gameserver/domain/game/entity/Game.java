@@ -1,7 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.game.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
+import io.ssafy.p.i13c203.gameserver.domain.ending.entity.Ending;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.CardDoc;
 import io.ssafy.p.i13c203.gameserver.domain.ranking.entity.Ranking;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
@@ -82,8 +82,8 @@ public class Game {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public void markEnded(EndingDoc ending) {
-        this.endingCode = ending.code();
+    public void markEnded(Ending ending) {
+        this.endingCode = ending.getCode();
         this.endedAt = Instant.now();
         this.active = false;
     }

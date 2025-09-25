@@ -16,6 +16,7 @@ public enum ErrorCode {
     SCENARIO_NOT_FOUND("SCENARIO_NOT_FOUND", "시나리오를 찾을 수 없습니다."),
     NPC_NOT_FOUND("NPC_NOT_FOUND", "NPC를 찾을 수 없습니다."),
     CONCURRENCY_CONFLICT("CONCURRENCY_CONFLICT", "동일 자원에 대한 동시 갱신 충돌이 발생했습니다."),
+    NEWS_NOT_FOUND("NEWS_NOT_FOUND", "뉴스를 찾을 수 없습니다."),
 
 
     // ===== 멱등성/인프라 =====

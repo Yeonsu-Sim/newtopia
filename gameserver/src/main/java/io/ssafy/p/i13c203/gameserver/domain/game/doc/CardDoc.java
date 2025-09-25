@@ -24,7 +24,7 @@ public record CardDoc(
         Map<String, ChoiceDoc> choices,
         RelatedArticleDoc relatedArticle
 ) {
-    public static CardDoc of(Scenario sc, CardType type) {
+    public static CardDoc from(Scenario sc) {
         Npc npc = sc.getNpc();
         if (npc == null) throw new BusinessException(ErrorCode.NPC_NOT_FOUND);
 
@@ -37,7 +37,7 @@ public record CardDoc(
         return new CardDoc(
                 java.util.UUID.randomUUID(), // cardId: 런타임 UUID
                 sc.getId(),                  // scenarioId: Long
-                type,
+                sc.getType(),
                 sc.getTitle(),
                 sc.getContent(),
                 npcRef,

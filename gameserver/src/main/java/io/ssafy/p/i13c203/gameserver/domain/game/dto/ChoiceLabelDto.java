@@ -15,6 +15,9 @@ public record ChoiceLabelDto(
             String imageUrl
     ) {
         public static PressReleaseDto from(PressReleaseDoc pressRelease) {
+            if (pressRelease == null) {
+                return null;
+            }
             return new PressReleaseDto(
                     pressRelease.title(),
                     pressRelease.content(),

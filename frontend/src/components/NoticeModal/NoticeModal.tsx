@@ -17,10 +17,7 @@ import {
     NoticeEmpty
 } from '@/components/NoticeModal/NoticeModal.styles'
 
-import { 
-    // exampleNotices, 
-    exampleNoticesEmpty 
-} from '@/data/exampleResponse'
+import { useNotice } from '@/hooks/useNotice'
 
 interface Notice {
   id: number;
@@ -36,22 +33,35 @@ interface NoticeModalProps {
 
 export const NoticeModal: React.FC<NoticeModalProps> = ({ isOpen, onClose }) => {
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null)
+  const { notices, loading, error } = useNotice()
 
   if (!isOpen) return null
 
-  const notices: Notice[] = exampleNoticesEmpty.data
-
-  if (!notices || notices.length === 0) {
+  if (loading) {
     return (
-        <ModalOverlay onClick={onClose}>
+      <ModalOverlay onClick={onClose}>
         <ModalBox onClick={e => e.stopPropagation()}>
-            <CloseButton onClick={onClose}>✕</CloseButton>
-            <ModalHeader>{selectedNotice ? selectedNotice.title : '공지사항'}</ModalHeader>
-            <NoticeEmptyWrapper>
-                <NoticeEmpty>공지사항이 없어용!</NoticeEmpty>
-            </NoticeEmptyWrapper>
+          <CloseButton onClick={onClose}>✕</CloseButton>
+          <ModalHeader>공지사항</ModalHeader>
+          <NoticeEmptyWrapper>
+            <NoticeEmpty>불러오는 중...</NoticeEmpty>
+          </NoticeEmptyWrapper>
         </ModalBox>
-        </ModalOverlay>
+      </ModalOverlay>
+    )
+  }
+
+  if (error || !notices || notices.length === 0) {
+    return (
+      <ModalOverlay onClick={onClose}>
+        <ModalBox onClick={e => e.stopPropagation()}>
+          <CloseButton onClick={onClose}>✕</CloseButton>
+          <ModalHeader>{selectedNotice ? selectedNotice.title : '공지사항'}</ModalHeader>
+          <NoticeEmptyWrapper>
+            <NoticeEmpty>{error || '공지사항이 없어용!'}</NoticeEmpty>
+          </NoticeEmptyWrapper>
+        </ModalBox>
+      </ModalOverlay>
     )
   }
 

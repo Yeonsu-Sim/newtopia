@@ -83,7 +83,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <HeaderTitle>
               <p>
                 {mode === 'login'
-                  ? 'Newtopia에 오신 것을 환영합니다'
+                  ? 'Wellcome to Newtopia!'
                   : 'Newtopia 회원가입'}
               </p>
             </HeaderTitle>

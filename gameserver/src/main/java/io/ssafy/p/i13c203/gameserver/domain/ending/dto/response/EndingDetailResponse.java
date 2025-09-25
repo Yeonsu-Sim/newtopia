@@ -1,7 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.ending.dto.response;
 
-import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
 import io.ssafy.p.i13c203.gameserver.domain.ending.dto.EndingAssetsDto;
+import io.ssafy.p.i13c203.gameserver.domain.ending.entity.Ending;
 
 public record EndingDetailResponse(
         String code,
@@ -9,11 +9,11 @@ public record EndingDetailResponse(
         String content,
         EndingAssetsDto assets
 ) {
-    public static EndingDetailResponse from(EndingDoc doc, EndingAssetsDto assets) {
+    public static EndingDetailResponse from(Ending ending, EndingAssetsDto assets) {
         return new EndingDetailResponse(
-                doc.code(),
-                doc.title(),
-                doc.content(),
+                ending.getCode(),
+                ending.getTitle(),
+                ending.getContent(),
                 assets
         );
     }

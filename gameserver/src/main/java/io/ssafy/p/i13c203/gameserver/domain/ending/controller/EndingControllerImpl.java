@@ -1,12 +1,15 @@
 package io.ssafy.p.i13c203.gameserver.domain.ending.controller;
 
-import io.ssafy.p.i13c203.gameserver.domain.ending.doc.EndingDoc;
+import io.ssafy.p.i13c203.gameserver.auth.security.CustomUserDetails;
 import io.ssafy.p.i13c203.gameserver.domain.ending.dto.EndingAssetsDto;
 import io.ssafy.p.i13c203.gameserver.domain.ending.dto.response.EndingDetailResponse;
+import io.ssafy.p.i13c203.gameserver.domain.ending.dto.response.GetMyEndingsResponse;
+import io.ssafy.p.i13c203.gameserver.domain.ending.entity.Ending;
 import io.ssafy.p.i13c203.gameserver.domain.ending.service.EndingService;
 import io.ssafy.p.i13c203.gameserver.global.APIResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,21 +22,27 @@ public class EndingControllerImpl implements EndingController {
     @Override
     public ResponseEntity<APIResponse<EndingDetailResponse, Void>> getEndingDetail(
             @PathVariable String endingCode) {
-        EndingDoc doc = endingService.getByCode(endingCode);
+        Ending ending = endingService.getByCode(endingCode);
 
-        EndingAssetsDto assets = buildAssets(doc);
-        EndingDetailResponse body = EndingDetailResponse.from(doc, assets);
+        EndingAssetsDto assets = EndingAssetsDto.from(ending);
+        EndingDetailResponse body = EndingDetailResponse.from(ending, assets);
 
         return ResponseEntity.ok(APIResponse.success(null, body));
     }
 
-    private EndingAssetsDto buildAssets(EndingDoc doc) {
-        String imageUrl = doc.imageUrl();
-        if (imageUrl == null || imageUrl.isBlank()) {
-            return new EndingAssetsDto(null, null);
+    @Override
+    public ResponseEntity<APIResponse<GetMyEndingsResponse, Void>> getMyEndings(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(APIResponse.fail("AUTH_REQUIRED", "인증이 필요합니다"));
         }
+        Long memberId = userDetails.getMemberId();
 
-        String thumbnailUrl = imageUrl;  // 아직 미정
-        return new EndingAssetsDto(imageUrl, thumbnailUrl);
+        var response = endingService.getMyEndings(memberId);
+
+        return ResponseEntity.ok(APIResponse.success(
+                "수집한 엔딩을 조회했습니다", response));
     }
+
 }

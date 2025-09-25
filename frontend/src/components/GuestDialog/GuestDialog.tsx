@@ -57,7 +57,7 @@ const GuestDialog: React.FC<GuestDialogProps> = ({
   return (
     <DialogOverlay $variant={variant}>
       <GuestBox>
-        {variant !== 'onboarding' && <GuestIcon src={guestImage}></GuestIcon>}
+        <GuestIcon src={guestImage}></GuestIcon>
         <DialogBox $variant={variant}>
           <DialogHeader $variant={variant}>{guestName}</DialogHeader>
           <DialogContent $variant={variant}>{finalText}</DialogContent>

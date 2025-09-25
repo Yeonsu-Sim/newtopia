@@ -48,10 +48,6 @@ function LandingPage() {
     setCurrentState('menu')
   }
 
-  const handleTryGame = () => {
-    playClickSound()
-    alert('체험하기 기능은 현재 준비중입니다.')
-  }
 
   const handleShowAuth = () => {
     playClickSound()
@@ -105,10 +101,6 @@ function LandingPage() {
         </WelcomeSection>
 
         <MenuContainer>
-          <MenuButton onClick={handleTryGame} variant="landing">
-            체험하기
-          </MenuButton>
-
           <MenuButton onClick={handleShowAuth} variant="landing">
             로그인
           </MenuButton>

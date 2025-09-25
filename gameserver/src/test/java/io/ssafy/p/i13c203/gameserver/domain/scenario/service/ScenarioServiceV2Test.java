@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ScenarioServiceV2Test {
 
     @Autowired
-    private ScenarioServiceV2 scenarioServiceV2;
+    private ScenarioServiceV3 scenarioServiceV2;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -59,7 +59,7 @@ class ScenarioServiceV2Test {
         long start = System.currentTimeMillis();
 
         // when
-        Scenario result = scenarioServiceV2.nextScenario(game, 1);
+        Scenario result = scenarioServiceV2.nextScenario(game);
 
         long end = System.currentTimeMillis();
         System.out.println("시나리오 생성 총 걸린 시간: " + (end - start) + "ms");

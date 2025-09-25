@@ -17,12 +17,12 @@ public interface ScenarioService {
 
 
     /** 게임 시작 시 선택할 첫 시나리오를 반환 (랜덤) */
-    public Scenario firstScenario();
+    public Scenario firstScenario(Long memberId);
 
     /**
      * 다음 턴에 사용할 시나리오를 반환 (랜덤)
      * 추후 등장 조건 평가는 이 메서드에서 진행
      */
-    public Scenario nextScenario(Game game, int nextTurn) ;
+    public Scenario nextScenario(Game game) ;
 
 }

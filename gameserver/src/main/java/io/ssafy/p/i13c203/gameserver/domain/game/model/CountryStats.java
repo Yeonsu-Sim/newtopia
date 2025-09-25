@@ -31,5 +31,14 @@ public class CountryStats {
         this.publicSentiment = clamp0To100(this.publicSentiment + dPublicSentiment);
         this.environment = clamp0To100(this.environment + dEnvironment);
     }
+    public void setValue(int aEconomy, int aDefense, int aPublicSentiment, int aEnvironment) {
+        this.economy = aEconomy;
+        this.defense = aDefense;
+        this.publicSentiment = aPublicSentiment;
+        this.environment = aEnvironment;
+    }
+
+
+    /***** HELPER *****/
     private int clamp0To100(int v) { return Math.max(0, Math.min(100, v)); }
 }

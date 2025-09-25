@@ -40,6 +40,15 @@ export const TitleText = styled.div`
     line-height: 1.4;
     white-space: pre;
   }
+
+  /* 모바일 최적화 - 폰트 2px 축소 */
+  @media (max-width: 768px) {
+    font-size: clamp(22px, 5.5vw, 46px);
+  }
+
+  @media (max-width: 480px) {
+    font-size: clamp(20px, 5vw, 44px);
+  }
 `
 
 export const FormSection = styled.div`
@@ -102,6 +111,15 @@ export const CountryNameInput = styled.input`
     color: #6e3400;
     opacity: 0.3;
   }
+
+  /* 모바일 최적화 - 폰트 2px 축소 */
+  @media (max-width: 768px) {
+    font-size: clamp(22px, 5.5vw, 46px);
+  }
+
+  @media (max-width: 480px) {
+    font-size: clamp(20px, 5vw, 44px);
+  }
 `
 
 export const InstructionText = styled.div`
@@ -115,6 +133,19 @@ export const InstructionText = styled.div`
     text-align: center;
     font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
     font-size: clamp(14px, 2vw, 18px);
+  }
+
+  /* 모바일 최적화 - 폰트 2px 축소 */
+  @media (max-width: 768px) {
+    p {
+      font-size: clamp(12px, 1.8vw, 16px);
+    }
+  }
+
+  @media (max-width: 480px) {
+    p {
+      font-size: clamp(10px, 1.6vw, 14px);
+    }
   }
 `
 
@@ -177,5 +208,14 @@ export const IntroTextLine = styled.div<{ $isActive: boolean }>`
 
   &:last-child {
     margin-bottom: 0;
+  }
+
+  /* 모바일 최적화 - 폰트 2px 축소 */
+  @media (max-width: 768px) {
+    font-size: clamp(22px, 5.5vw, 46px);
+  }
+
+  @media (max-width: 480px) {
+    font-size: clamp(20px, 5vw, 44px);
   }
 `

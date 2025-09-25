@@ -10,16 +10,18 @@ export const GameFont = createGlobalStyle`
 `
 
 export const BackgroundWrapper = styled.div`
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: hidden;
-  min-width: 800px;
 `
 
 export const BackgroundImage = styled.img`
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
 `
 
@@ -32,13 +34,52 @@ export const ParameterWrapper = styled.div<{ x: number; y: number }>`
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-
   width: 10%;
+  min-width: 60px;
+  min-height: 60px;
+  touch-action: manipulation;
+
+  /* 모바일에서 2x2 그리드 배치 */
+  @media (max-width: 768px) {
+    &:nth-of-type(1) { /* eco */
+      top: 45% !important;
+      left: 15% !important;
+    }
+    &:nth-of-type(2) { /* env */
+      top: 45% !important;
+      left: 86% !important;
+    }
+    &:nth-of-type(3) { /* opi */
+      top: 55% !important;
+      left: 15% !important;
+    }
+    &:nth-of-type(4) { /* mil */
+      top: 55% !important;
+      left: 86% !important;
+    }
+  }
 
   &:hover {
     .parameter-tooltip {
       opacity: 1;
       visibility: visible;
+    }
+  }
+
+  /* 터치 디바이스에서 호버 효과 */
+  @media (hover: none) {
+    &:hover {
+      .parameter-tooltip {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+    
+    &:active {
+      .parameter-tooltip {
+        opacity: 1;
+        visibility: visible;
+      }
     }
   }
 `
@@ -48,15 +89,39 @@ export const ParameterChangeWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   margin: 1rem;
+
+  /* 모바일 최적화 - 웹에서 크게, 모바일에서 작게 */
+  @media (max-width: 768px) {
+    margin: 0.75rem 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    margin: 0.5rem 0.25rem;
+  }
 `
 
 export const MainContainer = styled.div`
-  min-height: 100vh;
-  padding: 0 3rem 1rem 3rem;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
   color: #fff;
   font-family: 'Cafe24ProUp', sans-serif;
   background-color: #1a1a2e;
-  min-width: 1000px;
+  
+  /* 모바일에서 스크롤 방지 */
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height */
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+  }
 `
 
 export const Background = styled.img`
@@ -66,16 +131,36 @@ export const Background = styled.img`
 `
 
 export const GameHeader = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 1rem 1rem;
-  font-family: 'Cafe24ProUp', sans-serif;
+  padding: 2rem;
+  font-family: 'DNFBitBitv2', sans-serif;
+  z-index: 1;
+  pointer-events: none;
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+  }
+
+  /* InfoBox만 클릭 가능하도록 */
+  > * {
+    pointer-events: auto;
+  }
 `
 
 export const TurnBox = styled.div`
   color: #fff;
-  font-family: 'Cafe24ProUp', sans-serif;
+  font-family: 'DNFBitBitv2', sans-serif;
   text-align: center;
 `
 
@@ -83,22 +168,64 @@ export const InfoBox = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-  background: #2e2e3a;
+  align-items: center;
   padding: 1rem 2rem;
-  min-width: 180px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+  min-width: 200px;
+  border-radius: 20px;
+  border: 5px solid #f9bf26;
+  background: #e49000;
+  box-shadow:
+    2px 2px 4px 2px #a35400 inset,
+    0px 0px 0 0px #d57500;
   color: #fff;
   font-family: 'Cafe24ProUp', sans-serif;
   text-align: center;
-  border: 2px solid #555;
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    padding: 0.75rem 1.5rem;
+    min-width: 160px;
+    border-radius: 16px;
+    border: 4px solid #f9bf26;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem 1rem;
+    min-width: 120px;
+    border-radius: 12px;
+    border: 3px solid #f9bf26;
+    box-shadow:
+      1px 1px 2px 1px #a35400 inset,
+      0px 0px 0 0px #d57500;
+  }
 `
 
 export const InfoText = styled.div`
   font-size: 1.2rem;
   margin: 0.3rem 0;
-  text-shadow: 1px 1px 2px #000;
+  color: #ffffff;
+  font-family: 'Cafe24ProUp', sans-serif;
+  text-shadow:
+    2px 2px 4px #6e3400,
+    -1px -1px 2px #6e3400,
+    1px -1px 2px #6e3400,
+    -1px 1px 2px #6e3400;
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin: 0.25rem 0;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    margin: 0.2rem 0;
+    text-shadow:
+      1px 1px 2px #6e3400,
+      -1px -1px 1px #6e3400,
+      1px -1px 1px #6e3400,
+      -1px 1px 1px #6e3400;
+  }
 `
 
 export const TurnText = styled.div`
@@ -120,6 +247,17 @@ export const ParameterChangeBox = styled.div`
   align-items: flex-end;
   justify-content: space-around;
   padding: 2rem;
+  position: relative;
+  top: 5%;
+
+  /* 모바일 최적화 - 웹에서 크게, 모바일에서 작게 */
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem 0.5rem;
+  }
 `
 
 export const ProgressBar = styled.div`
@@ -176,6 +314,10 @@ ParameterIcon.defaultProps = {
 
 export const ParameterEmoji = styled.div`
   font-size: 2rem;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 export const GameMessage = styled.div`
@@ -222,15 +364,31 @@ export const MessageIcon = styled.img.attrs({
 
 export const EventIcon = styled.img<{ x: number; y: number }>`
   position: absolute;
-  top: ${({ y }) => y}%;
+  top: ${({ y }) => y + 5}%;
   left: ${({ x }) => x}%;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-
   width: 10%;
+  min-width: 80px;
+  min-height: 80px;
+  touch-action: manipulation;
+  z-index: 15;
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    width: 15%;
+    min-width: 100px;
+    min-height: 100px;
+  }
+
+  @media (max-width: 480px) {
+    width: 18%;
+    min-width: 120px;
+    min-height: 120px;
+  }
 
   &.pop-animation {
     animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -250,6 +408,13 @@ export const EventIcon = styled.img<{ x: number; y: number }>`
       opacity: 1;
     }
   }
+
+  /* 터치 디바이스에서 호버 효과 */
+  @media (hover: none) {
+    &:active {
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+  }
 `
 
 export const LodingIcon = styled.img<{ x: number; y: number }>`
@@ -260,8 +425,17 @@ export const LodingIcon = styled.img<{ x: number; y: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 30%;
+  z-index: 15;
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    width: 40%;
+  }
+
+  @media (max-width: 480px) {
+    width: 50%;
+  }
 `
 
 export const ParameterTooltip = styled.div`
