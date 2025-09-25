@@ -22,13 +22,13 @@ public interface RankingRepository extends JpaRepository<Ranking, Long> {
     WITH me AS (
       SELECT r.ranking_id AS rid,
              r.score      AS sc,
-             g.game_id    AS gameId,
+             g.id    AS gameId,
              g.country_name AS countryName,
              g.turn_number  AS turn,
              g.ended_at     AS endedAt
       FROM rankings r
-      JOIN game g ON g.game_id = r.game_id
-      WHERE r.game_id = :gameId
+      JOIN game g ON g.id = r.id
+      WHERE r.id = :gameId
     )
     SELECT m.gameId,
            m.countryName,
@@ -45,13 +45,13 @@ public interface RankingRepository extends JpaRepository<Ranking, Long> {
 
   @Query(value = """
     SELECT
-      g.game_id                             AS gameId,
+      g.id                             AS gameId,
       g.country_name                        AS countryName,
       g.turn_number                         AS turn,
       g.ended_at                            AS endedAt,
       RANK() OVER (ORDER BY r.score DESC, r.ranking_id ASC) AS ord
     FROM rankings r
-    JOIN game g ON g.game_id = r.game_id
+    JOIN game g ON g.id = r.id
     WHERE g.member_id = :memberId
     ORDER BY ord ASC
     """, nativeQuery = true)

@@ -9,6 +9,8 @@ import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
 import io.ssafy.p.i13c203.gameserver.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class RankingServiceImpl implements RankingService {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "rankingByTopN", allEntries = true)
   public void registerRanking(Long gameId) {
     log.trace("Registering ranking for game {}", gameId);
     var game = gameRepository.findById(gameId).orElseThrow(() -> new NotFoundException(ErrorCode.GAME_NOT_FOUND));
@@ -38,6 +41,7 @@ public class RankingServiceImpl implements RankingService {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "rankingByTopN", allEntries = true)
   public void registerRanking(Game game) {
     log.trace("Registering ranking for game {}", game.getId());
     var score = game.getTurn() * 1_000_000_000L - game.getEndedAt().getEpochSecond();
@@ -79,6 +83,7 @@ public class RankingServiceImpl implements RankingService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(cacheNames = "rankingByTopN", key = "#topN", sync = true)
   public List<RankingDto> getRankingByTopN(Integer topN) {
     log.trace("Getting ranking for topN {}", topN);
     var counter = new AtomicLong(1);
