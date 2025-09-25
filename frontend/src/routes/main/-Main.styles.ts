@@ -15,6 +15,19 @@ export const WelcomeSection = styled.div`
   transform: translateX(-50%);
   text-align: center;
   z-index: 10;
+  width: 90%;
+  max-width: 600px;
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    top: 28%;
+    width: 95%;
+  }
+
+  @media (max-width: 480px) {
+    top: 26%;
+    width: 98%;
+  }
 `
 
 export const WelcomeTitle = styled.h1`
@@ -26,6 +39,21 @@ export const WelcomeTitle = styled.h1`
   margin-bottom: 1rem;
   line-height: 1.2;
   white-space: nowrap;
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    font-size: clamp(38px, 7vw, 48px);
+    margin-bottom: 0.75rem;
+    white-space: normal;
+    word-break: keep-all;
+  }
+
+  @media (max-width: 480px) {
+    font-size: clamp(34px, 6.5vw, 36px);
+    margin-bottom: 0.5rem;
+    text-shadow: #000000 3px 3px 8px;
+    line-height: 1.1;
+  }
 `
 
 export const WelcomeSubtitle = styled.p`
@@ -35,6 +63,19 @@ export const WelcomeSubtitle = styled.p`
   font-weight: 500;
   text-shadow: #000000 2px 2px 4px;
   line-height: 1.4;
+  word-break: keep-all;
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    font-size: clamp(18px, 3.5vw, 20px);
+    line-height: 1.3;
+  }
+
+  @media (max-width: 480px) {
+    font-size: clamp(16px, 3.2vw, 16px);
+    line-height: 1.2;
+    text-shadow: #000000 1px 1px 3px;
+  }
 `
 
 export const MenuContainer = styled.div`
@@ -116,4 +157,9 @@ export const NoticeIcon = styled.img`
   cursor: pointer;
   display: block;
   z-index: 100;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
 `;

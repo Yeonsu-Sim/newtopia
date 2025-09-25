@@ -51,6 +51,7 @@ export const useAiReport = (gameId: number, handlers?: AiReportHandlers) => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!gameId) return
     let isClosed = false
     const url = `/api/v1/game-results/${gameId}/report/summary/stream`
     const es = new EventSource(url, { withCredentials: true })

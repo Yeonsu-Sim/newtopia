@@ -11,6 +11,7 @@ export const useReportContext = (gameId: number) => {
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
+    if (!gameId) return
     setLoading(true)
     getReportContext(gameId)
       .then(setData)
@@ -27,6 +28,7 @@ export const useReportGraph = (gameId: number, size: number = 200) => {
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
+    if (!gameId) return
     setLoading(true)
     getReportGraph(gameId, size)
       .then(setData)

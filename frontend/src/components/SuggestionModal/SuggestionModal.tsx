@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { createSuggestion, getSuggestionCategories } from '@/services/suggestionApi'
 import {
   ModalOverlay,
   ModalBackground,
@@ -30,6 +31,7 @@ import {
   ModalFrame,
   ModalBorder,
   CloseButton,
+  ErrorMessage,
 } from '@/components/SuggestionModal/SuggestionModal.styles'
 
 interface SuggestionModalProps {
@@ -49,12 +51,34 @@ export const SuggestionModal: React.FC<SuggestionModalProps> = ({
   onClose,
 }) => {
   const [formData, setFormData] = useState<SuggestionForm>({
-    type: '버그신고',
+    type: 'UI',
     title: '',
     content: '',
     files: [],
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [categories, setCategories] = useState<string[]>(['UI', 'BUG', 'FEATURE'])
+  const [error, setError] = useState<string>('')
+
+  // 모달이 열릴 때 카테고리 로드
+  useEffect(() => {
+    if (isOpen) {
+      loadCategories()
+    }
+  }, [isOpen])
+
+  const loadCategories = async () => {
+    try {
+      const categoryData = await getSuggestionCategories()
+      setCategories(categoryData)
+      if (categoryData.length > 0) {
+        setFormData(prev => ({ ...prev, type: categoryData[0] }))
+      }
+    } catch (err) {
+      console.error('카테고리 로드 실패:', err)
+      // 기본 카테고리 사용
+    }
+  }
 
   if (!isOpen) return null
 
@@ -81,21 +105,28 @@ export const SuggestionModal: React.FC<SuggestionModalProps> = ({
     e.preventDefault()
 
     if (!formData.title.trim() || !formData.content.trim()) {
-      alert('제목과 내용을 모두 입력해주세요.')
+      setError('제목과 내용을 모두 입력해주세요.')
       return
     }
 
     setIsLoading(true)
+    setError('')
 
     try {
-      // TODO: API 호출 구현
-      await new Promise((resolve) => setTimeout(resolve, 1000)) // 임시 지연
+      const suggestionRequest = {
+        title: formData.title,
+        text: formData.content,
+        suggestionCategory: formData.type,
+        imageIds: [], // TODO: 이미지 업로드 구현 시 imageId 배열 추가
+      }
+
+      await createSuggestion(suggestionRequest)
 
       alert('건의사항이 성공적으로 제출되었습니다.')
 
       // 폼 초기화
       setFormData({
-        type: '버그신고',
+        type: categories[0] || 'UI',
         title: '',
         content: '',
         files: [],
@@ -104,7 +135,7 @@ export const SuggestionModal: React.FC<SuggestionModalProps> = ({
       onClose()
     } catch (error) {
       console.error('건의사항 제출 중 오류 발생:', error)
-      alert('건의사항 제출 중 오류가 발생했습니다. 다시 시도해주세요.')
+      setError(error instanceof Error ? error.message : '건의사항 제출 중 오류가 발생했습니다.')
     } finally {
       setIsLoading(false)
     }
@@ -132,6 +163,9 @@ export const SuggestionModal: React.FC<SuggestionModalProps> = ({
             </HeaderSubtitle>
           </ModalHeader>
 
+          {/* 에러 메시지 */}
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+
           {/* 폼 */}
           <ModalForm onSubmit={handleSubmit}>
             <FormFields>
@@ -142,9 +176,11 @@ export const SuggestionModal: React.FC<SuggestionModalProps> = ({
                   onChange={(e) => handleInputChange('type', e.target.value)}
                   required
                 >
-                  <option value="버그신고">유형 : 버그신고</option>
-                  <option value="기능개선">유형 : 기능개선</option>
-                  <option value="기타">유형 : 기타</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      유형 : {category}
+                    </option>
+                  ))}
                 </Select>
               </SelectWrapper>
 

@@ -7,5 +7,15 @@ import java.util.List;
  * turnNumber, 선택 label, 적용 결과 등을 요약.
  */
 public interface GameHistoryReader {
+
+    /**
+     * 가장 변동 폭이 컸던 10개의 턴 선택 반환
+     */
     List<String> readTop10Turns(long gameId);
+
+    /**
+     * 가장 변동 폭이 컸던 10개의 턴 선택 반환
+     * 단, Event NPC 시나리오는 제외
+     */
+    List<String> readTop10TurnsNotEvent(long gameId);
 }

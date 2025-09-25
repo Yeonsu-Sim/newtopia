@@ -8,6 +8,7 @@ import { HotTopic } from '@/components/common/HotTopic'
 import { RankingModal } from '@/components/RankingModal'
 import { SuggestionModal } from '@/components/SuggestionModal'
 import { NoticeModal } from '@/components/NoticeModal/NoticeModal'
+import { EndingModal } from '@/components/EndingModal'
 
 import {
   MainContainer,
@@ -34,6 +35,7 @@ function MainPage() {
   const [showRankingModal, setShowRankingModal] = useState(false)
   const [showSuggestionModal, setShowSuggestionModal] = useState(false)
   const [showNoticeModal, setShowNoticeModal] = useState(false)
+  const [showEndingModal, setShowEndingModal] = useState(false)
 
   // 로그인되지 않은 사용자는 랜딩 페이지로 리다이렉트
   useEffect(() => {
@@ -47,10 +49,9 @@ function MainPage() {
     navigate({ to: '/game/setup' })
   }
 
-  const handleMyInfo = () => {
+  const handleEndingCollection = () => {
     playClickSound()
-    // TODO: 내정보 페이지 구현 후 연결
-    alert('내정보 기능은 준비 중입니다.')
+    setShowEndingModal(true)
   }
 
   const handleSuggestion = () => {
@@ -119,8 +120,8 @@ function MainPage() {
           게임하기
         </MenuButton>
 
-        <MenuButton onClick={handleMyInfo} variant="main">
-          내정보
+        <MenuButton onClick={handleEndingCollection} variant="main">
+          엔딩도감
         </MenuButton>
 
         <MenuButton onClick={handleSuggestion} variant="main">
@@ -155,6 +156,12 @@ function MainPage() {
       <NoticeModal
         isOpen={showNoticeModal}
         onClose={() => setShowNoticeModal(false)}
+      />
+
+      {/* 엔딩 도감 모달 */}
+      <EndingModal
+        isOpen={showEndingModal}
+        onClose={() => setShowEndingModal(false)}
       />
     </MainContainer>
   )

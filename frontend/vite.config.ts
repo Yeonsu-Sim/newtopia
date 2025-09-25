@@ -24,6 +24,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:8080', // Spring Boot 서버
+        // target: 'http://j13c203a.p.ssafy.io:30080/', // Spring Boot 서버
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/api/, ""),
       },

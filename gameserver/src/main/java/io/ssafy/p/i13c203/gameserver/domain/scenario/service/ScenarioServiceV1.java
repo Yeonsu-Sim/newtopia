@@ -19,7 +19,7 @@ public class ScenarioServiceV1 implements ScenarioService{
 
 
     /** 게임 시작 시 선택할 첫 시나리오를 반환 (랜덤) */
-    public Scenario firstScenario() {
+    public Scenario firstScenario(Long memberId) {
         List<Scenario> all = scenarioRepo.findAll();
         if (all.isEmpty()) {
             throw new BusinessException(ErrorCode.SCENARIO_NOT_FOUND);
@@ -31,7 +31,7 @@ public class ScenarioServiceV1 implements ScenarioService{
      * 다음 턴에 사용할 시나리오를 반환 (랜덤)
      * 추후 등장 조건 평가는 이 메서드에서 진행
      */
-    public Scenario nextScenario(Game game, int nextTurn) {
+    public Scenario nextScenario(Game game) {
         // TODO: spawn 조건(중분류 가중치, operator) 평가 로직으로 교체
         List<Scenario> all = scenarioRepo.findAll();
         if (all.isEmpty()) {

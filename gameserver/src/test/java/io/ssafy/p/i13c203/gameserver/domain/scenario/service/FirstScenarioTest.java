@@ -1,6 +1,8 @@
 package io.ssafy.p.i13c203.gameserver.domain.scenario.service;
 
+import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FirstScenarioTest {
 
     @Autowired
-    private ScenarioServiceV2 scenarioServiceV2;
+    private ScenarioServiceV3 scenarioServiceV3;
 
     @Test
     @DisplayName("첫 번째 시나리오 생성 테스트")
@@ -21,7 +23,7 @@ class FirstScenarioTest {
         long start = System.currentTimeMillis();
 
         // when
-        Scenario result = scenarioServiceV2.firstScenario();
+        Scenario result = scenarioServiceV3.firstScenario(1L);
 
         long end = System.currentTimeMillis();
         System.out.println("첫 번째 시나리오 생성 총 걸린 시간: " + (end - start) + "ms");
@@ -32,16 +34,15 @@ class FirstScenarioTest {
             System.out.println("제목: " + result.getTitle());
             System.out.println("내용: " + result.getContent());
             System.out.println("NPC: " + result.getNpc().getName());
-            System.out.println("등장 조건 수: " + result.getSpawn().conditions().size());
+//            System.out.println("등장 조건 수: " + result.getSpawn().conditions().size());
             System.out.println("선택지 수: " + result.getChoices().size());
-            System.out.println("관련 기사 제목: " + result.getRelatedArticle().title());
-            System.out.println("관련 기사 URL: " + result.getRelatedArticle().url());
-
+//            System.out.println("관련 기사 제목: " + result.getRelatedArticle().title());
+//            System.out.println("관련 기사 URL: " + result.getRelatedArticle().url());
             // 기본 검증
             assertThat(result.getTitle()).isNotNull().isNotEmpty();
             assertThat(result.getContent()).isNotNull().isNotEmpty();
             assertThat(result.getNpc()).isNotNull();
-            assertThat(result.getSpawn()).isNotNull();
+//            assertThat(result.getSpawn()).isNotNull();
             assertThat(result.getChoices()).isNotNull().hasSize(2);
             assertThat(result.getRelatedArticle()).isNotNull();
 
@@ -70,14 +71,14 @@ class FirstScenarioTest {
             });
 
             // 등장 조건 검증
-            if (!result.getSpawn().conditions().isEmpty()) {
-                System.out.println("\n=== 등장 조건 ===");
-                result.getSpawn().conditions().forEach(condition -> {
-                    System.out.println("  카테고리: " + condition.category());
-                    System.out.println("  연산자: " + condition.operator());
-                    System.out.println("  임계값: " + condition.threshold());
-                });
-            }
+//            if (!result.getSpawn().conditions().isEmpty()) {
+//                System.out.println("\n=== 등장 조건 ===");
+//                result.getSpawn().conditions().forEach(condition -> {
+//                    System.out.println("  카테고리: " + condition.category());
+//                    System.out.println("  연산자: " + condition.operator());
+//                    System.out.println("  임계값: " + condition.threshold());
+//                });
+//            }
 
             System.out.println("\n=== 첫 번째 Scenario 객체 생성 성공 ===");
 

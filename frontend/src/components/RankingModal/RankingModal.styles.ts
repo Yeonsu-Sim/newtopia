@@ -284,14 +284,20 @@ export const TableCell = styled.div`
     font-size: 24px;
     line-height: 40px;
     letter-spacing: 2px;
-    -webkit-text-stroke-width: 1px;
   }
 
   @media (max-width: 480px) {
     font-size: 18px;
     line-height: 32px;
-    letter-spacing: 1px;
-    -webkit-text-stroke-width: 0.5px;
+    letter-spacing: 0.5px;
+    -webkit-text-stroke-width: 0px;
+    -webkit-text-stroke-color: transparent;
+    text-shadow: 
+      1px 1px 0 #6e3400,
+      -1px -1px 0 #6e3400,
+      1px -1px 0 #6e3400,
+      -1px 1px 0 #6e3400,
+      0px 2px 4px rgba(232, 225, 225, 0.3);
   }
 `
 

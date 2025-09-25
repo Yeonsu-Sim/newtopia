@@ -8,6 +8,8 @@ export const DialogOverlay = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
+  z-index: 1000;
+
 `
 
 export const DialogBox = styled.div`

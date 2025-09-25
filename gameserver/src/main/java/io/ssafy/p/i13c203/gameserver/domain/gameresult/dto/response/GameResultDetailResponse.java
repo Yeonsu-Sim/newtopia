@@ -62,6 +62,9 @@ public record GameResultDetailResponse(
         String content
     ) {
         public static PressRelease from(PressReleaseDoc p) {
+            if (p == null) {
+                return null;
+            }
             return new PressRelease(p.title(), p.imaUrl(), p.content());
         }
     }

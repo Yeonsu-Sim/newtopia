@@ -326,7 +326,7 @@ export const SubmitButtonInner = styled.div`
 
 export const SubmitButtonText = styled.div`
   font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
-  font-weight: bold;
+  font-weight: normal;
   line-height: 0;
   font-style: normal;
   position: relative;
@@ -334,6 +334,8 @@ export const SubmitButtonText = styled.div`
   font-size: 18px;
   text-wrap: nowrap;
   color: white;
+      -webkit-text-stroke: 1px #a35400; 
+  text-stroke: 1px #a35400;
 
   p {
     line-height: 20px;
@@ -378,5 +380,23 @@ export const CloseButton = styled.button`
   &:hover {
     color: #fca5a5;
     background: #b91c1c;
+  }
+`
+
+export const ErrorMessage = styled.div`
+  background: rgba(220, 38, 38, 0.8);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin: 0 40px 20px 40px;
+  text-align: center;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    padding: 10px 15px;
+    margin: 0 20px 15px 20px;
   }
 `

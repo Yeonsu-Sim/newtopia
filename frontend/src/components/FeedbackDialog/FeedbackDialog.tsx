@@ -57,11 +57,15 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({
 
           {article.content && (
             <ContentArea>
-                        <NewsTitle>
-            <a href={article.url} target="_blank" rel="noopener noreferrer">
-              {article.title}
-            </a>
-          </NewsTitle>
+              <NewsTitle>
+                {article.url ? (
+                  <a href={article.url} target="_blank" rel="noopener noreferrer">
+                    {article.title}
+                  </a>
+                ) : (
+                  <span>{article.title}</span>
+                )}
+              </NewsTitle>
               <ContentText>{formatContent(article.content)}</ContentText>
             </ContentArea>
           )}

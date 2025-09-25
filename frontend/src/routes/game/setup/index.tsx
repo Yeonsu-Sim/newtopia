@@ -86,7 +86,7 @@ function GameSetupPage() {
     }
   }, [animationComplete, gameData, isApiLoading])
 
-  const startGame = (game: any) => {
+  const startGame = (game: any, isFirst: boolean = true) => {
     const turn = game.turn
     setGameStart(
       game.gameId,
@@ -100,7 +100,13 @@ function GameSetupPage() {
       user?.nickname || '플레이어',
       turn.number,
     )
-    navigate({ to: '/game', search: { isFirstGame: true } })
+
+    // 새 게임인 경우 localStorage에 플래그 설정
+    if (isFirst) {
+      localStorage.setItem('showGameOnboarding', 'true')
+    }
+
+    navigate({ to: '/game' })
   }
 
   const handleContinue = async () => {
@@ -108,7 +114,7 @@ function GameSetupPage() {
     if (!ongoingGame) return
     const data = await fetchGameById(ongoingGame.gameId)
     if (data?.data?.game) {
-      startGame(data.data.game)
+      startGame(data.data.game, false) // 기존 게임은 온보딩 없음
     }
   }
 

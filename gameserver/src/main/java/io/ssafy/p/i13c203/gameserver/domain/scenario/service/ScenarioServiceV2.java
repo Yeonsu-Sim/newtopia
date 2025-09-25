@@ -11,10 +11,12 @@ import io.minio.messages.OutputSerialization;
 import io.minio.messages.CompressionType;
 import io.minio.messages.JsonType;
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
+import io.ssafy.p.i13c203.gameserver.domain.game.model.CardType;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.CountryStats;
 import io.ssafy.p.i13c203.gameserver.domain.image.entity.Image;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Scenario;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.entity.Npc;
+import io.ssafy.p.i13c203.gameserver.domain.scenario.model.EffectApplyType;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.repository.ScenarioRepository;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.ChoiceDoc;
 import io.ssafy.p.i13c203.gameserver.domain.scenario.doc.PressReleaseDoc;
@@ -56,7 +58,7 @@ public class ScenarioServiceV2 implements ScenarioService{
 
 
     @Override
-    public Scenario firstScenario() {
+    public Scenario firstScenario(Long memberId) {
         JsonNode newsData = simpleNewsService.getRandomNews();
         return createScenarioFromNews(newsData);
     }
@@ -67,7 +69,7 @@ public class ScenarioServiceV2 implements ScenarioService{
     // 속도가 안나서 랜덤으로 하고
     // 후에 db 로 바꾸면 로직 바꿀게요
     @Override
-    public Scenario nextScenario(Game game, int nextTurn) {
+    public Scenario nextScenario(Game game) {
 
         JsonNode newsData = simpleNewsService.getRandomNews();
         return createScenarioFromNews(newsData);
@@ -230,6 +232,7 @@ public class ScenarioServiceV2 implements ScenarioService{
 
         Scenario sc = Scenario.builder()
                 .title(title)
+                .type(CardType.ORIGIN)
                 .content(content)
                 .npc(npc)
                 .spawn(spawn)
@@ -326,6 +329,7 @@ public class ScenarioServiceV2 implements ScenarioService{
         // scores 파싱
         JsonNode scoresNode = effectNode.path("scores");
         EffectScoresDoc scores = new EffectScoresDoc(
+            EffectApplyType.RELATIVE,
             scoresNode.path("economy").asInt(),
             scoresNode.path("defense").asInt(),
             scoresNode.path("publicSentiment").asInt(),
@@ -335,6 +339,7 @@ public class ScenarioServiceV2 implements ScenarioService{
         // weights 파싱
 //        JsonNode weightsNode = effectNode.path("weights");
         EffectWeightsDoc weights = new EffectWeightsDoc(
+                EffectApplyType.RELATIVE,
                 WEIGHT_VALUE,
                 WEIGHT_VALUE,
                 WEIGHT_VALUE,
@@ -360,6 +365,7 @@ public class ScenarioServiceV2 implements ScenarioService{
         // scores 파싱
         JsonNode scoresNode = effectNode.path("scores");
         EffectScoresDoc scores = new EffectScoresDoc(
+                EffectApplyType.RELATIVE,
                 scoresNode.path("economy").asInt(),
                 scoresNode.path("defense").asInt(),
                 scoresNode.path("publicSentiment").asInt(),
@@ -369,6 +375,7 @@ public class ScenarioServiceV2 implements ScenarioService{
         // weights 파싱
 //        JsonNode weightsNode = effectNode.path("weights");
         EffectWeightsDoc weights = new EffectWeightsDoc(
+                EffectApplyType.RELATIVE,
                 WEIGHT_VALUE,
                 WEIGHT_VALUE,
                 WEIGHT_VALUE,

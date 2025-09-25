@@ -1,6 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.game.controller;
 
 import io.ssafy.p.i13c203.gameserver.auth.security.CustomUserDetails;
+import io.ssafy.p.i13c203.gameserver.domain.game.dto.ChoiceHintDTO;
 import io.ssafy.p.i13c203.gameserver.domain.game.dto.request.CreateGameRequest;
 import io.ssafy.p.i13c203.gameserver.domain.game.dto.request.SubmitChoiceRequest;
 import io.ssafy.p.i13c203.gameserver.domain.game.dto.response.*;
@@ -82,5 +83,20 @@ public interface GameController {
             ) @RequestHeader String idemKey,
             @Parameter(description = "선택지 제출 요청 정보")
             @RequestBody @Valid SubmitChoiceRequest request
+    );
+
+    @Operation(summary = "선택지에 대한 지표 변동 힌트 제공", description = "각 A/B 선택지에 대한 지표 변동의 정도를 알려줍니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "힌트 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 필요"),
+            @ApiResponse(responseCode = "403", description = "해당 게임에 접근 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "게임을 찾을 수 없음"),
+    })
+    @GetMapping("/{gameId}/hints")
+    ResponseEntity<APIResponse<ChoiceHintDTO, Void>> getHints(
+            @Parameter(description = "게임 ID", example = "1")
+            @PathVariable Long gameId,
+            @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails
     );
 }

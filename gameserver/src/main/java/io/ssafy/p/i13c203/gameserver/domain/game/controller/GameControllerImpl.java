@@ -126,7 +126,7 @@ public class GameControllerImpl implements GameController {
                 // 실제 게임 종료/엔딩 정보 반영
                 GameStateDto.of(
                         result.gameOver(),
-                        null,  // TODO: Game Result - Report 기능 구현 이후 값 지정
+                        null,  // TODO: 미사용 필드 수거 보류
                         EndingDto.from(result.ending())
                 ),
                 NextTurnDto.of(
@@ -138,6 +138,18 @@ public class GameControllerImpl implements GameController {
 
         String msg = result.gameOver() ? "게임이 종료되었습니다." : "답변 선택을 완료했습니다.";
         return ResponseEntity.ok(APIResponse.success(msg, response));
+    }
+
+    @Override
+    public ResponseEntity<APIResponse<ChoiceHintDTO, Void>> getHints(Long gameId,
+            CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(APIResponse.fail("AUTH_REQUIRED", "인증이 필요합니다"));
+        }
+
+        ChoiceHintDTO hintsAboutChoice = gameService.getHintsAboutChoice(gameId);
+
+        return ResponseEntity.ok(APIResponse.success(hintsAboutChoice));
     }
 
 }
