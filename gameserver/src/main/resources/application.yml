@@ -70,10 +70,10 @@ cookie:
 # gms
 ssafy:
   gms:
-    base-url: https://gms.ssafy.io
+    base-url: https://api.openai.com
     paths:
-      chat-completions: /gmsapi/api.openai.com/v1/chat/completions
-    bearer-token: "S13P22C203-45155ad1-760a-4e91-bebf-8a7db540fc92"     # 예: S13P22C203-...
+      chat-completions: /v1/chat/completions
+    bearer-token: "${ssafy.gms.bearer-token}"     # 예: S13P22C203-...
     # api-key: ${GMS_API_KEY}            # GMS가 X-API-KEY를 요구한다면 사용
     log-body-preview: 500                # 본문 최대 N자만 로그(보안/성능)
     timeout-ms: 8000
