@@ -66,12 +66,14 @@ export const CloseButton = styled.button`
 
 export const ModalHeader = styled.div`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 30px;
+  gap: 15px;
 
   @media (max-width: 768px) {
     margin-bottom: 20px;
+    gap: 10px;
   }
 `
 
@@ -302,5 +304,68 @@ export const ErrorMessage = styled.div`
   @media (max-width: 768px) {
     font-size: 18px;
     padding: 10px 15px;
+  }
+`
+
+export const SummaryInfo = styled.div`
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid #f9bf26;
+  border-radius: 15px;
+  padding: 15px 25px;
+  color: #fff;
+  text-align: center;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  text-shadow: 2px 2px 4px #6e3400;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+    padding: 12px 20px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 16px;
+    padding: 10px 15px;
+  }
+`
+
+export const CountBadge = styled.div<EndingCardProps>`
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: ${({ $isUnlocked }) =>
+    $isUnlocked ? 'linear-gradient(45deg, #f9bf26, #ffd700)' : '#666'};
+  color: ${({ $isUnlocked }) => $isUnlocked ? '#8e4600' : '#ccc'};
+  border: 2px solid ${({ $isUnlocked }) =>
+    $isUnlocked ? '#e49000' : '#444'};
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: ${({ $isUnlocked }) =>
+    $isUnlocked ? '1px 1px 2px rgba(0, 0, 0, 0.3)' : 'none'};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  visibility: ${({ $isUnlocked }) => $isUnlocked ? 'visible' : 'hidden'};
+
+  @media (max-width: 768px) {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    top: -6px;
+    right: -6px;
+  }
+
+  @media (max-width: 480px) {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+    top: -4px;
+    right: -4px;
   }
 `
