@@ -47,6 +47,7 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 
 	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'org.springframework.session:spring-session-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.redisson:redisson:3.50.0'

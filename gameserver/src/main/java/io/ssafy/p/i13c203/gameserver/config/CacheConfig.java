@@ -1,27 +1,37 @@
 package io.ssafy.p.i13c203.gameserver.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.util.Arrays;
+import java.time.Duration;
 
 @Slf4j
 @Configuration
 @EnableCaching
 public class CacheConfig {
 
-    @Bean
-    public CacheManager cacheManager() {
-        log.info("인메모리 기반 CacheManager 설정 시작");
+  @Bean
+  public RedisCacheManager cacheManager(RedisConnectionFactory cf, ObjectMapper om) {
+    om.registerModule(new JavaTimeModule());
+    var valueSerializer = new GenericJackson2JsonRedisSerializer(om);
+    var config = RedisCacheConfiguration.defaultCacheConfig()
+      .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+      .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer))
+      .entryTtl(Duration.ofMinutes(10))
+      .disableCachingNullValues();
 
-        ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager();
-        cacheManager.setCacheNames(Arrays.asList("users"));
-
-        log.info("인메모리 기반 CacheManager 설정 완료 - 캐시: users");
-        return cacheManager;
-    }
+    return RedisCacheManager.builder(cf)
+      .cacheDefaults(config)
+      .build();
+  }
 }
