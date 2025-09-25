@@ -58,7 +58,19 @@ VALUES
     (8, 'ENV_MIN', '환경이 0이 되었습니다.', '강은 말랐고, 숨은 막혔다.', 'environment==0', NULL, now(), now()),
     (9,  'DOUBLE_OVER', '나라가 반이나 남았네?', '두개의 지표가 붕괴했습니다...', 'totalOver==2', NULL, now(), now()),
     (10, 'TRIPLE_OVER', '삼권붕괴', '세개의 지표가 붕괴했습니다... 우리나라의 미래는 어떻게 될까요?', 'totalOver==3', NULL, now(), now()),
-    (11, 'QUAD_OVER', '(나라가) 폭싹 망했수다', '진정한 뉴토피아', 'totalOver==4', NULL, now(), now())
+    (11, 'QUAD_OVER', '(나라가) 폭싹 망했수다', '진정한 뉴토피아', 'totalOver==4', NULL, now(), now()),
+    (12, 'ECO_100_PUB_LE30', '고독한 부', '돈은 넘쳐나지만, 당신을 따르는 이는 없다.', 'economy==100 && publicSentiment<=30', NULL, now(), now()),
+    (13, 'ECO_100_ENV_LE30', '잿더미 위의 황금', '황금의 제국은 잿더미 위에 세워졌다.', 'economy==100 && environment<=30', NULL, now(), now()),
+    (14, 'ECO_100_DEF_LE30', '부유한 잔해', '금고는 터질 듯 부풀었으나, 성벽은 갈라져 무너진다.', 'economy==100 && defense<=30', NULL, now(), now()),
+    (15, 'DEF_100_PUB_LE30', '강철과 고독', '군대는 강철 같지만, 시민은 당신을 버렸다.', 'defense==100 && publicSentiment<=30', NULL, now(), now()),
+    (16, 'DEF_100_ECO_LE30', '총과 굶주림', '전차는 굴러가도, 창고는 비어 있다.', 'defense==100 && economy<=30', NULL, now(), now()),
+    (17, 'DEF_100_ENV_LE30', '쇠소리와 침묵', '총성은 울리지만, 숲은 더 이상 노래하지 않는다.', 'defense==100 && environment<=30', NULL, now(), now()),
+    (18, 'PUB_100_ECO_LE30', '행복한 굶주림', '시민은 행복하다. 굶주림 속에서도.', 'publicSentiment==100 && economy<=30', NULL, now(), now()),
+    (19, 'PUB_100_DEF_LE30', '웃음 속의 그림자', '모두가 웃는다. 외적의 그림자 속에서도.', 'publicSentiment==100 && defense<=30', NULL, now(), now()),
+    (20, 'PUB_100_ENV_LE30', '웃음과 연기', '거리엔 웃음꽃, 하늘엔 검은 연기.', 'publicSentiment==100 && environment<=30', NULL, now(), now()),
+    (21, 'ENV_100_ECO_LE30', '푸른 황폐', '자연은 되살아났지만, 시장은 썰렁하다.', 'environment==100 && economy<=30', NULL, now(), now()),
+    (22, 'ENV_100_PUB_LE30', '고독한 숲', '숲은 푸르지만, 광장은 텅 비었다.', 'environment==100 && publicSentiment<=30', NULL, now(), now()),
+    (23, 'ENV_100_DEF_LE30', '무너진 국경', '새들은 노래하지만, 국경은 무너진다.', 'environment==100 && defense<=30', NULL, now(), now())
 ON CONFLICT (id) DO UPDATE SET
                                code = EXCLUDED.code,
                                title = EXCLUDED.title,
@@ -480,56 +492,60 @@ ON CONFLICT (id) DO UPDATE SET
 -- --------------------------------------------------------------------
 -- 뉴스 임시 원본 데이터
 -- --------------------------------------------------------------------
--- 1) 경제 이슈 (positive)
 INSERT INTO news_events (
     article_id, source_url, title, content, published_at, categories, sentiment, processed_at
-) VALUES (
-             '20250922-0001',
-             'https://news.example.com/economy-1',
-             '재정 정책 조정 발표',
-             '정부가 재정 지출 조정안을 발표하며 시장의 주목을 받고 있습니다.',
-             '2025-09-22 09:15:00',
-             '{
-               "sub_categories": { "economy": [ { "category": "fiscalPolicy", "confidence": 0.81 } ] },
-               "major_categories": [ { "category": "economy", "confidence": 0.87 } ],
-               "debug_similarities": { "defense": 0.12, "economy": 0.87, "environment": 0.22, "publicSentiment": 0.31 }
-             }'::jsonb,
-             '{ "label": "positive", "score": 0.64 }'::jsonb,
-             '2025-09-23 08:00:00'
-         );
-
--- 2) 국방 이슈 (negative)
-INSERT INTO news_events (
-    article_id, source_url, title, content, published_at, categories, sentiment, processed_at
-) VALUES (
-             '20250922-0002',
-             'https://news.example.com/defense-1',
-             '국방 예산 증액 논의 확산',
-             '국회에서 내년도 국방 예산 증액안이 논의되며 재정 부담 논쟁이 커지고 있습니다.',
-             '2025-09-22 11:40:00',
-             '{
-               "sub_categories": { "defense": [ { "category": "militarySpending", "confidence": 0.78 } ] },
-               "major_categories": [ { "category": "defense", "confidence": 0.83 } ],
-               "debug_similarities": { "defense": 0.83, "economy": 0.34, "environment": 0.15, "publicSentiment": 0.29 }
-             }'::jsonb,
-             '{ "label": "negative", "score": 0.58 }'::jsonb,
-             '2025-09-23 08:05:00'
-         );
-
--- 3) 환경 이슈 (neutral)
-INSERT INTO news_events (
-    article_id, source_url, title, content, published_at, categories, sentiment, processed_at
-) VALUES (
-             '20250922-0003',
-             'https://news.example.com/environment-1',
-             '재생에너지 투자 확대',
-             '정부와 민간이 대규모 재생에너지 투자 계획을 발표해 산업계의 관심이 집중되고 있습니다.',
-             '2025-09-22 14:05:00',
-             '{
-               "sub_categories": { "environment": [ { "category": "renewableEnergy", "confidence": 0.76 } ] },
-               "major_categories": [ { "category": "environment", "confidence": 0.80 } ],
-               "debug_similarities": { "defense": 0.09, "economy": 0.41, "environment": 0.80, "publicSentiment": 0.37 }
-             }'::jsonb,
-             '{ "label": "neutral", "score": 0.51 }'::jsonb,
-             '2025-09-23 08:10:00'
-         );
+) VALUES
+      -- 1) 경제 이슈 (positive)
+      (
+          '20250922-0001',
+          'https://news.example.com/economy-1',
+          '재정 정책 조정 발표',
+          '정부가 재정 지출 조정안을 발표하며 시장의 주목을 받고 있습니다.',
+          '2025-09-22 09:15:00',
+          '{
+            "sub_categories": { "economy": [ { "category": "fiscalPolicy", "confidence": 0.81 } ] },
+            "major_categories": [ { "category": "economy", "confidence": 0.87 } ],
+            "debug_similarities": { "defense": 0.12, "economy": 0.87, "environment": 0.22, "publicSentiment": 0.31 }
+          }'::jsonb,
+          '{ "label": "positive", "score": 0.64 }'::jsonb,
+          '2025-09-23 08:00:00'
+      ),
+      -- 2) 국방 이슈 (negative)
+      (
+          '20250922-0002',
+          'https://news.example.com/defense-1',
+          '국방 예산 증액 논의 확산',
+          '국회에서 내년도 국방 예산 증액안이 논의되며 재정 부담 논쟁이 커지고 있습니다.',
+          '2025-09-22 11:40:00',
+          '{
+            "sub_categories": { "defense": [ { "category": "militarySpending", "confidence": 0.78 } ] },
+            "major_categories": [ { "category": "defense", "confidence": 0.83 } ],
+            "debug_similarities": { "defense": 0.83, "economy": 0.34, "environment": 0.15, "publicSentiment": 0.29 }
+          }'::jsonb,
+          '{ "label": "negative", "score": 0.58 }'::jsonb,
+          '2025-09-23 08:05:00'
+      ),
+      -- 3) 환경 이슈 (neutral)
+      (
+          '20250922-0003',
+          'https://news.example.com/environment-1',
+          '재생에너지 투자 확대',
+          '정부와 민간이 대규모 재생에너지 투자 계획을 발표해 산업계의 관심이 집중되고 있습니다.',
+          '2025-09-22 14:05:00',
+          '{
+            "sub_categories": { "environment": [ { "category": "renewableEnergy", "confidence": 0.76 } ] },
+            "major_categories": [ { "category": "environment", "confidence": 0.80 } ],
+            "debug_similarities": { "defense": 0.09, "economy": 0.41, "environment": 0.80, "publicSentiment": 0.37 }
+          }'::jsonb,
+          '{ "label": "neutral", "score": 0.51 }'::jsonb,
+          '2025-09-23 08:10:00'
+      )
+ON CONFLICT (article_id) DO UPDATE
+    SET
+        source_url    = EXCLUDED.source_url,
+        title         = EXCLUDED.title,
+        content       = EXCLUDED.content,
+        published_at  = EXCLUDED.published_at,
+        categories    = EXCLUDED.categories,
+        sentiment     = EXCLUDED.sentiment,
+        processed_at  = EXCLUDED.processed_at;
