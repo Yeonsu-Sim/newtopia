@@ -38,6 +38,10 @@ ALTER TABLE scenario
     ADD CONSTRAINT scenario_type_check
         CHECK (type IN ('ORIGIN', 'CONSEQUENCE', 'EVENT'));
 
+-- PK 1000부터 시작
+ALTER SEQUENCE scenario_id_seq RESTART WITH 1000;
+
+
 
 -- --------------------------------------------------------------------
 -- Ending 시드 데이터
@@ -472,3 +476,60 @@ ON CONFLICT (id) DO UPDATE SET
                                origin_scenario_id = EXCLUDED.origin_scenario_id,
                                spawn              = EXCLUDED.spawn,
                                updated_at         = now();
+
+-- --------------------------------------------------------------------
+-- 뉴스 임시 원본 데이터
+-- --------------------------------------------------------------------
+-- 1) 경제 이슈 (positive)
+INSERT INTO news_events (
+    article_id, source_url, title, content, published_at, categories, sentiment, processed_at
+) VALUES (
+             '20250922-0001',
+             'https://news.example.com/economy-1',
+             '재정 정책 조정 발표',
+             '정부가 재정 지출 조정안을 발표하며 시장의 주목을 받고 있습니다.',
+             '2025-09-22 09:15:00',
+             '{
+               "sub_categories": { "economy": [ { "category": "fiscalPolicy", "confidence": 0.81 } ] },
+               "major_categories": [ { "category": "economy", "confidence": 0.87 } ],
+               "debug_similarities": { "defense": 0.12, "economy": 0.87, "environment": 0.22, "publicSentiment": 0.31 }
+             }'::jsonb,
+             '{ "label": "positive", "score": 0.64 }'::jsonb,
+             '2025-09-23 08:00:00'
+         );
+
+-- 2) 국방 이슈 (negative)
+INSERT INTO news_events (
+    article_id, source_url, title, content, published_at, categories, sentiment, processed_at
+) VALUES (
+             '20250922-0002',
+             'https://news.example.com/defense-1',
+             '국방 예산 증액 논의 확산',
+             '국회에서 내년도 국방 예산 증액안이 논의되며 재정 부담 논쟁이 커지고 있습니다.',
+             '2025-09-22 11:40:00',
+             '{
+               "sub_categories": { "defense": [ { "category": "militarySpending", "confidence": 0.78 } ] },
+               "major_categories": [ { "category": "defense", "confidence": 0.83 } ],
+               "debug_similarities": { "defense": 0.83, "economy": 0.34, "environment": 0.15, "publicSentiment": 0.29 }
+             }'::jsonb,
+             '{ "label": "negative", "score": 0.58 }'::jsonb,
+             '2025-09-23 08:05:00'
+         );
+
+-- 3) 환경 이슈 (neutral)
+INSERT INTO news_events (
+    article_id, source_url, title, content, published_at, categories, sentiment, processed_at
+) VALUES (
+             '20250922-0003',
+             'https://news.example.com/environment-1',
+             '재생에너지 투자 확대',
+             '정부와 민간이 대규모 재생에너지 투자 계획을 발표해 산업계의 관심이 집중되고 있습니다.',
+             '2025-09-22 14:05:00',
+             '{
+               "sub_categories": { "environment": [ { "category": "renewableEnergy", "confidence": 0.76 } ] },
+               "major_categories": [ { "category": "environment", "confidence": 0.80 } ],
+               "debug_similarities": { "defense": 0.09, "economy": 0.41, "environment": 0.80, "publicSentiment": 0.37 }
+             }'::jsonb,
+             '{ "label": "neutral", "score": 0.51 }'::jsonb,
+             '2025-09-23 08:10:00'
+         );

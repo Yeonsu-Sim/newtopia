@@ -18,7 +18,7 @@ spring:
 
   sql:
     init:
-      mode: always  # TODO: 임시 설정 수거 -> never
+      mode: never  # TODO: 임시 설정 수거 -> never
       data-locations: classpath:sql/data.sql
 
 

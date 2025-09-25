@@ -1,6 +1,7 @@
 package io.ssafy.p.i13c203.gameserver.domain.game.repository;
 
 import io.ssafy.p.i13c203.gameserver.domain.game.entity.Game;
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,8 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     Optional<Game> findFirstByMemberIdAndActiveTrueOrderByCreatedAtDesc(Long memberId);
 
+    @Query("select g.id from Game g where g.memberId = :memberId")
+    List<Long> findGameIdsByMemberId(@Param("memberId") Long memberId);
     boolean existsByIdAndMemberId(Long id, Long memberId);  // 소유권 확인
 
     @Query("""

@@ -27,7 +27,7 @@ import io.ssafy.p.i13c203.gameserver.domain.game.doc.EffectScoresDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.EffectWeightsDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.doc.ConditionEntryDoc;
 import io.ssafy.p.i13c203.gameserver.domain.game.model.ConditionOperator;
-import io.ssafy.p.i13c203.gameserver.domain.game.model.MinorCategory;
+import io.ssafy.p.i13c203.gameserver.domain.game.model.MajorCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Random;
 
 
-@Service
+//@Service
 @RequiredArgsConstructor
 @Slf4j
 public class ScenarioServiceV2 implements ScenarioService{
