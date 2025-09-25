@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getEndingCollection, type EndingItem } from '@/services/endingApi'
+import { getEndingCollectionWithSummary, type EndingItem, type EndingSummary } from '@/services/endingApi'
 import {
   ModalOverlay,
   ModalBackground,
@@ -7,12 +7,14 @@ import {
   CloseButton,
   ModalHeader,
   HeaderTitle,
+  SummaryInfo,
   CollectionContainer,
   EndingGrid,
   EndingCard,
   EndingImage,
   EndingTitle,
   EndingDescription,
+  CountBadge,
   LockIcon,
   LoadingSpinner,
   ErrorMessage,
@@ -28,6 +30,7 @@ export const EndingModal: React.FC<EndingModalProps> = ({
   onClose,
 }) => {
   const [endingData, setEndingData] = useState<EndingItem[]>([])
+  const [summaryData, setSummaryData] = useState<EndingSummary | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>('')
 
@@ -43,8 +46,9 @@ export const EndingModal: React.FC<EndingModalProps> = ({
     setError('')
 
     try {
-      const data = await getEndingCollection()
-      setEndingData(data)
+      const { endings, summary } = await getEndingCollectionWithSummary()
+      setEndingData(endings)
+      setSummaryData(summary)
     } catch (err) {
       setError(
         err instanceof Error ? err.message : '엔딩 컬렉션을 불러오는데 실패했습니다.',
@@ -79,6 +83,11 @@ export const EndingModal: React.FC<EndingModalProps> = ({
 
         <ModalHeader>
           <HeaderTitle>엔딩 도감</HeaderTitle>
+          {summaryData && (
+            <SummaryInfo>
+              수집된 엔딩: {summaryData.collected} / {summaryData.total}
+            </SummaryInfo>
+          )}
         </ModalHeader>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -94,6 +103,12 @@ export const EndingModal: React.FC<EndingModalProps> = ({
                   $isUnlocked={ending.isUnlocked}
                   onClick={() => handleEndingClick(ending)}
                 >
+                  {ending.isUnlocked && ending.count > 0 && (
+                    <CountBadge $isUnlocked={ending.isUnlocked}>
+                      {ending.count}
+                    </CountBadge>
+                  )}
+
                   <EndingImage $isUnlocked={ending.isUnlocked}>
                     {ending.isUnlocked ? (
                       <img

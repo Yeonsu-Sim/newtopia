@@ -1,13 +1,54 @@
 // 엔딩 관련 API 서비스
 
+// 기존 UI에서 사용하는 인터페이스 (하위 호환성 유지)
 export interface EndingItem {
   code: string;
   title: string;
   description: string;
   imageUrl: string;
   isUnlocked: boolean;
+  count: number;
 }
 
+// 새로운 API 응답 타입 정의
+export interface EndingSummary {
+  total: number;
+  collected: number;
+}
+
+export interface EndingAssets {
+  imageUrl: string;
+  thumbnailUrl: string;
+}
+
+export interface EndingStatus {
+  collected: boolean;
+  count: number;
+  lastCollectedAt: string;
+}
+
+export interface EndingData {
+  code: string;
+  title: string;
+  content: string;
+  assets: EndingAssets;
+  status: EndingStatus;
+}
+
+export interface EndingsApiResponse {
+  status: 'success' | 'error';
+  data: {
+    summary: EndingSummary;
+    endings: EndingData[];
+  };
+  message: string;
+  error: {
+    code: string;
+    details: {};
+  } | null;
+}
+
+// 기존 응답 타입 (하위 호환성 유지)
 export interface EndingCollectionResponse {
   status: 'success' | 'error';
   data: EndingItem[];
@@ -18,141 +59,95 @@ export interface EndingCollectionResponse {
   };
 }
 
-// const API_BASE_URL = '/api/v1'; // 추후 실제 API 연동 시 사용
+const API_BASE_URL = '/api/v1';
 
-// 임시 목업 데이터 (추후 실제 API로 교체)
-const mockEndingData: EndingItem[] = [
-  {
-    code: 'ECO_MAX',
-    title: '경제 100달성.',
-    description: '부는 쌓였지만, 나눌 생각은 없었다.',
-    imageUrl: '/ending/ECO_MAX.png',
-    isUnlocked: true,
-  },
-  {
-    code: 'ECO_MIN',
-    title: '경제 0달성.',
-    description: '돈도, 빵도, 희망도 사라졌다.',
-    imageUrl: '/ending/ECO_MIN.png',
-    isUnlocked: false,
-  },
-  {
-    code: 'DEF_MAX',
-    title: '국방 100달성.',
-    description: '철옹성은 완성됐다. 감옥도 함께.',
-    imageUrl: '/ending/DEF_MAX.png',
-    isUnlocked: true,
-  },
-  {
-    code: 'DEF_MIN',
-    title: '국방 0달성.',
-    description: '군대가 사라지자, 나라가 사라졌다.',
-    imageUrl: '/ending/DEF_MIN.png',
-    isUnlocked: false,
-  },
-  {
-    code: 'PUB_MAX',
-    title: '민심 100달성.',
-    description: '사랑이 지나쳐 숭배가 되었다.',
-    imageUrl: '/ending/PUB_MAX.png',
-    isUnlocked: true,
-  },
-  {
-    code: 'PUB_MIN',
-    title: '민심 0달성.',
-    description: '군중은 환호를 멈추고 돌을 던졌다.',
-    imageUrl: '/ending/PUB_MIN.png',
-    isUnlocked: false,
-  },
-  {
-    code: 'ENV_MAX',
-    title: '환경 100달성.',
-    description: '숲은 살아났지만, 사람은 사라졌다.',
-    imageUrl: '/ending/ENV_MAX.png',
-    isUnlocked: false,
-  },
-  {
-    code: 'ENV_MIN',
-    title: '환경 0달성.',
-    description: '강은 말랐고, 숨은 막혔다.',
-    imageUrl: '/ending/ENV_MIN.png',
-    isUnlocked: false,
-  },
-  {
-    code: 'DOUBLE_OVER',
-    title: '나라가 반이나 남았네?',
-    description: '두개의 지표가 붕괴했습니다…',
-    imageUrl: '/ending/DOUBLE_OVER.png',
-    isUnlocked: true,
-  },
-  {
-    code: 'TRIPLE_OVER',
-    title: '삼권붕괴',
-    description: '세개의 지표가 붕괴했습니다… 우리나라의 미래는 어떻게 될까요?',
-    imageUrl: '/ending/TRIPLE_OVER.png',
-    isUnlocked: false,
-  },
-  {
-    code: 'QUAD_OVER',
-    title: '(나라가) 폭싹 망했수다',
-    description: '진정한 뉴토피아',
-    imageUrl: '/ending/QUAD_OVER.png',
-    isUnlocked: false,
-  },
-];
-
-// 사용자의 엔딩 컬렉션 조회 (추후 실제 API로 교체)
-export const getEndingCollection = async (): Promise<EndingItem[]> => {
-  // TODO: 실제 API 연결 시 아래 주석 해제하고 목업 데이터 제거
-  /*
-  const response = await fetch(`${API_BASE_URL}/endings/collection`, {
-    method: 'GET',
-    credentials: 'include',
-  });
-
-  const data: EndingCollectionResponse = await response.json();
-
-  if (!response.ok || data.status === 'error') {
-    throw new Error(data.message || '엔딩 컬렉션을 불러오는데 실패했습니다.');
-  }
-
-  return data.data;
-  */
-
-  // 임시 목업 데이터 반환
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockEndingData);
-    }, 500); // 로딩 시뮬레이션
-  });
+// API 응답을 UI에서 사용하는 형태로 변환하는 유틸리티 함수
+const convertEndingDataToEndingItem = (endingData: EndingData): EndingItem => {
+  return {
+    code: endingData.code,
+    title: endingData.title,
+    description: endingData.content,
+    imageUrl: endingData.assets.imageUrl,
+    isUnlocked: endingData.status.collected,
+    count: endingData.status.count,
+  };
 };
 
-// 특정 엔딩 상세 정보 조회 (추후 실제 API로 교체)
-export const getEndingDetail = async (endingCode: string): Promise<any> => {
-  // TODO: 실제 API 연결 시 구현
-  /*
-  const response = await fetch(`${API_BASE_URL}/endings/${endingCode}`, {
-    method: 'GET',
-    credentials: 'include',
-  });
+// 사용자의 엔딩 컬렉션과 요약 정보 조회
+export const getEndingCollection = async (): Promise<EndingItem[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/endings/me`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-  if (!response.ok || data.status === 'error') {
-    throw new Error(data.message || '엔딩 정보를 불러오는데 실패했습니다.');
+    const data: EndingsApiResponse = await response.json();
+
+    if (data.status === 'error') {
+      throw new Error(data.message || '엔딩 컬렉션을 불러오는데 실패했습니다.');
+    }
+
+    // API 응답을 기존 EndingItem 형태로 변환
+    return data.data.endings.map(convertEndingDataToEndingItem);
+  } catch (error) {
+    console.error('Failed to fetch ending collection:', error);
+    throw error instanceof Error ? error : new Error('엔딩 컬렉션을 불러오는데 실패했습니다.');
   }
+};
 
-  return data.data;
-  */
+// 엔딩 컬렉션과 요약 정보를 함께 반환하는 함수
+export interface EndingCollectionWithSummary {
+  endings: EndingItem[];
+  summary: EndingSummary;
+}
 
-  const ending = mockEndingData.find(item => item.code === endingCode);
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (ending) {
-        resolve(ending);
-      } else {
-        reject(new Error('엔딩을 찾을 수 없습니다.'));
-      }
-    }, 300);
-  });
+export const getEndingCollectionWithSummary = async (): Promise<EndingCollectionWithSummary> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/endings/me`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: EndingsApiResponse = await response.json();
+
+    if (data.status === 'error') {
+      throw new Error(data.message || '엔딩 컬렉션을 불러오는데 실패했습니다.');
+    }
+
+    return {
+      endings: data.data.endings.map(convertEndingDataToEndingItem),
+      summary: data.data.summary,
+    };
+  } catch (error) {
+    console.error('Failed to fetch ending collection with summary:', error);
+    throw error instanceof Error ? error : new Error('엔딩 컬렉션을 불러오는데 실패했습니다.');
+  }
+};
+
+// 특정 엔딩 상세 정보 조회
+// 현재 API에서는 모든 엔딩 정보를 한 번에 가져오므로,
+// 필요한 경우 getEndingCollection()에서 특정 코드로 필터링
+export const getEndingDetail = async (endingCode: string): Promise<EndingItem | null> => {
+  try {
+    const allEndings = await getEndingCollection();
+    const ending = allEndings.find(item => item.code === endingCode);
+    return ending || null;
+  } catch (error) {
+    console.error('Failed to fetch ending detail:', error);
+    throw error instanceof Error ? error : new Error('엔딩 정보를 불러오는데 실패했습니다.');
+  }
 };
