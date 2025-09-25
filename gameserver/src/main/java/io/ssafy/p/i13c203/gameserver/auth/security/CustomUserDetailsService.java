@@ -25,9 +25,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(member);
     }
 
-    @Cacheable(value = "users", key = "#memberId")
     public UserDetails loadUserByMemberId(Long memberId) throws UsernameNotFoundException {
-        log.trace("회원 ID로 사용자 조회 시작 - 회원 ID: {} (인메모리 캐시 미스로 DB 조회)", memberId);
+        log.trace("회원 ID로 사용자 조회 시작 - 회원 ID: {}", memberId);
 
         try {
             Member member = memberRepository.findById(memberId)
@@ -40,7 +39,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                     member.getId(), member.getEmail(), member.getRole());
 
             CustomUserDetails userDetails = new CustomUserDetails(member);
-            log.trace("CustomUserDetails 생성 완료 - 권한: {} (인메모리 캐시에 저장됨)", userDetails.getAuthorities());
+            log.trace("CustomUserDetails 생성 완료 - 권한: {}", userDetails.getAuthorities());
 
             return userDetails;
         } catch (Exception e) {
