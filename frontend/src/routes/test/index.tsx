@@ -270,6 +270,7 @@ function TestComponent() {
 
       {choiceOpen && (
         <ChoiceDialog
+          gameId={999} // 테스트용 gameId
           guestText={mockCard.content}
           choices={mockCard.choices}
           currentStats={mockStats}

@@ -6,13 +6,15 @@ import {
   ProgressValue,
   ParameterEmoji,
 } from '@/routes/game/-Game.styles'
+import { type ParameterChangeLevel } from '@/services/game/gameService'
 
 interface ParameterProps {
   type: 'eco' | 'env' | 'opi' | 'mil'
   value: number
+  highlightLevel?: ParameterChangeLevel
 }
 
-const ParameterChange: React.FC<ParameterProps> = ({ type, value }) => {
+const ParameterChange: React.FC<ParameterProps> = ({ type, value, highlightLevel }) => {
   const getEmoji = (t: ParameterProps['type']) => {
     switch (t) {
       case 'eco':
@@ -28,9 +30,15 @@ const ParameterChange: React.FC<ParameterProps> = ({ type, value }) => {
     }
   }
 
+  // 하이라이트 애니메이션 클래스 결정
+  const getHighlightClass = () => {
+    if (!highlightLevel || highlightLevel === 'none') return ''
+    return `highlight-${highlightLevel}`
+  }
+
   return (
     <ParameterChangeWrapper>
-      <ParameterEmoji>{getEmoji(type)}</ParameterEmoji>
+      <ParameterEmoji className={getHighlightClass()}>{getEmoji(type)}</ParameterEmoji>
       <ProgressBox>
         <ProgressBar>
           <ProgressFill value={value} max={100} />

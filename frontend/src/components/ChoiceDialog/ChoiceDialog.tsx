@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAudio } from '@/hooks/useAudio'
+import { gameService, type HintData } from '@/services/game/gameService'
 
 import { ParameterChangeBox } from '@/routes/game/-Game.styles'
 
@@ -29,6 +30,7 @@ interface CountryStats {
 }
 
 interface ChoiceDialogProps {
+  gameId: number
   guestText: string
   choices: ChoiceOption[]
   currentStats: CountryStats
@@ -39,6 +41,7 @@ interface ChoiceDialogProps {
 }
 
 const ChoiceDialog: React.FC<ChoiceDialogProps> = ({
+  gameId,
   guestText,
   choices,
   currentStats,
@@ -48,6 +51,8 @@ const ChoiceDialog: React.FC<ChoiceDialogProps> = ({
 }) => {
   const { playClickSound } = useAudio({ enableBgm: false })
   const [mousePos, setMousePos] = useState(initialMousePos || { x: 0, y: 0 })
+  const [hints, setHints] = useState<HintData | null>(null)
+  const [hoveredChoice, setHoveredChoice] = useState<'A' | 'B' | null>(null)
 
   const handleBack = () => {
     playClickSound()
@@ -58,6 +63,22 @@ const ChoiceDialog: React.FC<ChoiceDialogProps> = ({
     playClickSound()
     onSelect(choiceCode)
   }
+
+  // 힌트 데이터 로드
+  useEffect(() => {
+    const loadHints = async () => {
+      try {
+        const hintData = await gameService.fetchChoiceHints(gameId)
+        setHints(hintData)
+      } catch (error) {
+        console.error('Failed to load choice hints:', error)
+      }
+    }
+
+    if (gameId) {
+      loadHints()
+    }
+  }, [gameId])
 
   useEffect(() => {
     if (initialMousePos) {
@@ -73,6 +94,7 @@ const ChoiceDialog: React.FC<ChoiceDialogProps> = ({
     return () => window.removeEventListener('mousemove', move)
   }, [])
 
+
   return (
     <DialogOverlay>
       <CustomCursorImg
@@ -81,22 +103,46 @@ const ChoiceDialog: React.FC<ChoiceDialogProps> = ({
       />
 
       <ParameterChangeBox>
-        <ParameterChange type="eco" value={currentStats.eco} />
-        <ParameterChange type="env" value={currentStats.env} />
-        <ParameterChange type="opi" value={currentStats.opi} />
-        <ParameterChange type="mil" value={currentStats.mil} />
+        <ParameterChange
+          type="eco"
+          value={currentStats.eco}
+          highlightLevel={hoveredChoice && hints ? hints[hoveredChoice].economy : undefined}
+        />
+        <ParameterChange
+          type="env"
+          value={currentStats.env}
+          highlightLevel={hoveredChoice && hints ? hints[hoveredChoice].environment : undefined}
+        />
+        <ParameterChange
+          type="opi"
+          value={currentStats.opi}
+          highlightLevel={hoveredChoice && hints ? hints[hoveredChoice].publicSentiment : undefined}
+        />
+        <ParameterChange
+          type="mil"
+          value={currentStats.mil}
+          highlightLevel={hoveredChoice && hints ? hints[hoveredChoice].defense : undefined}
+        />
       </ParameterChangeBox>
 
       <DialogBox>
         <DialogText>{guestText}</DialogText>
         <ChoiceCards>
           {choices[0] && (
-            <ChoiceCardA onClick={() => handleSelect(choices[0].code)}>
+            <ChoiceCardA
+              onClick={() => handleSelect(choices[0].code)}
+              onMouseEnter={() => setHoveredChoice('A')}
+              onMouseLeave={() => setHoveredChoice(null)}
+            >
               {choices[0].label}
             </ChoiceCardA>
           )}
           {choices[1] && (
-            <ChoiceCardB onClick={() => handleSelect(choices[1].code)}>
+            <ChoiceCardB
+              onClick={() => handleSelect(choices[1].code)}
+              onMouseEnter={() => setHoveredChoice('B')}
+              onMouseLeave={() => setHoveredChoice(null)}
+            >
               {choices[1].label}
             </ChoiceCardB>
           )}
