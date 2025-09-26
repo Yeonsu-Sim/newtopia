@@ -36,6 +36,34 @@ const Parameter: React.FC<ParameterProps> = ({ type, value, x, y }) => {
     }
   }
 
+  const getFeedback = (type: string, value: number) => {
+    if (type === 'eco') {
+      if (value < 25) return '경제 붕괴 직전!'
+      if (value < 50) return '경기 침체 우려'
+      if (value < 75) return '안정적 성장'
+      return '호황기 진입!'
+    }
+    if (type === 'mil') {
+      if (value < 25) return '국가 방어 불가'
+      if (value < 50) return '방어력 취약'
+      if (value < 75) return '전투력 양호'
+      return '압도적 군사력'
+    }
+    if (type === 'opi') {
+      if (value < 25) return '민중의 분노 폭발'
+      if (value < 50) return '불만 확산 중'
+      if (value < 75) return '대체로 만족'
+      return '절대적 지지'
+    }
+    if (type === 'env') {
+      if (value < 25) return '환경 재앙 수준'
+      if (value < 50) return '오염 심각'
+      if (value < 75) return '환경 안정적'
+      return '친환경 모범국'
+    }
+    return ''
+  }
+
   return (
     <ParameterWrapper x={x} y={y}>
       <ParameterIcon
@@ -45,7 +73,9 @@ const Parameter: React.FC<ParameterProps> = ({ type, value, x, y }) => {
         alt={`${type} parameter icon`}
       />
       <ParameterTooltip className="parameter-tooltip">
-        {getParameterLabel(type)}
+        <strong>{getParameterLabel(type)}</strong>
+        <br />
+        {getFeedback(type, value)}
       </ParameterTooltip>
       <ProgressBox>
         <ProgressBar>

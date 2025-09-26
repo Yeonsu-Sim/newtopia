@@ -11,6 +11,7 @@ import {
   BackgroundImage,
   EventIcon,
   LodingIcon,
+  PauseButton,
 } from '@/routes/game/-Game.styles'
 
 import Parameter from '@/components/Parameter'
@@ -259,6 +260,16 @@ function RouteComponent() {
           <InfoText>{countryName}</InfoText>
           <InfoText>{currentTurn ?? 0}턴</InfoText>
         </InfoBox>
+
+        <PauseButton
+          onClick={() =>
+            navigate({
+              to: `/main`,
+            })
+          }
+        >
+          ⏸ 게임 일시정지
+        </PauseButton>
       </GameHeader>
 
       <BackgroundWrapper>
