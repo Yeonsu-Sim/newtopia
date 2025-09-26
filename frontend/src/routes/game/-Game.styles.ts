@@ -137,7 +137,7 @@ export const GameHeader = styled.div`
   right: 0;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
   padding: 2rem;
   font-family: 'DNFBitBitv2', sans-serif;
   z-index: 1;
@@ -470,5 +470,55 @@ export const ParameterTooltip = styled.div`
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
     border-bottom: 6px solid rgba(0, 0, 0, 0.8);
+  }
+`
+export const PauseButton = styled.button`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 2rem;
+  min-width: 200px;
+  border-radius: 20px;
+  border: 5px solid #ff4d4d; /* 빨간색 테두리 */
+  background: #cc0000; /* 빨간색 배경 */
+  box-shadow:
+    2px 2px 4px 2px #800000 inset,
+    0px 0px 0 0px #a80000;
+  color: #fff;
+  font-family: 'Cafe24ProUp', sans-serif;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background: #e60000;
+    transform: scale(1.05);
+    box-shadow:
+      2px 2px 6px 2px #800000 inset,
+      0px 0px 10px 2px rgba(255, 0, 0, 0.7);
+  }
+
+  &:active {
+    transform: scale(0.95);
+    background: #b30000;
+  }
+
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    padding: 0.75rem 1.5rem;
+    min-width: 160px;
+    border-radius: 16px;
+    border: 4px solid #ff4d4d;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem 1rem;
+    min-width: 120px;
+    border-radius: 12px;
+    border: 3px solid #ff4d4d;
+    box-shadow:
+      1px 1px 2px 1px #800000 inset,
+      0px 0px 0 0px #a80000;
   }
 `
