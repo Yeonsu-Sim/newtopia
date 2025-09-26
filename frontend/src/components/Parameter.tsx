@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import {
   ParameterWrapper,
   ProgressBar,
@@ -6,6 +7,7 @@ import {
   ProgressValue,
   ParameterIcon,
   ParameterTooltip,
+  ParameterDiff,
 } from '@/routes/game/-Game.styles'
 import { type ParameterChangeLevel } from '@/services/game/gameService'
 
@@ -22,6 +24,19 @@ const Parameter: React.FC<ParameterProps> = ({ type, value, x, y, highlightLevel
   if (value >= 75) level = 4
   else if (value >= 50) level = 3
   else if (value >= 25) level = 2
+
+  const prevValue = useRef(value)
+  const [diff, setDiff] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (prevValue.current !== value) {
+      setDiff(value - prevValue.current)
+      prevValue.current = value
+
+      const timer = setTimeout(() => setDiff(null), 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [value])
 
   const getParameterLabel = (type: string) => {
     switch (type) {
@@ -90,7 +105,14 @@ const Parameter: React.FC<ParameterProps> = ({ type, value, x, y, highlightLevel
         <ProgressBar>
           <ProgressFill value={value} max={100} />
         </ProgressBar>
-        <ProgressValue>{value}</ProgressValue>
+        <ProgressValue>
+          {value}
+          {diff !== null && diff !== 0 && (
+            <ParameterDiff $diff={diff}>
+              {diff > 0 ? `+${diff}` : diff}
+            </ParameterDiff>
+          )}
+        </ProgressValue>
       </ProgressBox>
     </ParameterWrapper>
   )
