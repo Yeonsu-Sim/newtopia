@@ -1,4 +1,4 @@
-import styled, { createGlobalStyle } from 'styled-components'
+import styled, { createGlobalStyle, keyframes } from 'styled-components'
 
 export const GameFont = createGlobalStyle`
   @font-face {
@@ -289,6 +289,7 @@ export const ProgressBox = styled.div`
   display: flex;
   align-items: baseline;
   gap: 5px;
+  position: relative;
 `
 
 export const ProgressValue = styled.div`
@@ -411,6 +412,31 @@ export const ParameterEmoji = styled.div`
       transform: scale(1.25);
     }
   }
+`
+
+const floatUp = keyframes`
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+`
+
+export const ParameterDiff = styled.span<{ $diff: number }>`
+  position: absolute;
+  top: -1rem;
+  left: 80%;
+  margin-left: 4px;
+
+  font-weight: bold;
+  font-size: 1.5em;
+  color: ${({ $diff }) => ($diff > 0 ? '#2ecc71' : $diff < 0 ? '#e74c3c' : 'inherit')};
+
+  animation: ${floatUp} 5.0s ease-out forwards;
+  pointer-events: none;
 `
 
 export const GameMessage = styled.div`
