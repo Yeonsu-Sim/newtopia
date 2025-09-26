@@ -313,8 +313,9 @@ function RouteComponent() {
         />
       )}
 
-      {choiceOpen && currentCard && (
+      {choiceOpen && currentCard && gameId && (
         <ChoiceDialog
+          gameId={gameId}
           guestText={currentCard.content}
           choices={currentCard.choices}
           currentStats={currentStats!}

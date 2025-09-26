@@ -306,6 +306,52 @@ export const ParameterIcon = styled.img<{ $type: string; $level: number }>`
   &:hover {
     transform: scale(1.1);
   }
+
+  /* 힌트 하이라이트 애니메이션 */
+  &.highlight-small {
+    animation: glowSmall 2s infinite ease-in-out;
+  }
+
+  &.highlight-medium {
+    animation: glowMedium 2s infinite ease-in-out;
+  }
+
+  &.highlight-large {
+    animation: glowLarge 2s infinite ease-in-out;
+  }
+
+  @keyframes glowSmall {
+    0%, 100% {
+      filter: drop-shadow(0 0 5px #4CAF50) drop-shadow(0 0 15px #4CAF50) brightness(1.1);
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 15px #4CAF50) drop-shadow(0 0 25px #4CAF50) brightness(1.3);
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes glowMedium {
+    0%, 100% {
+      filter: drop-shadow(0 0 10px #FF9800) drop-shadow(0 0 20px #FF9800) brightness(1.1);
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 25px #FF9800) drop-shadow(0 0 40px #FF9800) brightness(1.4);
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes glowLarge {
+    0%, 100% {
+      filter: drop-shadow(0 0 20px #F44336) drop-shadow(0 0 30px #F44336) brightness(1.2);
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 35px #F44336) drop-shadow(0 0 55px #F44336) brightness(1.5);
+      transform: scale(1.15);
+    }
+  }
 `
 
 ParameterIcon.defaultProps = {
@@ -318,6 +364,53 @@ export const ParameterEmoji = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+
+  /* 힌트 하이라이트 애니메이션 */
+  &.highlight-small {
+    animation: emojiGlowSmall 2s infinite ease-in-out;
+  }
+
+  &.highlight-medium {
+    animation: emojiGlowMedium 2s infinite ease-in-out;
+  }
+
+  &.highlight-large {
+    animation: emojiGlowLarge 2s infinite ease-in-out;
+  }
+
+  @keyframes emojiGlowSmall {
+    0%, 100% {
+      filter: drop-shadow(0 0 12px #4CAF50) drop-shadow(0 0 20px #4CAF50) brightness(1.2);
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 20px #4CAF50) drop-shadow(0 0 30px #4CAF50) brightness(1.4);
+      transform: scale(1.15);
+    }
+  }
+
+  @keyframes emojiGlowMedium {
+    0%, 100% {
+      filter: drop-shadow(0 0 16px #FF9800) drop-shadow(0 0 25px #FF9800) brightness(1.2);
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 28px #FF9800) drop-shadow(0 0 40px #FF9800) brightness(1.5);
+      transform: scale(1.2);
+    }
+  }
+
+  @keyframes emojiGlowLarge {
+    0%, 100% {
+      filter: drop-shadow(0 0 20px #F44336) drop-shadow(0 0 35px #F44336) brightness(1.3);
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 35px #F44336) drop-shadow(0 0 55px #F44336) brightness(1.6);
+      transform: scale(1.25);
+    }
+  }
 `
 
 export const GameMessage = styled.div`

@@ -281,3 +281,4 @@ export const CustomCursorImg = styled.img`
   transform: translate(-50%, -50%);
   z-index: 9999;
 `
+

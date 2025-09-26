@@ -7,15 +7,17 @@ import {
   ParameterIcon,
   ParameterTooltip,
 } from '@/routes/game/-Game.styles'
+import { type ParameterChangeLevel } from '@/services/game/gameService'
 
 interface ParameterProps {
   type: 'eco' | 'env' | 'opi' | 'mil'
   value: number
   x: number
   y: number
+  highlightLevel?: ParameterChangeLevel
 }
 
-const Parameter: React.FC<ParameterProps> = ({ type, value, x, y }) => {
+const Parameter: React.FC<ParameterProps> = ({ type, value, x, y, highlightLevel }) => {
   let level = 1
   if (value >= 75) level = 4
   else if (value >= 50) level = 3
@@ -34,6 +36,12 @@ const Parameter: React.FC<ParameterProps> = ({ type, value, x, y }) => {
       default:
         return ''
     }
+  }
+
+  // 하이라이트 애니메이션 클래스 결정
+  const getHighlightClass = () => {
+    if (!highlightLevel || highlightLevel === 'none') return ''
+    return `highlight-${highlightLevel}`
   }
 
   const getFeedback = (type: string, value: number) => {
@@ -69,6 +77,7 @@ const Parameter: React.FC<ParameterProps> = ({ type, value, x, y }) => {
       <ParameterIcon
         $type={type}
         $level={level}
+        className={getHighlightClass()}
         src={`/parameters/${type}_${level}.png`}
         alt={`${type} parameter icon`}
       />
