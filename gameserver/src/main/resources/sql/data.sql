@@ -38,8 +38,12 @@ ALTER TABLE scenario
     ADD CONSTRAINT scenario_type_check
         CHECK (type IN ('ORIGIN', 'CONSEQUENCE', 'EVENT'));
 
--- PK 1000부터 시작
-ALTER SEQUENCE scenario_id_seq RESTART WITH 1000;
+-- PK 시퀀스 초기화:  Max(가장 마지막 번호,1000) 부터 시작
+SELECT setval(
+    'scenario_id_seq',
+    GREATEST((SELECT COALESCE(MAX(id), 0) FROM scenario), 1000) + 1,
+    false
+);
 
 
 

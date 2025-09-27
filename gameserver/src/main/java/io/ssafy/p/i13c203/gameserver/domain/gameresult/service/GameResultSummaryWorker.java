@@ -33,7 +33,7 @@ public class GameResultSummaryWorker {
 
     private static final String MODEL = "gpt-4.1";
 
-    @Async("taskExecutor")
+    @Async("aiSummaryTaskExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startAsync(Long gameId, Long gameResultId, String promptHash) {
         markProcessing(gameResultId, promptHash);
