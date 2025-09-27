@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class GameResultSummaryOrchestrator {
 
         // PENDING 문서 준비
         promptHash = normPromptHash(gameId, promptHash);
+        String finalPromptHash = promptHash;
         String subscribeUrl = String.format(SUBS_URL_FORMAT, gameId, promptHash);
         SummaryDoc pendingDoc = new SummaryDoc(SummaryStatus.PENDING, promptHash, null, subscribeUrl);
         String pendingJson = toJson(pendingDoc);
@@ -42,17 +45,31 @@ public class GameResultSummaryOrchestrator {
         // 1) 없으면 생성(원자적 삽입)
         int created = summaryRepo.insertPendingIfAbsent(grId, pendingJson);
 
-        // 2) 생성되지 않았다면, ERROR 상태일 때만 재시작
-        int restarted = (created == 0) ? summaryRepo.restartIfError(grId, pendingJson) : 0;
+        // 2) 생성되지 않았다면, ERROR 상태 또는 오래된 PENDING 상태일 때만 재시작
+        int restarted = 0;
+        if (created == 0) {
+            restarted = summaryRepo.restartIfError(grId, pendingJson);
+
+            // === 오래된 PENDING 상태 체크 ===
+            summaryRepo.findByGameResultId(grId).ifPresent(grs -> {
+                SummaryDoc summary = grs.getSummary();
+                if (summary != null
+                        && summary.status() == SummaryStatus.PENDING
+                        && grs.getUpdatedAt().isBefore(LocalDateTime.now().minusSeconds(30))) {
+                    log.warn("Restarting stuck PENDING job. gameId={}, grId={}", gameId, grId);
+                    worker.startAsync(gameId, grId, finalPromptHash);
+                }
+            });
+        }
 
         // 생성 or 재시작된 경우에만, "커밋 후" 워커/이벤트 기동
         if (created > 0 || restarted > 0) {
-            String finalPromptHash = promptHash;
             runAfterCommit(() -> {
-                log.info("Ensure job has been successfully started");
+                log.info("Ensure job has been successfully started. gameId={}, grId={}", gameId, grId);
                 eventBus.publish(gameId, SummaryStatus.PENDING);
                 worker.startAsync(gameId, grId, finalPromptHash);
             });
+            return pendingDoc;
         } else {
             log.info("No-op (already running or ready). Skip starting worker. gameId={}, grId={}", gameId, grId);
         }

@@ -13,7 +13,6 @@ import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.request.ReportQuery;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.dto.response.*;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.entity.GameResult;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.reader.GameResultReader;
-import io.ssafy.p.i13c203.gameserver.domain.gameresult.model.SummaryStatus;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.repository.GameResultRepository;
 import io.ssafy.p.i13c203.gameserver.domain.gameresult.repository.GameResultSummaryRepository;
 import io.ssafy.p.i13c203.gameserver.global.exception.ErrorCode;
@@ -30,6 +29,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * 컨텍스트/요약은 저장 테이블에서 읽고, 그래프는 히스토리 기반으로 즉시 생성한다.
@@ -82,6 +83,13 @@ public class GameResultServiceImpl implements GameResultService {
                 .context(context)
                 .build());
 
+        // ai 요약 비동기 생성 호출을 트랜잭션 커밋 이후로 미룬다
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                orchestrator.ensureJob(gameId, null);
+            }
+        });
     }
 
     @Override
@@ -110,13 +118,23 @@ public class GameResultServiceImpl implements GameResultService {
             var grId = Objects.requireNonNull(gr).getId();
             var s = summaryRepository.findByGameResultId(grId).orElse(null);
 
-            if (s != null && s.getSummary() != null && s.getSummary().status() == SummaryStatus.READY) {
-                // READY 그대로 반환
-                summaryDto = summaryDtoMapper.toReadySummary(s.getSummary());
-            } else {
-                // 없거나 PENDING/ERROR
-                summaryDto = summaryDtoMapper.toSummary(orchestrator.ensureJob(gameId, null));
+            // 요약 상태 읽기만 수행
+            if (s == null) {
+                orchestrator.ensureJob(gameId, null);
+                s = summaryRepository.findByGameResultId(grId).orElseThrow(
+                        () -> new NotFoundException(ErrorCode.NOT_FOUND, "요약을 찾을 수 없습니다. gameResultId="+grId)
+                );
             }
+            summaryDto = summaryDtoMapper.toSummary(s.getSummary());
+
+            // TODO: 미사용 주석 수거 보류
+//            if (s != null && s.getSummary() != null && s.getSummary().status() == SummaryStatus.READY) {
+//                // READY 그대로 반환
+//                summaryDto = summaryDtoMapper.toReadySummary(s.getSummary());
+//            } else {
+//                // 없거나 PENDING/ERROR
+//                summaryDto = summaryDtoMapper.toSummary(orchestrator.ensureJob(gameId, null));
+//            }
         }
 
 
