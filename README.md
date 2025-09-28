@@ -45,6 +45,7 @@
 
 ---
 ## 프로젝트 구조
+```
 S13P21C203/
 ├── data-pipeline/   # Kafka Connect 및 Spark 기반 데이터 처리 관련 코드, 스크립트
 ├── frontend/        # React + Vite 기반 웹 클라이언트 소스, 컴포넌트, 스타일, 상태관리
@@ -52,6 +53,7 @@ S13P21C203/
 ├── kubernetes/      # 배포용 YAML, 설정 파일 등 인프라 관련 구성
 ├── monitoring/      # Prometheus 설정, Grafana 대시보드 파일, 알람 관련 구성
 └── news-crawler/    # Spring Boot 기반 뉴스 수집 서비스 코드, 크롤러, 데이터 전처리
+```
 
 ---
 ## 산출물
