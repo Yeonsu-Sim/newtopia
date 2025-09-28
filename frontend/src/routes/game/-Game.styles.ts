@@ -676,7 +676,7 @@ export const TooltipText = styled.div`
   padding: 8px;
   position: absolute;
   z-index: 1;
-  bottom: 125%;
+  top: 125%;
   left: 50%;
   transform: translateX(-90%);
   opacity: 0;
