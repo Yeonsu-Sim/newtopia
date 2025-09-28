@@ -22,6 +22,9 @@ public interface ScenarioRepository extends JpaRepository<Scenario, Long> {
         , nativeQuery = true)
     Scenario findRandomEventScenario();
 
+    @Query(value = "SELECT * FROM scenario WHERE id = 7", nativeQuery = true)
+    Scenario findHardCodingEventScenario();
+
 
     @EntityGraph(attributePaths = "npc")
     @Query("""
