@@ -89,6 +89,7 @@ export const ParameterChangeWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   margin: 1rem;
+  padding-bottom: 1rem;
 
   /* 모바일 최적화 - 웹에서 크게, 모바일에서 작게 */
   @media (max-width: 768px) {
@@ -244,6 +245,7 @@ export const ParameterBox = styled.div`
 
 export const ParameterChangeBox = styled.div`
   display: flex;
+  position: relative;
   align-items: flex-end;
   justify-content: space-around;
   padding: 2rem;
@@ -639,5 +641,50 @@ export const PauseButton = styled.button`
     box-shadow:
       1px 1px 2px 1px #800000 inset,
       0px 0px 0 0px #a80000;
+  }
+`
+
+export const TooltipWrapper = styled.div`
+  position: absolute;
+  bottom: 1.5rem; 
+  right: 1.5rem;
+  display: inline-block;
+  cursor: none;
+`
+
+export const TooltipIcon = styled.span`
+  display: inline-flex;
+  justify-content: center;
+  align-items: baseline;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  border-radius: 50%;
+  background-color: #ccc;
+  color: #000;
+  font-weight: bold;
+  cursor: none;
+`
+
+export const TooltipText = styled.div`
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-90%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-family: 'PF Stardust ExtraBold', 'DNFBitBitv2', 'Noto Sans KR', sans-serif;
+
+  ${TooltipWrapper}:hover & {
+    visibility: visible;
+    opacity: 1;
   }
 `
