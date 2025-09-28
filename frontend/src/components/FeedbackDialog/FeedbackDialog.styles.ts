@@ -100,7 +100,7 @@ export const CloseButton = styled.button`
     0 4px 8px rgba(0, 0, 0, 0.4),
     inset 2px 2px 4px rgba(255, 255, 255, 0.3);
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: linear-gradient(135deg, #fcd34d, #f59e0b);
     transform: translateY(-2px) scale(1.05);
     box-shadow:
@@ -108,11 +108,24 @@ export const CloseButton = styled.button`
       inset 2px 2px 4px rgba(255, 255, 255, 0.4);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     transform: translateY(0) scale(1);
     box-shadow:
       0 2px 4px rgba(0, 0, 0, 0.3),
       inset 1px 1px 2px rgba(255, 255, 255, 0.2);
+  }
+
+  &:disabled {
+    background: linear-gradient(135deg, #999, #666);
+    border-color: #555;
+    color: #ccc;
+    text-shadow: 1px 1px 0 #333;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.1);
   }
 `
 

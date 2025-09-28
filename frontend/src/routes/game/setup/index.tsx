@@ -69,13 +69,10 @@ function GameSetupPage() {
     if (showIntroAnimation && currentTextIndex < introTexts.length) {
       const timer = setTimeout(() => {
         setCurrentTextIndex(currentTextIndex + 1)
-      }, 2000)
+      }, 1500)
       return () => clearTimeout(timer)
     } else if (showIntroAnimation && currentTextIndex >= introTexts.length) {
-      const timer = setTimeout(() => {
-        setAnimationComplete(true)
-      }, 1000)
-      return () => clearTimeout(timer)
+      setAnimationComplete(true)
     }
   }, [showIntroAnimation, currentTextIndex, introTexts.length])
 
@@ -162,6 +159,27 @@ function GameSetupPage() {
     navigate({ to: '/main' })
   }
 
+  const handleSkipAnimation = async () => {
+    if (showIntroAnimation && !animationComplete) {
+      setCurrentTextIndex(introTexts.length)
+      setAnimationComplete(true)
+
+      // API가 아직 완료되지 않았다면 완료될 때까지 기다림
+      if (isApiLoading || !gameData) {
+        // API 완료를 기다린 후 즉시 게임 시작
+        if (isApiLoading) {
+          // API 완료를 기다리는 동안 로딩 상태 유지
+          return
+        }
+      }
+
+      // API가 이미 완료되었다면 즉시 게임 시작
+      if (gameData && !isApiLoading) {
+        startGame(gameData)
+      }
+    }
+  }
+
   return (
     <SetupContainer>
       <GameBackground variant="setup" />
@@ -210,7 +228,7 @@ function GameSetupPage() {
       )}
 
       {showIntroAnimation && (
-        <IntroTextContainer>
+        <IntroTextContainer onClick={handleSkipAnimation}>
           <div>
             {introTexts.slice(0, currentTextIndex + 1).map((text, index) => (
               <IntroTextLine
@@ -234,6 +252,12 @@ function GameSetupPage() {
           {animationComplete && (isApiLoading || !gameData) && (
             <InstructionText>
               <p>시나리오 준비 중...</p>
+            </InstructionText>
+          )}
+
+          {!animationComplete && (
+            <InstructionText>
+              <p>클릭하여 건너뛰기</p>
             </InstructionText>
           )}
         </IntroTextContainer>
