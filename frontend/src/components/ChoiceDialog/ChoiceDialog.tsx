@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react'
 import { useAudio } from '@/hooks/useAudio'
 import { gameService, type HintData } from '@/services/game/gameService'
 
-import { ParameterChangeBox } from '@/routes/game/-Game.styles'
+import { 
+  ParameterChangeBox,
+  TooltipWrapper,
+  TooltipIcon,
+  TooltipText
+} from '@/routes/game/-Game.styles'
 
 import {
   DialogOverlay,
@@ -123,6 +128,17 @@ const ChoiceDialog: React.FC<ChoiceDialogProps> = ({
           value={currentStats.mil}
           highlightLevel={hoveredChoice && hints ? hints[hoveredChoice].defense : undefined}
         />
+
+        <TooltipWrapper>
+          <TooltipIcon>?</TooltipIcon>
+          <TooltipText>
+            <div>🟢 초록색: 작은 변화</div>
+            <div>🟡 노란색: 중간 변화</div>
+            <div>🔴 빨간색: 큰 변화</div>
+            <hr style={{ margin: '6px 0', border: '0.5px solid #555' }} />
+            <div>턴이 증가할수록 변화의 가중치도 커집니다.</div>
+          </TooltipText>
+        </TooltipWrapper>
       </ParameterChangeBox>
 
       <DialogBox>
