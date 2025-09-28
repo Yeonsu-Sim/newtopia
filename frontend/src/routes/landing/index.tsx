@@ -43,6 +43,25 @@ function LandingPage() {
     }
   }, [user, navigate])
 
+  // 키보드 이벤트 리스너 추가
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // initial 상태에서만 키보드 입력 처리
+      if (currentState === 'initial') {
+        // 아무 키나 누르면 다음 화면으로
+        if (event.key) {
+          handlePressStart()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [currentState])
+
   const handlePressStart = () => {
     playClickSound()
     setCurrentState('menu')

@@ -46,8 +46,8 @@ export const ModalContent = styled.div`
 
 export const CloseButton = styled.button`
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: 10px;
+  right: 10px;
   width: 40px;
   height: 40px;
   border: none;
@@ -61,10 +61,42 @@ export const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  touch-action: manipulation;
+  z-index: 30;
+
+  /* 모바일 터치 최적화 */
+  @media (max-width: 768px) {
+    width: 44px;
+    height: 44px;
+    font-size: 26px;
+    top: 8px;
+    right: 8px;
+  }
+
+  @media (max-width: 480px) {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+    top: 6px;
+    right: 6px;
+  }
 
   &:hover {
     background: rgba(0, 0, 0, 0.5);
     transform: scale(1.1);
+  }
+
+  /* 터치 디바이스에서 활성화 효과 */
+  @media (hover: none) {
+    &:hover {
+      background: rgba(0, 0, 0, 0.3);
+      transform: none;
+    }
+
+    &:active {
+      background: rgba(0, 0, 0, 0.5);
+      transform: scale(0.95);
+    }
   }
 `
 

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAuthForm } from '@/hooks/useAuthForm'
 import {
@@ -47,6 +47,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     switchMode,
     switchToLogin,
   } = useAuthForm(initialMode)
+
+  // 모달이 열릴 때마다 initialMode로 리셋
+  useEffect(() => {
+    if (isOpen) {
+      switchToLogin() // 로그인 모드로 전환하고 폼 초기화
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -135,7 +142,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onChange={(e) =>
                     handleInputChange('password', e.target.value)
                   }
-                  placeholder="비밀번호를 입력해주세요"
+                  placeholder="6자 이상의 비밀번호를 입력해주세요"
                   required
                   minLength={6}
                 />
