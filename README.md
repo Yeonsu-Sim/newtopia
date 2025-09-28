@@ -56,10 +56,10 @@ S13P21C203/
 ---
 ## 산출물
 ### ERD
-![alt text](image.png)
+![alt text](docs/image.png)
 
 ### 시스템 아키텍처
-![alt text](image-1.png)
+![alt text](docs/image-1.png)
 ### 기능 명세서
 ### 와이어 프레임
 ### API 명세서
@@ -142,7 +142,7 @@ S13P21C203/
 - Grafana
 
 ---
-## 기능 소개((gif 및 간단한 소개 넣을 예정))
+## 기능 소개
 ### 랜딩
 
 ![Image](https://github.com/user-attachments/assets/a301f488-beb3-4bb5-917f-5b45aa57fb44)
@@ -175,6 +175,9 @@ S13P21C203/
 
 ### 게임 진행
 - 온보딩
+
+![alt text](docs/게임온보딩.gif)
+
 
 - 초기 게임 시작 화면
 
