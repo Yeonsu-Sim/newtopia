@@ -16,7 +16,9 @@ public class EventScenarioServiceImpl implements EventScenarioService {
      */
     @Override
     public Scenario nextScenario() {
-        return scenarioRepository.findRandomEventScenario();
+        // TODO: HARD CODING for Presentation
+        // return scenarioRepository.findRandomEventScenario();
+        return scenarioRepository.findHardCodingEventScenario();
     }
 
 }
