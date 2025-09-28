@@ -56,7 +56,10 @@ S13P21C203/
 ---
 ## 산출물
 ### ERD
+![alt text](image.png)
+
 ### 시스템 아키텍처
+![alt text](image-1.png)
 ### 기능 명세서
 ### 와이어 프레임
 ### API 명세서
@@ -141,28 +144,65 @@ S13P21C203/
 ---
 ## 기능 소개((gif 및 간단한 소개 넣을 예정))
 ### 랜딩
+
+![Image](https://github.com/user-attachments/assets/a301f488-beb3-4bb5-917f-5b45aa57fb44)
+
 ### 로그인 및 회원가입
 - 로그인
+
+![Image](https://github.com/user-attachments/assets/9bc32389-5264-4793-ae6c-74387c73c8e8)
+
 - 회원가입
+
+![Image](https://github.com/user-attachments/assets/668801c5-f21c-4d67-b47d-30d08dd9a4f7)
 ### 메인
 - 이달의 핫토픽 뉴스
+
+![Image](https://github.com/user-attachments/assets/8cae59d2-0401-458b-8fe9-38d3b55c3b78)
 - 공지사항
+![Image](https://github.com/user-attachments/assets/7935c93f-4f15-426d-9949-f062bdcd96a7)
 - 엔딩 도감
+![Image](https://github.com/user-attachments/assets/089f901d-0e9e-4daf-ad56-9014143ba23e)
 - 건의하기
+
 - 랭킹
 ### 게임 생성
 - 새게임 생성하기
+
+![Image](https://github.com/user-attachments/assets/fe4359f3-a9d6-49f6-aef7-a770f4c5aae6)
 - 이전 게임 불러오기
+![Image](https://github.com/user-attachments/assets/5cea9c96-318d-462c-87de-896ebd225146)
+
 ### 게임 진행
 - 온보딩
+
 - 초기 게임 시작 화면
+
+![Image](https://github.com/user-attachments/assets/e6320320-7788-40c9-b496-21dbda675ec8)
 - npc&시나리오
+![Image](https://github.com/user-attachments/assets/7ed95261-4a14-4458-86ac-545e626bb3eb)
+
 - 선택지
+![Image](https://github.com/user-attachments/assets/b71a1754-e7b8-4bce-a8d3-3f6724c0a768)
+
 - 플레이어의 선택과 선택에 따른 시민 반응
+
+![Image](https://github.com/user-attachments/assets/01ce6d17-1749-4567-b0d9-6b83b3dc48a7)
+
 - 연관 뉴스 기사
+
+
+![Image](https://github.com/user-attachments/assets/9e456570-51e1-4311-a3fa-e08a5b5a03a9)
+
+
 - 선택에 따른 지표 변동 확인
+
+![Image](https://github.com/user-attachments/assets/abe51795-f6ce-4c82-b808-8d28fbab73c4)
 ### 게임 오버 및 엔딩
+![Image](https://github.com/user-attachments/assets/f11c0d24-50e4-4109-9885-7d62a4be20b4)
+
 ### 리포트
+![Image](https://github.com/user-attachments/assets/b377bd3b-5f80-455d-82a7-d6e60c57e3d0)
 
 ---
 ## 고민 및 개선 사항
