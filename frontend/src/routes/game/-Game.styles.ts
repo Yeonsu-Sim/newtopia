@@ -437,7 +437,7 @@ export const ParameterDiff = styled.span<{ $diff: number }>`
   font-size: 1.5em;
   color: ${({ $diff }) => ($diff > 0 ? '#2ecc71' : $diff < 0 ? '#e74c3c' : 'inherit')};
 
-  animation: ${floatUp} 5.0s ease-out forwards;
+  animation: ${floatUp} 8.0s ease-out forwards;
   pointer-events: none;
 `
 
