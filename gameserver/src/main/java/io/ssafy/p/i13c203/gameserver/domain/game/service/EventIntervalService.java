@@ -26,10 +26,6 @@ public class EventIntervalService {
 
     /** 이벤트 발생 여부 */
     public boolean shouldTrigger(Long gameId, int currentTurn) {
-        // TODO: HARD CODING for Presentation
-        if(currentTurn == 3) {
-            return true;
-        }
         String next = repository.findField(gameId, "nextEventTurn");
         log.debug("nextEventTurn: {} gameId: {}", next, gameId);
         if (next == null) {
