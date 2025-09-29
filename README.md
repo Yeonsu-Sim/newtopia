@@ -52,10 +52,10 @@ S13P21C203/
 ---
 ## 산출물
 ### ERD
-![alt text](docs/image.png)
+![alt text](docs/image/erd.png)
 
 ### 시스템 아키텍처
-![alt text](docs/image-1.png)
+![alt text](docs/image/아키텍쳐.png)
 
 ### 기능 명세서
 [기능 명세서](https://www.notion.so/2622d751f8b680e28f17d8961a28f70c?source=copy_link)
@@ -145,7 +145,7 @@ S13P21C203/
 ---
 ## 기능 소개
 ### 랜딩
-![Image](docs/gif/랜딩이미지.gif)
+![Image](docs/gif/landing.gif)
 
 ### 로그인 및 회원가입
 - 로그인
@@ -162,37 +162,37 @@ S13P21C203/
 ![Image](docs/gif/ending.gif)
 - 건의하기
 ![Image](docs/gif/suggestion.gif)
-
-
 - 랭킹
+![Image](docs/gif/ranking.gif)
+
 ### 게임 생성
 - 새게임 생성하기
-![Image](docs/gif/새게임.gif)
+![Image](docs/gif/game_new.gif)
 - 이전 게임 불러오기
 ![Image](docs/gif/game_origin.gif)
 
 
 ### 게임 진행
 - 온보딩
-![Image](docs/gif/게임온보딩.gif)
+![Image](docs/gif/onboarding.gif)
 - 초기 게임 시작 화면
-![Image](docs/gif/초기게임시작화면.gif)
+![Image](docs/gif/initial.gif)
 - npc&시나리오
-![Image](docs/gif/초기게임시작화면.gif)
+![Image](docs/gif/npc.gif)
 - 선택지
-![Image](docs/gif/선택지.gif)
+![Image](docs/gif/choice.gif)
 - 플레이어의 선택과 선택에 따른 시민 반응
-![Image](docs/gif/시민반응.gif)
+![Image](docs/gif/reaction.gif)
 - 연관 뉴스 기사
-![Image](docs/gif/연관뉴스기사.gif)
+![Image](docs/gif/related.gif)
 - 선택에 따른 지표 변동 확인
-![Image](docs/gif/지표변화.gif)
+![Image](docs/gif/change.gif)
 
 ### 게임 오버 및 엔딩
-![Image](docs/gif/게임오버1.gif)
+![Image](docs/gif/gameover.gif)
 
 ### 리포트
-![Image](docs/gif/게임오버리포트.gif)
+![Image](docs/gif/report.gif)
 
 ---
 ## 고민 및 개선 사항
