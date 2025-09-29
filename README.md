@@ -23,12 +23,6 @@
 2025.09.01.~2025.09.29.(약 4주)
 
 ---
-
-((## 프로젝트 목표
-뉴스 기반 로그라이크 게임 제작, 뉴스 소비와 재미 결합))
-((뺄듯합니다))
-
----
 ## 프로젝트 특장점
 - 뉴스 소비를 게임화하여 자연스럽게 학습 및 재미 제공
 - 실제 데이터 기반 시나리오 구성
@@ -62,9 +56,14 @@ S13P21C203/
 
 ### 시스템 아키텍처
 ![alt text](docs/image-1.png)
+
 ### 기능 명세서
+[기능 명세서](https://www.notion.so/2622d751f8b680e28f17d8961a28f70c?source=copy_link)
+
 ### 와이어 프레임
+
 ### API 명세서
+[API 명세서](https://www.notion.so/API-2642d751f8b680ffa612d7b8488cedfa)
 
 ---
 ## 개발환경
@@ -102,7 +101,7 @@ S13P21C203/
 
 ---
 ## 기술 스택
-###Backend
+### Backend
 - Spring Boot 3.5.5 (Tomcat)
 - Spring Boot 3.4.9 (Netty)
 - Spring Security
@@ -146,85 +145,51 @@ S13P21C203/
 ---
 ## 기능 소개
 ### 랜딩
-
 ![Image](docs/gif/초기게임시작화면.gif)
 
 ### 로그인 및 회원가입
 - 로그인
 ![Image](docs/gif/login.gif)
-
 - 회원가입
 ![Image](docs/gif/signup.gif)
 
-
-
 ### 메인
 - 이달의 핫토픽 뉴스
-
-
 ![Image](docs/gif/hottopic.gif)
-
 - 공지사항
-
 ![Image](docs/gif/notice.gif)
-
-
 - 엔딩 도감
-
 ![Image](docs/gif/ending.gif)
-
-
-
 - 건의하기
-
 ![Image](docs/gif/suggestion.gif)
 
 
 - 랭킹
 ### 게임 생성
 - 새게임 생성하기
-
 ![Image](docs/gif/새게임.gif)
-
 - 이전 게임 불러오기
 ![Image](docs/gif/game_origin.gif)
 
 
 ### 게임 진행
 - 온보딩
-
-![alt text](docs/게임온보딩.gif)
-
-
+![Image](docs/gif/게임온보딩.gif)
 - 초기 게임 시작 화면
-
 ![Image](docs/gif/초기게임시작화면.gif)
-
 - npc&시나리오
 ![Image](docs/gif/초기게임시작화면.gif)
-
-
 - 선택지
 ![Image](docs/gif/선택지.gif)
-
-
 - 플레이어의 선택과 선택에 따른 시민 반응
 ![Image](docs/gif/시민반응.gif)
-
-
-
 - 연관 뉴스 기사
 ![Image](docs/gif/연관뉴스기사.gif)
-
-
 - 선택에 따른 지표 변동 확인
 ![Image](docs/gif/지표변화.gif)
 
-
-
 ### 게임 오버 및 엔딩
 ![Image](docs/gif/게임오버1.gif)
-
 
 ### 리포트
 ![Image](docs/gif/게임오버리포트.gif)
@@ -261,7 +226,7 @@ S13P21C203/
 - Prometheus 및 Grafana 기반 모니터링으로 서버 상태, 게임 지표, 이벤트 처리 상황 실시간 확인
 
 ---
-## 결과 공유((추가 예정))
+## 결과 공유
 ### mvp 1차
 게임 기능
 건의사항
