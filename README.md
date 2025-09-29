@@ -247,3 +247,29 @@ S13P21C203/
 
 ---
 ## 멤버 소개
+<div>
+  <markdown-accessiblity-table data-catalyst="">
+    <table border="1">
+      <thead>
+        <tr>
+          <th>문영호</th>
+          <th>방준엽</th>
+          <th>심연수</th>
+          <th>진덕종</th>
+          <th>최훈석</th>
+          <th>한지우</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><img src="./docs/image/문.png" alt="문영호" style="height:80px; width:auto;"></td>
+          <td><img src="./docs/image/방.png" alt="방준엽" style="height:80px; width:auto;"></td>
+          <td><img src="./docs/image/심.png" alt="심연수" style="height:80px; width:auto;"></td>
+          <td><img src="./docs/image/진.png" alt="진덕종" style="height:80px; width:auto;"></td>
+          <td><img src="./docs/image/최.png" alt="최훈석" style="height:80px; width:auto;"></td>
+          <td><img src="./docs/image/한.png" alt="한지우" style="height:80px; width:auto;"></td>
+        </tr>
+      </tbody>
+    </table>
+  </markdown-accessiblity-table>
+</div>
