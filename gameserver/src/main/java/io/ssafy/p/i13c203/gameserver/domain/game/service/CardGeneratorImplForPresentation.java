@@ -26,7 +26,9 @@ public class CardGeneratorImplForPresentation implements CardGenerator {
     @Override
     public CardDoc createFirstCard(Long memberId) {
         // 첫 시나리오 선택은 ScenarioService가 담당
-        var sc = scenarioService.firstScenario(memberId);
+        //var sc = scenarioService.firstScenario(memberId);
+
+        Scenario sc = scenarioServiceForPresentation.getFirst();
         return CardDoc.from(sc);
     }
 
