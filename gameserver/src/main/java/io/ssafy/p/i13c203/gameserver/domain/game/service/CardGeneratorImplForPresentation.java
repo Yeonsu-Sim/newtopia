@@ -28,7 +28,12 @@ public class CardGeneratorImplForPresentation implements CardGenerator {
         // 첫 시나리오 선택은 ScenarioService가 담당
         //var sc = scenarioService.firstScenario(memberId);
 
-        Scenario sc = scenarioServiceForPresentation.getFirst();
+        if(memberId == 3){
+            Scenario sc = scenarioServiceForPresentation.getFirst();
+            return CardDoc.from(sc);
+        }
+
+        var sc = scenarioService.firstScenario(memberId);
         return CardDoc.from(sc);
     }
 
