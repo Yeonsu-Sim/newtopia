@@ -33,7 +33,7 @@ const Parameter: React.FC<ParameterProps> = ({ type, value, x, y, highlightLevel
       setDiff(value - prevValue.current)
       prevValue.current = value
 
-      const timer = setTimeout(() => setDiff(null), 1500)
+      const timer = setTimeout(() => setDiff(null), 20000)
       return () => clearTimeout(timer)
     }
   }, [value])
