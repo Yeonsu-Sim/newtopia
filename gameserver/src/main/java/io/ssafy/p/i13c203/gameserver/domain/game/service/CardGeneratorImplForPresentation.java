@@ -41,14 +41,14 @@ public class CardGeneratorImplForPresentation implements CardGenerator {
 
         // TODO: HARD CODING for Presentation
         // 첫번째 시나리오
-        if(memberId == 2 && currentTurn == 1){
+        if(memberId == 3 && currentTurn == 1){
             Scenario sc = scenarioServiceForPresentation.getFirst();
 
             return CardDoc.from(sc);
         }
 
         // 두번째 시나리오
-        if(memberId == 2 && currentTurn == 2){
+        if(memberId == 3 && currentTurn == 2){
             Scenario sc = scenarioServiceForPresentation.getSecond();
             return CardDoc.from(sc);
         }
@@ -56,7 +56,7 @@ public class CardGeneratorImplForPresentation implements CardGenerator {
 
 
         // 시연용 3.  memberId 라면 무조건 하드코딩된 이벤트로 가야함
-        if(memberId == 2 && currentTurn == 3){
+        if(memberId == 3 && currentTurn == 3){
             // 이벤트 시나리오임
             var sc = eventScenarioService.nextScenarioForPresentation();
 
