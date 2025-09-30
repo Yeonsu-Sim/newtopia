@@ -8,4 +8,7 @@ public interface EventScenarioService {
      * 다음 이벤트 시나리오를 선별한다.
      */
     Scenario nextScenario();
+
+    Scenario nextScenarioForPresentation();
+
 }
