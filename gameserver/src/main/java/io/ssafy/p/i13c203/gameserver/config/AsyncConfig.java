@@ -23,18 +23,4 @@ public class AsyncConfig {
         return executor;
     }
 
-    /**
-     * Spring MVC 비동기 응답용 Executor (SSE 등)
-     */
-    @Bean(name = "mvcAsyncTaskExecutor")
-    public ThreadPoolTaskExecutor mvcAsyncTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setThreadNamePrefix("mvc-async-");
-        executor.setCorePoolSize(4);   // 코어 수 정도면 충분
-        executor.setMaxPoolSize(8);
-        executor.setQueueCapacity(50);
-        executor.setKeepAliveSeconds(30);
-        executor.initialize();
-        return executor;
-    }
 }
