@@ -17,6 +17,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 
 @Slf4j
@@ -34,21 +36,29 @@ public class GameResultSummaryWorker {
     private static final String MODEL = "gpt-4.1";
 
     @Async("aiSummaryTaskExecutor")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startAsync(Long gameId, Long gameResultId, String promptHash) {
         markProcessing(gameResultId, promptHash);
-        try {
-            var entries = historyReader.readTop10Turns(gameId);
-            var system = promptBuilder.systemPrompt();
-            var user   = promptBuilder.userPrompt(entries);
-            var text   = openAiClient.chatCompletion(MODEL, system, user);
-            var sections = parser.parse(text);
-            markReady(gameResultId, promptHash, sections);
-            eventBus.publish(gameId, SummaryStatus.READY);
-        } catch (Exception e) {
-            markError(gameResultId, promptHash);
-            eventBus.publish(gameId, SummaryStatus.ERROR);
-        }
+
+        var entries = historyReader.readTop10Turns(gameId);
+        var system  = promptBuilder.systemPrompt();
+        var user    = promptBuilder.userPrompt(entries);
+
+        openAiClient.chatCompletionAsync(MODEL, system, user)
+                .flatMap(text -> Mono.fromCallable(() -> {
+                    var sections = parser.parse(text);
+                    markReady(gameResultId, promptHash, sections);
+                    eventBus.publish(gameId, SummaryStatus.READY);
+                    return sections;
+                }).subscribeOn(Schedulers.boundedElastic()))
+                .doOnError(e -> {
+                    log.error("AI 요약 생성 실패. gameId={}", gameId, e);
+                    Mono.fromCallable(() -> {
+                        markError(gameResultId, promptHash);
+                        eventBus.publish(gameId, SummaryStatus.ERROR);
+                        return null;
+                    }).subscribeOn(Schedulers.boundedElastic()).subscribe();
+                })
+                .subscribe();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

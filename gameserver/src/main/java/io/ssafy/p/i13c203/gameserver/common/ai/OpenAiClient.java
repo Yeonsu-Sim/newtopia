@@ -1,5 +1,6 @@
 package io.ssafy.p.i13c203.gameserver.common.ai;
 
+import reactor.core.publisher.Mono;
 
 /**
  * GMS Open AI 호출 유틸리티
@@ -7,11 +8,13 @@ package io.ssafy.p.i13c203.gameserver.common.ai;
 public interface OpenAiClient {
 
     /**
-     * Open AI 모델 api 호출
-     * @param model: 대상 모델
-     * @param systemPrompt: 행동 지침 프롬프트
-     * @param userPrompt: 입력 데이터 프롬프트
-     * @return
+     * Open AI 모델 api 호출 (블로킹)
      */
     String chatCompletion(String model, String systemPrompt, String userPrompt);
+
+    /**
+     * Open AI 모델 api 호출 (논블로킹, Mono 반환)
+     * 예외는 Mono.error()로 전파됨
+     */
+    Mono<String> chatCompletionAsync(String model, String systemPrompt, String userPrompt);
 }

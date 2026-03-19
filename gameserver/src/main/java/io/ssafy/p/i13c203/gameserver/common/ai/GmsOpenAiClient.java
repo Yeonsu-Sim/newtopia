@@ -8,7 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GmsOpenAiClient implements OpenAiClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final WebClient webClient = WebClient.builder().build();
     private final ObjectMapper objectMapper;
 
     @Value("${ssafy.gms.base-url}")
@@ -38,68 +39,68 @@ public class GmsOpenAiClient implements OpenAiClient {
 
     @Override
     public String chatCompletion(String model, String systemPrompt, String userPrompt) {
+        try {
+            return chatCompletionAsync(model, systemPrompt, userPrompt).block();
+        } catch (Exception e) {
+            log.error("GPT API 호출 중 오류 발생", e);
+            return null;
+        }
+    }
 
-        String url = baseUrl + chatCompletionsPath; // ** 중복 붙지 않게 엄격히 관리 **
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        if (!isBlank(bearerToken)) headers.setBearerAuth(bearerToken);
-        if (!isBlank(apiKey)) headers.set("X-API-KEY", apiKey);
-        headers.set("User-Agent", "Gameserver/1.0");
-        headers.set("Accept", "application/json");
+    @Override
+    public Mono<String> chatCompletionAsync(String model, String systemPrompt, String userPrompt) {
+        String url = baseUrl + chatCompletionsPath;
 
         Map<String, Object> requestBody = Map.of(
                 "model", model,
                 "messages", List.of(
                         Map.of("role", "system", "content", systemPrompt),
                         Map.of("role", "user",   "content", userPrompt)
-                                   )
-                                                );
+                )
+        );
 
-        // ==== 요청 로그 (마스킹) ====
-        log.info("[GMS] POST {}", url);
-        log.info("[GMS] headers: {}", maskedHeaders(headers));
         String reqJson = Jsons.toJson(requestBody);
+
+        // ==== 요청 로그 ====
+        log.info("[GMS] POST {}", url);
         log.info("[GMS] req.length={} body={}", reqJson.length(), truncate(reqJson, logPreviewLen));
 
-        HttpEntity<String> request = new HttpEntity<>(reqJson, headers);
+        return webClient.post()
+                .uri(url)
+                .headers(h -> {
+                    h.setContentType(MediaType.APPLICATION_JSON);
+                    if (!isBlank(bearerToken)) h.setBearerAuth(bearerToken);
+                    if (!isBlank(apiKey))      h.set("X-API-KEY", apiKey);
+                    h.set("User-Agent", "Gameserver/1.0");
+                    h.set("Accept", "application/json");
+                })
+                .bodyValue(reqJson)
+                .retrieve()
+                .onStatus(status -> !status.is2xxSuccessful(), resp ->
+                        Mono.error(new RuntimeException("GPT API 호출 실패: " + resp.statusCode()))
+                )
+                .bodyToMono(String.class)
+                .map(responseBody -> {
+                    try {
+                        JsonNode responseJson = objectMapper.readTree(responseBody);
 
-        try {
+                        // 토큰 사용량 로깅
+                        if (responseJson.has("usage")) {
+                            JsonNode usage = responseJson.path("usage");
+                            log.info("=== 토큰 사용량 ===");
+                            log.info("프롬프트 토큰: {}", usage.path("prompt_tokens").asInt());
+                            log.info("응답 토큰: {}", usage.path("completion_tokens").asInt());
+                            log.info("총 토큰: {}", usage.path("total_tokens").asInt());
+                        }
 
-            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+                        String content = responseJson.path("choices").get(0).path("message").path("content").asText();
+                        log.info("Message Content: {}", content);
+                        return content;
 
-            if (response.getStatusCode().is2xxSuccessful()) {
-                JsonNode responseJson = objectMapper.readTree(response.getBody());
-
-                // 토큰 사용량 로깅
-                if (responseJson.has("usage")) {
-                    JsonNode usage = responseJson.path("usage");
-                    int promptTokens = usage.path("prompt_tokens").asInt();
-                    int completionTokens = usage.path("completion_tokens").asInt();
-                    int totalTokens = usage.path("total_tokens").asInt();
-
-                    log.info("=== 토큰 사용량 ===");
-                    log.info("프롬프트 토큰: {}", promptTokens);
-                    log.info("응답 토큰: {}", completionTokens);
-                    log.info("총 토큰: {}", totalTokens);
-                }
-
-//                log.info("Response: {}", response.getBody());
-
-                String content = responseJson.path("choices").get(0).path("message").path("content").asText();
-                log.info("Message Content: {}", content);
-
-                return content;
-
-            } else {
-                log.error("GPT API 호출 실패: {}", response.getStatusCode());
-                return null;
-            }
-
-        } catch (Exception e) {
-            log.error("GPT API 호출 중 오류 발생", e);
-            return null;
-        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("GPT 응답 파싱 실패", e);
+                    }
+                });
     }
 
 
@@ -108,13 +109,5 @@ public class GmsOpenAiClient implements OpenAiClient {
     private static String truncate(String s, int n) {
         if (s == null) return null;
         return s.length() <= n ? s : s.substring(0, n) + "...(truncated)";
-    }
-
-    private static String maskedHeaders(HttpHeaders h) {
-        HttpHeaders c = new HttpHeaders();
-        c.putAll(h);
-        if (c.containsKey(HttpHeaders.AUTHORIZATION)) c.set(HttpHeaders.AUTHORIZATION, "Bearer ****");
-        if (c.containsKey("X-API-KEY")) c.set("X-API-KEY", "****");
-        return c.toString();
     }
 }

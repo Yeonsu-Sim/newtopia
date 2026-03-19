@@ -10,8 +10,6 @@ import io.ssafy.p.i13c203.gameserver.domain.gameresult.repository.GameResultSumm
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -30,7 +28,6 @@ public class GameResultSummaryOrchestrator {
 
     private static final String SUBS_URL_FORMAT = "/api/v1/game-results/%s/report/summary/stream?promptHash=%s";
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public SummaryDoc ensureJob(Long gameId, String promptHash) {
         Long grId = gameResultRepo.findByGameId(gameId).orElseThrow().getId();
 
