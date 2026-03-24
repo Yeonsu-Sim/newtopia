@@ -118,23 +118,11 @@ public class GameResultServiceImpl implements GameResultService {
             var grId = Objects.requireNonNull(gr).getId();
             var s = summaryRepository.findByGameResultId(grId).orElse(null);
 
-            // 요약 상태 읽기만 수행
             if (s == null) {
-                orchestrator.ensureJob(gameId, null);
-                s = summaryRepository.findByGameResultId(grId).orElseThrow(
-                        () -> new NotFoundException(ErrorCode.NOT_FOUND, "요약을 찾을 수 없습니다. gameResultId="+grId)
-                );
+                summaryDto = summaryDtoMapper.toSummary(orchestrator.ensureJob(gameId, null));
+            } else {
+                summaryDto = summaryDtoMapper.toSummary(s.getSummary());
             }
-            summaryDto = summaryDtoMapper.toSummary(s.getSummary());
-
-            // TODO: 미사용 주석 수거 보류
-//            if (s != null && s.getSummary() != null && s.getSummary().status() == SummaryStatus.READY) {
-//                // READY 그대로 반환
-//                summaryDto = summaryDtoMapper.toReadySummary(s.getSummary());
-//            } else {
-//                // 없거나 PENDING/ERROR
-//                summaryDto = summaryDtoMapper.toSummary(orchestrator.ensureJob(gameId, null));
-//            }
         }
 
 
