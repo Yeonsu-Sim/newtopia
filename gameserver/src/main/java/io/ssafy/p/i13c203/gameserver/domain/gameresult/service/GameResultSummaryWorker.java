@@ -38,6 +38,7 @@ public class GameResultSummaryWorker {
     @Async("aiSummaryTaskExecutor")
     public void startAsync(Long gameId, Long gameResultId, String promptHash) {
         markProcessing(gameResultId, promptHash);
+        eventBus.publish(gameId, SummaryStatus.PROCESSING);
 
         var entries = historyReader.readTop10Turns(gameId);
         var system  = promptBuilder.systemPrompt();
@@ -67,9 +68,8 @@ public class GameResultSummaryWorker {
                 () -> new NotFoundException(ErrorCode.NOT_FOUND, "Game Result Id: " + grId)
         );
         row.setSummary(new SummaryDoc(SummaryStatus.PROCESSING, ph, null, row.getSummary().subscribeUrl()));
-        summaryRepo.saveAndFlush(row);
+        summaryRepo.save(row);
         log.info("Mark processing for Game Result Id: {}", grId);
-        eventBus.publish(row.getGameResultId(), SummaryStatus.PROCESSING);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -78,7 +78,7 @@ public class GameResultSummaryWorker {
                 () -> new NotFoundException(ErrorCode.NOT_FOUND, "Game Result Id: " + grId)
         );
         row.setSummary(new SummaryDoc(SummaryStatus.READY, ph, sections, row.getSummary().subscribeUrl()));
-        summaryRepo.saveAndFlush(row);
+        summaryRepo.save(row);
         log.info("Mark ready for Game Result Id: {}", grId);
     }
 
@@ -88,7 +88,7 @@ public class GameResultSummaryWorker {
                 () -> new NotFoundException(ErrorCode.NOT_FOUND, "Game Result Id: " + grId)
         );
         row.setSummary(new SummaryDoc(SummaryStatus.ERROR, ph, null, row.getSummary().subscribeUrl()));
-        summaryRepo.saveAndFlush(row);
+        summaryRepo.save(row);
         log.info("Mark error for Game Result Id: {}", grId);
     }
 }
